@@ -4,7 +4,7 @@ import android.graphics.Bitmap;
 
 import androidx.annotation.Nullable;
 
-import com.example.surveymaster.objects.Survey;
+import com.example.aspp.objects.Survey;
 
 import java.util.ArrayList;
 
