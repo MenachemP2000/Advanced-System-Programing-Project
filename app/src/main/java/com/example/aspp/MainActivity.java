@@ -2,23 +2,50 @@ package com.example.aspp;
 
 import android.os.Bundle;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+
+import com.example.aspp.fragments.ActiveSurveysFragment;
+import com.example.aspp.fragments.AvailableSurveysFragment;
+import com.example.aspp.fragments.ProfileFragment;
+import com.example.aspp.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
+
+    ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
+        binding.bottomNavbar.getMenu().findItem(R.id.ava_surveys).setChecked(true);
+
+        switchFragment(new AvailableSurveysFragment());
+
+        binding.bottomNavbar.setOnItemSelectedListener(item -> {
+
+            if (item.getItemId() == R.id.ava_surveys){
+                switchFragment(new AvailableSurveysFragment());
+
+            } else if (item.getItemId() == R.id.my_surveys) {
+                switchFragment(new ActiveSurveysFragment());
+
+            } else {
+                switchFragment(new ProfileFragment());
+            }
+            return true;
         });
     }
+
+    private void switchFragment(Fragment f){
+
+        FragmentManager fm = getSupportFragmentManager();
+        fm.beginTransaction()
+                .replace(R.id.fragmentContainer, f, null)
+                .commit();
+    }
+
 }

@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="blue">#1D95FF</color>
+    <color name="dark_blue">#004480</color>
+    <color name="transparent_green" tools:ignore="MissingDefaultResource">#1A24CDCD</color>
+    <color name="green" tools:ignore="MissingDefaultResource">#24CDCD</color>
+    <color name="transparent_dark_green" tools:ignore="MissingDefaultResource">#1A179191</color>
+    <color name="dark_green" tools:ignore="MissingDefaultResource">#179191</color>
+
 </resources>
