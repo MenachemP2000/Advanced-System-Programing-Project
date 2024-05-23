@@ -3,13 +3,13 @@ package com.example.aspp;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-import com.example.aspp.fragments.ActiveSurveysFragment;
-import com.example.aspp.fragments.AvailableSurveysFragment;
+import com.example.aspp.fragments.ShortsFragment;
+import com.example.aspp.fragments.HomeFragment;
 import com.example.aspp.fragments.ProfileFragment;
 import com.example.aspp.databinding.ActivityMainBinding;
+import com.example.aspp.fragments.SubscriptionsFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,26 +21,31 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        binding.bottomNavbar.getMenu().findItem(R.id.ava_surveys).setChecked(true);
+        binding.bottomNavbar.getMenu().findItem(R.id.home).setChecked(true);
 
-        switchFragment(new AvailableSurveysFragment());
+        switchFragment(new HomeFragment());
 
         binding.bottomNavbar.setOnItemSelectedListener(item -> {
 
-            if (item.getItemId() == R.id.ava_surveys){
-                switchFragment(new AvailableSurveysFragment());
+            if (item.getItemId() == R.id.home){
+                switchFragment(new HomeFragment());
 
-            } else if (item.getItemId() == R.id.my_surveys) {
-                switchFragment(new ActiveSurveysFragment());
+            } else if (item.getItemId() == R.id.shorts) {
+                switchFragment(new ShortsFragment());
 
-            } else {
+            }
+            else if (item.getItemId() == R.id.subscriptions) {
+                switchFragment(new SubscriptionsFragment());
+
+            }
+            else {
                 switchFragment(new ProfileFragment());
             }
             return true;
         });
     }
 
-    private void switchFragment(Fragment f){
+    private void switchFragment(androidx.fragment.app.Fragment f){
 
         FragmentManager fm = getSupportFragmentManager();
         fm.beginTransaction()
