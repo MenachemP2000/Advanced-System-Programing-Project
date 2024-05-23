@@ -1,8 +1,10 @@
 package com.example.aspp.fragments;
 
+import android.app.Dialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -17,22 +19,28 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.example.aspp.MainActivity;
 import com.example.aspp.R;
 import com.example.aspp.adapters.HomeRVAdapter;
-import com.example.aspp.objects.Survey;
+import com.example.aspp.objects.Video;
 import com.example.aspp.objects.User;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -47,7 +55,7 @@ public class HomeFragment extends Fragment {
 
     RecyclerView surveyListContainer;
     HomeRVAdapter adp;
-    ArrayList<Survey> surveysList;
+    ArrayList<Video> surveysList;
     Toolbar toolbar;
     MenuItem menuItem;
     SearchView searchView;
@@ -126,10 +134,10 @@ public class HomeFragment extends Fragment {
             surveyListContainer.setAdapter(adp);
             return;
         }
-        ArrayList<Survey> updatedArr = new ArrayList<>();
-        Set<Survey> updatedSet = new HashSet<>();
+        ArrayList<Video> updatedArr = new ArrayList<>();
+        Set<Video> updatedSet = new HashSet<>();
         if (filters.get("Author")) {
-            for (Survey s : surveysList) {
+            for (Video s : surveysList) {
                 if (s.getFirst_name().startsWith(query))
                     updatedSet.add(s);
                 if (s.getLast_name().startsWith(query))
@@ -137,19 +145,19 @@ public class HomeFragment extends Fragment {
             }
         }
         if (filters.get("Length")) {
-            for (Survey s : surveysList) {
+            for (Video s : surveysList) {
                 if (s.getTime() <= Integer.parseInt(query))
                     updatedSet.add(s);
             }
         }
         if (filters.get("Reward")) {
-            for (Survey s : surveysList) {
+            for (Video s : surveysList) {
                 if (s.getSurvey_reward() >= Integer.parseInt(query))
                     updatedSet.add(s);
             }
         }
         if (filters.get("S_name")) {
-            for (Survey s : surveysList) {
+            for (Video s : surveysList) {
                 if (s.getSurvey_name().startsWith(query))
                     updatedSet.add(s);
             }
@@ -227,14 +235,122 @@ public class HomeFragment extends Fragment {
     private void demoSurveys() {
         for (int i = 1; i <= 20; i++) {
             surveysList.add(
-                    new Survey(i,
+                    new Video(i,
                             new User(
-                                    "Harel", "hevrony", "self Employed",
-                                    "PhD", "male", 34, null
-                            ),
+                                    "Harel", "hevrony", LocalDateTime.now(), null),
                             "Demo " + i, 7 * i - 3, i / 2, LocalDateTime.of(2024, 1, i, 6, 29, 30)
                     )
             );
         }
+    }
+
+    public static void showBottomDialog(Context context) {
+
+        final Dialog dialog = new Dialog(context);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.bottom_sheet_layout);
+
+        LinearLayout layout_download = dialog.findViewById(R.id.layout_download);
+        layout_download.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                dialog.dismiss();
+                Toast.makeText(context,"Upload a Video is clicked",Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+        LinearLayout layout_not_interested = dialog.findViewById(R.id.layout_not_interested);
+        layout_not_interested.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                dialog.dismiss();
+                Toast.makeText(context,"Create a short is Clicked",Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+        LinearLayout layout_not_recommend = dialog.findViewById(R.id.layout_not_recommend);
+        layout_not_recommend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                dialog.dismiss();
+                Toast.makeText(context,"Go live is Clicked",Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+        LinearLayout layout_playlist = dialog.findViewById(R.id.layout_playlist);
+        layout_playlist.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                dialog.dismiss();
+                Toast.makeText(context,"Go live is Clicked",Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+        LinearLayout layout_queue = dialog.findViewById(R.id.layout_queue);
+        layout_queue.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                dialog.dismiss();
+                Toast.makeText(context,"Go live is Clicked",Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+        LinearLayout layout_report = dialog.findViewById(R.id.layout_report);
+        layout_report.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                dialog.dismiss();
+                Toast.makeText(context,"Go live is Clicked",Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+        LinearLayout layout_watch_later = dialog.findViewById(R.id.layout_watch_later);
+        layout_watch_later.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                dialog.dismiss();
+                Toast.makeText(context,"Go live is Clicked",Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+        LinearLayout layout_share = dialog.findViewById(R.id.layout_share);
+        layout_share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                dialog.dismiss();
+                Toast.makeText(context,"Share is Clicked",Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+        ImageView cancelButton = dialog.findViewById(R.id.cancelButton);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+        dialog.getWindow().setGravity(Gravity.BOTTOM);
+
     }
 }

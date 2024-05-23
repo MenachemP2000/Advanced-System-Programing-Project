@@ -11,18 +11,19 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.aspp.R;
-import com.example.aspp.objects.Survey;
+import com.example.aspp.fragments.HomeFragment;
+import com.example.aspp.objects.Video;
 
 import java.util.ArrayList;
 
 public class HomeRVAdapter extends RecyclerView.Adapter<HomeRVAdapter.MyViewHolder> {
 
     Context context;
-    ArrayList<Survey> surveys;
+    ArrayList<Video> videos;
     int pos;
-    public HomeRVAdapter(Context context, ArrayList<Survey> surveys) {
+    public HomeRVAdapter(Context context, ArrayList<Video> videos) {
         this.context = context;
-        this.surveys = surveys;
+        this.videos = videos;
     }
 
     @NonNull
@@ -37,7 +38,7 @@ public class HomeRVAdapter extends RecyclerView.Adapter<HomeRVAdapter.MyViewHold
     @Override
     public void onBindViewHolder(@NonNull HomeRVAdapter.MyViewHolder holder, int position) {
 //        holder.id.setText(surveys.get(position).get_id() + "");
-        holder.surveyName.setText(surveys.get(position).getSurvey_name());
+        holder.surveyName.setText(videos.get(position).getSurvey_name());
 //        holder.surveyReward.setText(surveys.get(position).getSurvey_reward() + " Coins");
 //        holder.profilePic.setImageBitmap(surveys.get(position).getProfilePic());
         holder.v.setOnClickListener(new View.OnClickListener() {
@@ -46,12 +47,19 @@ public class HomeRVAdapter extends RecyclerView.Adapter<HomeRVAdapter.MyViewHold
 
             }
         });
+        holder.v.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                HomeFragment.showBottomDialog(context);
+                return true;
+            }
+        });
 
     }
 
     @Override
     public int getItemCount() {
-        return surveys.size();
+        return videos.size();
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {

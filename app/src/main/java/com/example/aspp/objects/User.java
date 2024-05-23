@@ -4,26 +4,20 @@ import android.graphics.Bitmap;
 
 import androidx.annotation.Nullable;
 
-import com.example.aspp.objects.Survey;
-
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class User {
-    private String first_name, last_name, occupation, level_of_education, sex;
-    private int age;
-    private ArrayList <Survey> published_surveys, participated_surveys;
+    private String first_name, last_name;
+    private LocalDateTime date_of_creation;
+    private ArrayList <Video> published_videos;
     Bitmap profilePic;
 
-    public User(String first_name, String last_name, String occupation, String level_of_education, String sex, int age,
-                @Nullable Bitmap profilePic) {
+    public User(String first_name, String last_name, LocalDateTime date_of_creation, @Nullable Bitmap profilePic) {
         this.first_name = first_name;
         this.last_name = last_name;
-        this.sex = sex;
-        this.occupation = occupation;
-        this.level_of_education = level_of_education;
-        this.age = age;
-        this.published_surveys = new ArrayList<>();
-        this.participated_surveys = new ArrayList<>();
+        this.date_of_creation = date_of_creation;
+        this.published_videos = new ArrayList<>();
         this.profilePic = profilePic;
     }
 
@@ -35,28 +29,8 @@ public class User {
         return last_name;
     }
 
-    public String getOccupation() {
-        return occupation;
-    }
-
-    public String getLevel_of_education() {
-        return level_of_education;
-    }
-
-    public String getSex() {
-        return sex;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public ArrayList<Survey> getPublished_surveys() {
-        return published_surveys;
-    }
-
-    public ArrayList<Survey> getParticipated_surveys() {
-        return participated_surveys;
+    public ArrayList<Video> getPublished_surveys() {
+        return published_videos;
     }
 
     public Bitmap getProfilePic() throws NullPointerException {

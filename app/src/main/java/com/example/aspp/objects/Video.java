@@ -5,13 +5,14 @@ import android.os.Build;
 
 import java.time.LocalDateTime;
 
-public class Survey {
+public class Video {
     private User author;
     private String survey_name, survey_des;
     private int survey_reward, time_in_minutes, id, rating, answers;
+    private double duration;
     private LocalDateTime date_of_publish;
 
-    public Survey(int id, User author, String survey_name, int survey_reward, int time_in_minutes, LocalDateTime date_of_publish) {
+    public Video(int id, User author, String survey_name, int survey_reward, int time_in_minutes, LocalDateTime date_of_publish) {
         this.rating = 0;
         this.answers = 0;
         this.author = author;
@@ -25,7 +26,7 @@ public class Survey {
         }
     }
 
-    public Survey(int id, User author, String survey_name, String survey_des, int survey_reward, int time_in_minutes, LocalDateTime date_of_publish) {
+    public Video(int id, User author, String survey_name, String survey_des, int survey_reward, int time_in_minutes, LocalDateTime date_of_publish) {
         this.author = author;
         this.survey_name = survey_name;
         this.survey_des = survey_des;
@@ -36,7 +37,7 @@ public class Survey {
         this.answers = 0;
     }
 
-    public Survey(int id, User author, String survey_name, int survey_reward, int time_in_minutes) {
+    public Video(int id, User author, String survey_name, int survey_reward, int time_in_minutes) {
         this.author = author;
         this.survey_name = survey_name;
         this.survey_reward = survey_reward;
@@ -45,7 +46,7 @@ public class Survey {
         this.answers = 0;
     }
 
-    public Survey(int id, User author, String survey_name, String survey_des, int survey_reward, int time_in_minutes) {
+    public Video(int id, User author, String survey_name, String survey_des, int survey_reward, int time_in_minutes) {
         this.author = author;
         this.survey_name = survey_name;
         this.survey_des = survey_des;
@@ -61,10 +62,6 @@ public class Survey {
 
     public String getLast_name() {
         return author.getLast_name();
-    }
-
-    public String getOccupation() {
-        return author.getOccupation();
     }
 
     public String getSurvey_name() {
