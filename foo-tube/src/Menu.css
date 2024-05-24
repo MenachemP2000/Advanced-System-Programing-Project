@@ -1,0 +1,38 @@
+
+
+.Menu {
+    position: fixed;
+    top: 60px; 
+    left: 0;
+    width: 250px;
+    height: calc(100% - 60px); 
+    background-color: inherit;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    transition: transform 0.3s ease;
+    transform: translateX(-100%);
+  }
+  
+  .Menu.open {
+    transform: translateX(0);
+  }
+  
+  .Menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .Menu ul li {
+    padding: 15px;
+  }
+  
+  .Menu ul li a {
+    color: inherit;
+    text-decoration: none;
+  }
+  
+  .Menu ul li a:hover {
+    text-decoration: underline;
+  }
+  
