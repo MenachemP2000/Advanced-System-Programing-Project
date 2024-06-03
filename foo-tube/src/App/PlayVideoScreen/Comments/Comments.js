@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Comments.css';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid'; // Import uuidv4
 import Comment from './Comment';
 
 const Comments = ({ comments, onCommentsChange }) => {
@@ -22,23 +22,25 @@ const Comments = ({ comments, onCommentsChange }) => {
       return comment;
     });
     setCommentList(updatedComments);
-    onCommentsChange(updatedComments);
+    onCommentsChange(updatedComments);  // Notify parent component about the change
   };
 
   const handleDeleteComment = (commentId) => {
     const updatedComments = commentList.filter(comment => comment.id !== commentId);
     setCommentList(updatedComments);
-    onCommentsChange(updatedComments);
+    onCommentsChange(updatedComments);  // Notify parent component about the change
   };
 
   const handleAddComment = (e) => {
     e.preventDefault();
     if (newComment.trim() !== '') {
-      const updatedComments = [...commentList, { id: uuidv4(), content: newComment, replies: [], user: "ghost", date: Date.now() }];
+      let updatedComments;
+        updatedComments = [...commentList, { id: uuidv4(), content: newComment, replies: [], user: "ghost", date: Date.now() }]; // Generate a unique id
+      
       setCommentList(updatedComments);
       setNewComment('');
       setIsCommentFormVisible(false);
-      onCommentsChange(updatedComments);
+      onCommentsChange(updatedComments);  // Notify parent component about the change
     }
   };
 
@@ -51,41 +53,72 @@ const Comments = ({ comments, onCommentsChange }) => {
       if (replyContent && replyContent.trim() !== '') {
         updatedComments[commentIndex].replies.push({
           id: uuidv4(),
-          user: 'User', // Set dynamically based on authentication
+          user: 'User', // You can set the user dynamically based on authentication
           content: replyContent
         });
         setCommentList(updatedComments);
-        onCommentsChange(updatedComments);
-        setNewReply(prevState => ({ ...prevState, [commentId]: '' }));
+        onCommentsChange(updatedComments); // Notify parent component about the change
+        setNewReply(prevState => ({ ...prevState, [commentId]: '' })); // Clear the reply input
       }
     }
   };
-
   const handleEditReply = (replyId, commentId, editedContent) => {
+    // Find the comment index in the commentList
     const commentIndex = commentList.findIndex(comment => comment.id === commentId);
+    
     if (commentIndex !== -1) {
+      // Find the reply index in the replies array of the comment
       const replyIndex = commentList[commentIndex].replies.findIndex(reply => reply.id === replyId);
+      
       if (replyIndex !== -1) {
+        // Create a copy of the commentList and the replies array
         const updatedComments = [...commentList];
         const updatedReplies = [...updatedComments[commentIndex].replies];
-        updatedReplies[replyIndex] = { ...updatedReplies[replyIndex], content: editedContent };
-        updatedComments[commentIndex] = { ...updatedComments[commentIndex], replies: updatedReplies };
+        
+        // Update the content of the reply
+        updatedReplies[replyIndex] = {
+          ...updatedReplies[replyIndex],
+          content: editedContent
+        };
+        
+        // Update the replies array in the comment
+        updatedComments[commentIndex] = {
+          ...updatedComments[commentIndex],
+          replies: updatedReplies
+        };
+        
+        // Update the state with the updated commentList
         setCommentList(updatedComments);
-        onCommentsChange(updatedComments);
+        
+        // Notify the parent component about the change if needed
+        // onCommentsChange(updatedComments);
       }
     }
   };
-
   const handleDeleteReply = (replyId, commentId) => {
+    // Find the comment index in the commentList
     const commentIndex = commentList.findIndex(comment => comment.id === commentId);
+    
     if (commentIndex !== -1) {
+      // Filter out the reply with the specified id from the replies array
       const updatedReplies = commentList[commentIndex].replies.filter(reply => reply.id !== replyId);
+      
+      // Create a copy of the commentList and update the replies array
       const updatedComments = [...commentList];
-      updatedComments[commentIndex] = { ...updatedComments[commentIndex], replies: updatedReplies };
+      updatedComments[commentIndex] = {
+        ...updatedComments[commentIndex],
+        replies: updatedReplies
+      };
+      
+      // Update the state with the updated commentList
       setCommentList(updatedComments);
-      onCommentsChange(updatedComments);
+      
+      // Notify the parent component about the change if needed
+      // onCommentsChange(updatedComments);
     }
   };
+  
+  
 
   const handleReplyChange = (e, commentId) => {
     const { value } = e.target;
@@ -139,9 +172,9 @@ const Comments = ({ comments, onCommentsChange }) => {
             <button
               className="btn btn-primary submit-button"
               type="submit"
-              aria-label="Comment"
+              aria-label={'Comment'}
             >
-              Comment
+              {'Comment'}
             </button>
           </div>
         )}

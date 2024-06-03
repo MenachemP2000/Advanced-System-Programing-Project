@@ -1,3 +1,4 @@
+// Comment.js
 import React, { useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import Reply from './Reply'; // Import Reply component
@@ -122,12 +123,10 @@ const Comment = ({
   const handleSendDeleteReply = (replyId) => {
     handleDeleteReply(replyId, comment.id);
   };
-
-  const handleSendAddReply = (e) => {
-    handleAddReply(e, comment.id);
+  const handleSendAddReply = (replyId) => {
+    handleAddReply(replyId, comment.id);
   };
-
-  const handleSendEditReply = (replyId, editedContent) => {
+  const handleSendEditReply = (replyId ,editedContent) => {
     handleEditReply(replyId, comment.id, editedContent);
   };
 
@@ -245,6 +244,7 @@ const Comment = ({
               reply={reply}
               handleLikeReply={handleLikeReply}
               handleUnlikeReply={handleUnlikeReply}
+              handleAddReply={handleSendAddReply}
               handleEditReply={handleSendEditReply}
               handleDeleteReply={handleSendDeleteReply}
               handleReplyChange={handleReplyChange}

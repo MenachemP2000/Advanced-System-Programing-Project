@@ -1,3 +1,4 @@
+// Reply.js
 import React, { useState, useEffect, useRef } from 'react';
 
 const Reply = ({
@@ -20,6 +21,7 @@ const Reply = ({
   const [isReplyFormVisible, setIsReplyFormVisible] = useState(false);
   const editTextareaRef = useRef(null);
 
+  
   useEffect(() => {
     if (isEditing && editTextareaRef.current) {
       editTextareaRef.current.style.height = 'auto';
@@ -27,6 +29,7 @@ const Reply = ({
     }
   }, [isEditing, editedContent]);
 
+  
   const handleReply = (e) => {
     e.preventDefault();
     handleAddReply(e, comment.id);
@@ -56,7 +59,6 @@ const Reply = ({
     setEditedContent(reply.content);
     setIsEditing(false);
   };
-
   const showReplyForm = () => {
     setIsReplyFormVisible(true);
   };
@@ -65,26 +67,81 @@ const Reply = ({
     if (isReplyFormVisible) {
       handleReplyChange({ target: { value: '' } }, comment.id);
     }
-    setIsReplyFormVisible(false);
+    setIsReplyFormVisible(!isReplyFormVisible);
   };
 
   const isLongReply = reply.content.length > 100;
 
   return (
     <div className="reply" key={reply.id}>
-      {!isEditing ? (
-        <>
-          <p>@{reply.user}</p>
-          <div>
-            <p>{isExpanded ? reply.content : `${reply.content.substring(0, 100)}...`}</p>
-            {isLongReply && (
-              <button className="btn btn-link" onClick={toggleReadMore}>
-                {isExpanded ? "Read Less" : "Read More"}
+      {!isEditing &&(<>
+        <p>@{reply.user}</p>
+        <div>
+          <p>{isExpanded ? reply.content : reply.content.substring(0, 100)}</p>
+          {isLongReply && (
+            <button className="btn btn-link" onClick={toggleReadMore}>
+              {isExpanded ? "Read Less" : "Read More"}
+            </button>
+          )}
+        </div>
+      </>)
+      }
+      
+      <div className="button-container"> 
+
+        <button className="btn btn-primary edit-button" onClick={toggleEdit}>Edit</button>
+        <button className="btn btn-primary delete-button" onClick={() => handleDeleteReply(reply.id)}>Delete</button>
+
+      </div>
+      <div>
+        {!isEditing && (
+          <>
+          
+            <button className="btn btn-link" onClick={showReplyForm}>
+              {'Reply'}
+            </button>
+            {!userLikedReply ? (
+              <button 
+                className="btn btn-primary like-button"
+                onClick={() => handleLikeReply(reply.id)}
+                aria-label="Like reply"
+              >
+                {replyLikes} Like 
+              </button>
+            ) : (
+              <button 
+                className="btn btn-primary unlike-button"
+                onClick={() => handleUnlikeReply(reply.id)}
+                aria-label="Unlike reply"
+              >
+                Unlike 
               </button>
             )}
-          </div>
-        </>
-      ) : (
+                {isReplyFormVisible && (
+              <form onSubmit={handleReply}>
+                <textarea
+                  value={newReply[comment.id] || "@"+reply.user + " "}
+                  onChange={handleReplyContentChange}
+                  className="reply-textarea"
+                ></textarea>
+                <div className="button-container">
+                  <button className="btn btn-primary cancel-button" onClick={hideReplyForm}>
+                    {'Cancel'}
+                  </button>
+                  <button
+                    className="btn btn-primary submit-button"
+                    type="submit"
+                    aria-label="Add reply"
+                  >
+                    Reply
+                  </button>
+                </div>
+              </form>
+            )}
+            
+          </>
+        )}
+        {isEditing && (
         <div>
           <textarea
             ref={editTextareaRef}
@@ -112,50 +169,6 @@ const Reply = ({
           </div>
         </div>
       )}
-      <div className="button-container">
-        {!isEditing && (
-          <>
-            <button className="btn btn-primary edit-button" onClick={toggleEdit}>Edit</button>
-            <button className="btn btn-primary delete-button" onClick={() => handleDeleteReply(reply.id)}>Delete</button>
-          </>
-        )}
-      </div>
-      <div>
-        {!isEditing && (
-          <>
-            <button className="btn btn-link" onClick={showReplyForm}>Reply</button>
-            {!userLikedReply ? (
-              <button
-                className="btn btn-primary like-button"
-                onClick={() => handleLikeReply(reply.id)}
-                aria-label="Like reply"
-              >
-                {replyLikes} Like
-              </button>
-            ) : (
-              <button
-                className="btn btn-primary unlike-button"
-                onClick={() => handleUnlikeReply(reply.id)}
-                aria-label="Unlike reply"
-              >
-                Unlike
-              </button>
-            )}
-            {isReplyFormVisible && (
-              <form onSubmit={handleReply}>
-                <textarea
-                  value={newReply[comment.id] || "@" + reply.user + " "}
-                  onChange={handleReplyContentChange}
-                  className="reply-textarea"
-                ></textarea>
-                <div className="button-container">
-                  <button className="btn btn-primary cancel-button" onClick={hideReplyForm}>Cancel</button>
-                  <button className="btn btn-primary submit-button" type="submit" aria-label="Add reply">Reply</button>
-                </div>
-              </form>
-            )}
-          </>
-        )}
       </div>
     </div>
   );
