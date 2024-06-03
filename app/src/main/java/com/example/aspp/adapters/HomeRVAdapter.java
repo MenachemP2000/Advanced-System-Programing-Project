@@ -1,6 +1,8 @@
 package com.example.aspp.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.aspp.R;
+import com.example.aspp.VideoPlayerActivity;
 import com.example.aspp.fragments.HomeFragment;
 import com.example.aspp.objects.Video;
 
@@ -38,19 +41,19 @@ public class HomeRVAdapter extends RecyclerView.Adapter<HomeRVAdapter.MyViewHold
     @Override
     public void onBindViewHolder(@NonNull HomeRVAdapter.MyViewHolder holder, int position) {
 //        holder.id.setText(surveys.get(position).get_id() + "");
-        holder.surveyName.setText(videos.get(position).getSurvey_name());
+        holder.surveyName.setText(videos.get(position).getTitle());
 //        holder.surveyReward.setText(surveys.get(position).getSurvey_reward() + " Coins");
-//        holder.profilePic.setImageBitmap(surveys.get(position).getProfilePic());
+        holder.thumbnail.setImageResource(videos.get(position).getThumbnailDrawableId());
         holder.v.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                context.startActivity(new Intent(context, VideoPlayerActivity.class).putExtra("video", videos.get(position)));
             }
         });
         holder.v.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                HomeFragment.showBottomDialog(context);
+                HomeFragment.showBottomDialog(context, videos.get(position));
                 return true;
             }
         });
@@ -64,13 +67,13 @@ public class HomeRVAdapter extends RecyclerView.Adapter<HomeRVAdapter.MyViewHold
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         TextView surveyName, surveyReward;
-        ImageView profilePic;
+        ImageView thumbnail;
         View v;
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
 
             surveyName = itemView.findViewById(R.id.videoName);
-            profilePic = itemView.findViewById(R.id.thumbnail);
+            thumbnail = itemView.findViewById(R.id.thumbnail);
             v = itemView;
         }
     }
