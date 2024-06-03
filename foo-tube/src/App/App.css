@@ -21,7 +21,7 @@ body {
 }
 .App{
   width: 100%;
-  height:  inherit;
+  height:max-content;
   padding: 20px;
 }
 
@@ -33,4 +33,19 @@ body {
 .App.dark {
   background-color: black;
   color: white;
+}
+
+p {
+  word-break: break-word;
+  white-space: normal;
+}
+button {
+  --yt-button-margin: 0;
+  --yt-button-padding: 10px 16px;
+  --yt-button-padding-minus-border: 9px 15px;
+  --yt-button-padding-minus-focus-outline: 8px 14px;
+  --yt-button-padding-minus-focus-outline-width: 2px;
+  --yt-button-with-icon-padding-minus-focus-outline: 4px 14px;
+  --yt-button-border-radius: 2px;
+
 }

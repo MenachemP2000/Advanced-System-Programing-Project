@@ -1,0 +1,51 @@
+.description-container {
+  margin: 20px;
+}
+
+.description-view p {
+  font-size: 16px;
+}
+
+.description-edit textarea {
+  width: 100%;
+  height: 150px; /* Adjust height as needed */
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box; 
+  background-color: transparent;
+  color: inherit;
+}
+
+.button-container {
+  margin-top: 10px;
+}
+
+.btn {
+  margin-right: 10px;
+}
+
+.save-button {
+  background-color: green;
+  color: white;
+}
+
+.cancel-button {
+  background-color: red;
+  color: white;
+}
+
+.edit-button {
+  background-color: blue;
+  color: white;
+}
+
+.btn-link {
+  background: none;
+  color: blue;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}

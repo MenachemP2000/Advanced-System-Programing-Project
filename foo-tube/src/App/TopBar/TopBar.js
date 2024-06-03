@@ -10,12 +10,14 @@ const TopBar = ({ toggleMenu, toggleTheme }) => {
 
   return (
     <div className="TopBar">
-      <div className="hamburger-menu" onClick={toggleMenu}>
-        <div className="bar"></div>
-        <div className="bar"></div>
-        <div className="bar"></div>
+      <div className ="leftTop">
+        <div className="hamburger-menu" onClick={toggleMenu}>
+          <div className="bar"></div>
+          <div className="bar"></div>
+          <div className="bar"></div>
+        </div>
+        <h1 className="app-title">FooTube&trade;</h1>
       </div>
-      <h1 className="app-title">Foo Tube</h1>
       <div className ="search">
         <input
           type="text"
@@ -24,7 +26,7 @@ const TopBar = ({ toggleMenu, toggleTheme }) => {
           onChange={handleSearch}
         />
       </div>
-      <div><button className="theme-toggle btn btn-primary" onClick={toggleTheme}>Toggle Theme</button></div>
+      <div className='button-container'><button className="theme-toggle btn btn-primary" onClick={toggleTheme}>Toggle Theme</button></div>
     </div>
   );
 }

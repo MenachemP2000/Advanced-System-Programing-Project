@@ -9,7 +9,7 @@
     background-color: #333;
     color: #fff;
     display: flex;
-    justify-content: flex-start;
+    justify-content: space-between;
     align-items: center;
     padding: 0 20px;
     z-index: 1000;
@@ -33,5 +33,20 @@
     margin: 4px 0;
   }
   .search{
-    margin: 25%;
+    width: 50%;
   }
+  .search-input{
+    background-color: transparent;
+    color: inherit;
+    width: 100%;
+
+  }
+  
+.button-container {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end; 
+}
+.leftTop{
+  display: flex;
+}
