@@ -1,5 +1,7 @@
 .description-container {
   margin: 20px;
+  display: flex;
+  flex-direction: column;
 }
 
 .description-view p {
@@ -8,14 +10,17 @@
 
 .description-edit textarea {
   width: 100%;
-  height: 150px; /* Adjust height as needed */
   padding: 10px;
+  height: auto;
   font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 4px;
   box-sizing: border-box; 
   background-color: transparent;
   color: inherit;
+  min-height: 100px; /* Set a minimum height */
+  resize: none; /* Disable resizing by user */
+  overflow-y: hidden; /* Hide scrollbar */
 }
 
 .button-container {

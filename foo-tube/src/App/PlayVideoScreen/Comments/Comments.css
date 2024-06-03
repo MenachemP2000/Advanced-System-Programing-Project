@@ -2,9 +2,10 @@
   margin: 20px;
 }
 
-.comment-textarea {
+.comment-textarea, .reply-textarea, .edit-textarea  {
   width: 100%;
-  height: 100px; /* Adjust height as needed */
+  height: auto;
+  min-height: fit-content;
   padding: 10px;
   font-size: 14px;
   border: 1px solid #ccc;
@@ -13,6 +14,7 @@
   resize: none;
   background-color: transparent;
   color: inherit;
+  overflow: hidden; /* Prevents scrollbar */
 }
 
 .button-container {

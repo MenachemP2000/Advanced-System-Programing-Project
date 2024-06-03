@@ -1,13 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import './Description.css';
 
 const Description = ({ description, onSave }) => {
   const [currentDescription, setCurrentDescription] = useState(description);
   const [isEditing, setIsEditing] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const textareaRef = useRef(null);
+
+  useEffect(() => {
+    // Set the initial height of the textarea based on its content
+    if (textareaRef.current && isEditing) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [isEditing]);
 
   const handleEditClick = () => {
     setIsEditing(true);
+    setIsExpanded(true); // Automatically expand textarea in edit mode
   };
 
   const handleSaveClick = () => {
@@ -20,25 +30,15 @@ const Description = ({ description, onSave }) => {
     setIsEditing(false);
   };
 
-  const toggleReadMore = () => {
-    setIsExpanded(!isExpanded);
+  const handleTextareaChange = () => {
+    setCurrentDescription(textareaRef.current.value);
+    // Automatically adjust the height of the textarea
+    textareaRef.current.style.height = 'auto';
+    textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
   };
 
-  const renderDescription = () => {
-    if (isExpanded) {
-      return (
-        <>
-          {currentDescription} <button className="btn btn-link" onClick={toggleReadMore}>Read Less</button>
-        </>
-      );
-    } else {
-      return (
-        <>
-          {currentDescription.length > 100 ? currentDescription.substring(0, 100) + '...' : currentDescription}
-          {currentDescription.length > 100 && <button className="btn btn-link" onClick={toggleReadMore}>Read More</button>}
-        </>
-      );
-    }
+  const toggleReadMore = () => {
+    setIsExpanded(!isExpanded);
   };
 
   return (
@@ -47,10 +47,11 @@ const Description = ({ description, onSave }) => {
       {isEditing ? (
         <div className="description-edit">
           <textarea
+            ref={textareaRef}
             id="description-textarea"
             name="description"
             value={currentDescription}
-            onChange={(e) => setCurrentDescription(e.target.value)}
+            onChange={handleTextareaChange}
           ></textarea>
           <div className="button-container">
             <button 
@@ -71,7 +72,12 @@ const Description = ({ description, onSave }) => {
         </div>
       ) : (
         <div className="description-view">
-          <p>{renderDescription()}</p>
+          <p>{isExpanded ? currentDescription : currentDescription.substring(0, 100)}</p>
+          {currentDescription.length > 100 && (
+            <button className="btn btn-link" onClick={toggleReadMore}>
+              {isExpanded ? "Show Less" : "Show More"}
+            </button>
+          )}
           <div className="button-container">
             <button 
               className="btn btn-primary edit-button" 
