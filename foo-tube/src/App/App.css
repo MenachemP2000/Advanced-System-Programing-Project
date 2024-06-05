@@ -1,3 +1,7 @@
+* {
+  text-align: start;
+  unicode-bidi: plaintext;
+}
 
 body {
   margin: 0;

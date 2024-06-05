@@ -1,5 +1,6 @@
 // Reply.js
 import React, { useState, useEffect, useRef } from 'react';
+import { v4 as uuidv4 } from 'uuid'; // Import uuidv4
 
 const Reply = ({
   reply,
@@ -7,19 +8,19 @@ const Reply = ({
   handleUnlikeReply,
   handleEditReply,
   handleDeleteReply,
-  handleAddReply,
   userLikedReply,
   replyLikes,
-  handleReplyChange,
   comment,
-  newReply,
-  handleReplyContentChange
+  commentList,
+  onCommentsChange,
+  setCommentList,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(reply.content);
   const [isReplyFormVisible, setIsReplyFormVisible] = useState(false);
   const editTextareaRef = useRef(null);
+  const [newReply, setNewReply] = useState({});
 
   
   useEffect(() => {
@@ -29,6 +30,25 @@ const Reply = ({
     }
   }, [isEditing, editedContent]);
 
+  
+  const handleAddReply = (e, commentId) => {
+    e.preventDefault();
+    const commentIndex = commentList.findIndex(comment => comment.id === commentId);
+    if (commentIndex !== -1) {
+      const updatedComments = [...commentList];
+      const replyContent = newReply[commentId];
+      if (replyContent && replyContent.trim() !== '') {
+        updatedComments[commentIndex].replies.push({
+          id: uuidv4(),
+          user: 'User', // Y
+          content: replyContent
+        });
+        setCommentList(updatedComments);
+        onCommentsChange(updatedComments); // Notify parent component about the change
+        setNewReply(prevState => ({ ...prevState, [commentId]: '' })); // Clear the reply input
+      }
+    }
+  };
   
   const handleReply = (e) => {
     e.preventDefault();
@@ -42,6 +62,19 @@ const Reply = ({
 
   const toggleEdit = () => {
     setIsEditing(!isEditing);
+  };
+
+  
+
+  const handleReplyChange = (e, commentId) => {
+    const { value } = e.target;
+    setNewReply(prevState => ({ ...prevState, [commentId]: value }));
+  };
+  
+  const handleReplyContentChange = (e) => {
+    handleReplyChange(e, comment.id);
+    e.target.style.height = 'auto';
+    e.target.style.height = e.target.scrollHeight + 'px';
   };
 
   const handleEditContentChange = (e) => {

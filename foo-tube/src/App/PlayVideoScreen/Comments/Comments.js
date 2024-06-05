@@ -62,6 +62,7 @@ const Comments = ({ comments, onCommentsChange }) => {
       }
     }
   };
+
   const handleEditReply = (replyId, commentId, editedContent) => {
     // Find the comment index in the commentList
     const commentIndex = commentList.findIndex(comment => comment.id === commentId);
@@ -191,6 +192,9 @@ const Comments = ({ comments, onCommentsChange }) => {
           handleDeleteReply={handleDeleteReply}
           handleReplyChange={handleReplyChange}
           newReply={newReply}
+          commentList={commentList}
+          onCommentsChange={onCommentsChange}
+          setCommentList={setCommentList}
         />
       ))}
     </div>

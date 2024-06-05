@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import Reply from './Reply'; // Import Reply component
+import './Comment.css';
 
 const Comment = ({
   comment,
@@ -12,6 +13,9 @@ const Comment = ({
   handleEditReply,
   handleReplyChange,
   newReply,
+  commentList,
+  onCommentsChange,
+  setCommentList,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isShowingReplies, setIsShowingReplies] = useState(false);
@@ -236,8 +240,7 @@ const Comment = ({
           </button>
         )}
       </div>
-      {isShowingReplies && (
-        <div className="replies">
+        <div className={`replies ${isShowingReplies ? 'show' : 'hide'}`}>
           {comment.replies.map(reply => (
             <Reply
               key={reply.id}
@@ -253,10 +256,12 @@ const Comment = ({
               comment={comment}
               newReply={newReply}
               handleReplyContentChange={handleReplyContentChange}
+              commentList={commentList}
+              onCommentsChange={onCommentsChange}
+              setCommentList={setCommentList}
             />
           ))}
         </div>
-      )}
     </div>
   );
 };

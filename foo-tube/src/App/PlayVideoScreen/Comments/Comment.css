@@ -1,0 +1,8 @@
+.replies.hide {
+    display: none;
+  }
+  
+  .replies.show {
+    display: inherit;
+  }
+  
