@@ -1,5 +1,7 @@
 import React from 'react';
 import './Menu.css';
+import { Link } from 'react-router-dom';
+
 
 const Menu = ({ isOpen, topBarHeight }) => {
   const menuStyle = {
@@ -9,7 +11,7 @@ const Menu = ({ isOpen, topBarHeight }) => {
   return (
     <div className={`Menu ${isOpen ? 'open' : ''}`} style={menuStyle}>
       <ul>
-        <li><a href="#home">Home</a></li>
+        <li><Link to="/">Home</Link></li>
         <li><a href="#trending">Trending</a></li>
         <li><a href="#subscriptions">Subscriptions</a></li>
         <li><a href="#library">Library</a></li>

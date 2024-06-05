@@ -1,7 +1,7 @@
 import React from 'react';
 import './TopBar.css';
 
-const TopBar = ({ toggleMenu, toggleTheme }) => {
+const TopBar = ({ toggleMenu, toggleDropDown }) => {
   const handleSearch = (e) => {
     const query = e.target.value;
     // Logic to handle search query
@@ -10,7 +10,7 @@ const TopBar = ({ toggleMenu, toggleTheme }) => {
 
   return (
     <div className="TopBar">
-      <div className ="leftTop">
+      <div className="leftTop">
         <div className="hamburger-menu" onClick={toggleMenu}>
           <div className="bar"></div>
           <div className="bar"></div>
@@ -18,7 +18,8 @@ const TopBar = ({ toggleMenu, toggleTheme }) => {
         </div>
         <h1 className="app-title">FooTube&trade;</h1>
       </div>
-      <div className ="search">
+
+      <div className="search">
         <input
           type="text"
           placeholder="Search..."
@@ -26,7 +27,14 @@ const TopBar = ({ toggleMenu, toggleTheme }) => {
           onChange={handleSearch}
         />
       </div>
-      <div className='button-container'><button className="theme-toggle btn btn-primary" onClick={toggleTheme}>Toggle Theme</button></div>
+
+      <div className="RightTop">
+        <div className="hamburger-menu" onClick={toggleDropDown}>
+          <div className="bar"></div>
+          <div className="bar"></div>
+          <div className="bar"></div>
+        </div>
+      </div>
     </div>
   );
 }

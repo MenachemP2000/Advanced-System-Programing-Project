@@ -6,13 +6,16 @@ import Comments from './Comments/Comments';
 import Description from './Description/Description';
 import videoData from './MetaData/videos.json'; // Corrected the import path
 
-const PlayVideoScreen = () => {
+const PlayVideoScreen = ({ toggleScreen }) => {
   const { id } = useParams();
   const [video, setVideo] = useState(null);
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
 
+
   useEffect(() => {
+    
+    toggleScreen("PlayVideoScreen");
     const fetchVideo = () => {
       const video = videoData.videos.find(v => v.id === id);
       if (video) {
