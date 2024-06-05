@@ -1,7 +1,7 @@
 // Reply.js
 import React, { useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid'; // Import uuidv4
-
+import './Reply.css'
 const Reply = ({
   reply,
   handleLikeReply,
@@ -14,6 +14,8 @@ const Reply = ({
   commentList,
   onCommentsChange,
   setCommentList,
+  isSignedIn,
+  users
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -21,16 +23,19 @@ const Reply = ({
   const [isReplyFormVisible, setIsReplyFormVisible] = useState(false);
   const editTextareaRef = useRef(null);
   const [newReply, setNewReply] = useState({});
+  const [author, setAuthor] = useState(null);
 
-  
+
+
   useEffect(() => {
     if (isEditing && editTextareaRef.current) {
       editTextareaRef.current.style.height = 'auto';
       editTextareaRef.current.style.height = editTextareaRef.current.scrollHeight + 'px';
     }
+    setAuthor(users.find(author => author.username === reply.user));
   }, [isEditing, editedContent]);
 
-  
+
   const handleAddReply = (e, commentId) => {
     e.preventDefault();
     const commentIndex = commentList.findIndex(comment => comment.id === commentId);
@@ -40,7 +45,7 @@ const Reply = ({
       if (replyContent && replyContent.trim() !== '') {
         updatedComments[commentIndex].replies.push({
           id: uuidv4(),
-          user: 'User', // Y
+          user: isSignedIn.username, // Y
           content: replyContent
         });
         setCommentList(updatedComments);
@@ -49,7 +54,7 @@ const Reply = ({
       }
     }
   };
-  
+
   const handleReply = (e) => {
     e.preventDefault();
     handleAddReply(e, comment.id);
@@ -64,13 +69,13 @@ const Reply = ({
     setIsEditing(!isEditing);
   };
 
-  
+
 
   const handleReplyChange = (e, commentId) => {
     const { value } = e.target;
     setNewReply(prevState => ({ ...prevState, [commentId]: value }));
   };
-  
+
   const handleReplyContentChange = (e) => {
     handleReplyChange(e, comment.id);
     e.target.style.height = 'auto';
@@ -106,8 +111,12 @@ const Reply = ({
   const isLongReply = reply.content.length > 100;
 
   return (
-    <div className="reply" key={reply.id}>
-      {!isEditing &&(<>
+    <div id="outerreply">
+    {author && (
+      <div><img src={author.image} height="50px" width="50px" ></img></div>
+    )}
+    <div className="reply" id="innerreply" key={reply.id}>
+      {!isEditing && (<>
         <p>@{reply.user}</p>
         <div>
           <p>{isExpanded ? reply.content : reply.content.substring(0, 100)}</p>
@@ -119,41 +128,43 @@ const Reply = ({
         </div>
       </>)
       }
-      
-      <div className="button-container"> 
+      {(isSignedIn.username == reply.user) && (
+        <div className="button-container">
 
-        <button className="btn btn-primary edit-button" onClick={toggleEdit}>Edit</button>
-        <button className="btn btn-primary delete-button" onClick={() => handleDeleteReply(reply.id)}>Delete</button>
+          <button className="btn btn-primary edit-button" onClick={toggleEdit}>Edit</button>
+          <button className="btn btn-primary delete-button" onClick={() => handleDeleteReply(reply.id)}>Delete</button>
 
-      </div>
+        </div>
+      )}
       <div>
         {!isEditing && (
           <>
-          
-            <button className="btn btn-link" onClick={showReplyForm}>
-              {'Reply'}
-            </button>
+            {isSignedIn && (
+              <button className="btn btn-link" onClick={showReplyForm}>
+                {'Reply'}
+              </button>
+            )}
             {!userLikedReply ? (
-              <button 
+              <button
                 className="btn btn-primary like-button"
                 onClick={() => handleLikeReply(reply.id)}
                 aria-label="Like reply"
               >
-                {replyLikes} Like 
+                {replyLikes} Like
               </button>
             ) : (
-              <button 
+              <button
                 className="btn btn-primary unlike-button"
                 onClick={() => handleUnlikeReply(reply.id)}
                 aria-label="Unlike reply"
               >
-                Unlike 
+                Unlike
               </button>
             )}
-                {isReplyFormVisible && (
+            {isReplyFormVisible && (
               <form onSubmit={handleReply}>
                 <textarea
-                  value={newReply[comment.id] || "@"+reply.user + " "}
+                  value={newReply[comment.id] || "@" + reply.user + " "}
                   onChange={handleReplyContentChange}
                   className="reply-textarea"
                 ></textarea>
@@ -171,38 +182,39 @@ const Reply = ({
                 </div>
               </form>
             )}
-            
+
           </>
         )}
         {isEditing && (
-        <div>
-          <textarea
-            ref={editTextareaRef}
-            value={editedContent}
-            onChange={handleEditContentChange}
-            className="edit-textarea"
-          />
-          <div className="button-container">
-            <button
-              type="button"
-              className="btn btn-primary save-button"
-              onClick={handleSaveEdit}
-              aria-label="Save edit"
-            >
-              Save
-            </button>
-            <button
-              type="button"
-              className="btn btn-primary cancel-button"
-              onClick={handleCancelEdit}
-              aria-label="Cancel edit"
-            >
-              Cancel
-            </button>
+          <div>
+            <textarea
+              ref={editTextareaRef}
+              value={editedContent}
+              onChange={handleEditContentChange}
+              className="edit-textarea"
+            />
+            <div className="button-container">
+              <button
+                type="button"
+                className="btn btn-primary save-button"
+                onClick={handleSaveEdit}
+                aria-label="Save edit"
+              >
+                Save
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary cancel-button"
+                onClick={handleCancelEdit}
+                aria-label="Cancel edit"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
       </div>
+    </div>
     </div>
   );
 };

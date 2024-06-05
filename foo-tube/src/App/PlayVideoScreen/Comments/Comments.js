@@ -3,7 +3,7 @@ import './Comments.css';
 import { v4 as uuidv4 } from 'uuid'; // Import uuidv4
 import Comment from './Comment';
 
-const Comments = ({ comments, onCommentsChange }) => {
+const Comments = ({ comments, onCommentsChange ,isSignedIn ,users }) => {
   const [newComment, setNewComment] = useState('');
   const [newReply, setNewReply] = useState({});
   const [commentList, setCommentList] = useState([]);
@@ -32,10 +32,11 @@ const Comments = ({ comments, onCommentsChange }) => {
   };
 
   const handleAddComment = (e) => {
+    let author = isSignedIn.username
     e.preventDefault();
     if (newComment.trim() !== '') {
       let updatedComments;
-        updatedComments = [...commentList, { id: uuidv4(), content: newComment, replies: [], user: "ghost", date: Date.now() }]; // Generate a unique id
+        updatedComments = [...commentList, { id: uuidv4(), content: newComment, replies: [], user: author , date: Date.now() }]; // Generate a unique id
       
       setCommentList(updatedComments);
       setNewComment('');
@@ -53,7 +54,7 @@ const Comments = ({ comments, onCommentsChange }) => {
       if (replyContent && replyContent.trim() !== '') {
         updatedComments[commentIndex].replies.push({
           id: uuidv4(),
-          user: 'User', // You can set the user dynamically based on authentication
+          user: isSignedIn.username, // You can set the user dynamically based on authentication
           content: replyContent
         });
         setCommentList(updatedComments);
@@ -150,6 +151,7 @@ const Comments = ({ comments, onCommentsChange }) => {
   return (
     <div className="comments-container">
       <h2>{commentList.length} Comments</h2>
+      {(isSignedIn) && (
       <form onSubmit={handleAddComment}>
         <textarea
           ref={commentTextareaRef}
@@ -180,8 +182,11 @@ const Comments = ({ comments, onCommentsChange }) => {
           </div>
         )}
       </form>
+      )}
       {commentList.map((comment, index) => (
         <Comment
+          users ={users}
+          isSignedIn ={isSignedIn}
           key={comment.id}
           comment={comment}
           index={index}

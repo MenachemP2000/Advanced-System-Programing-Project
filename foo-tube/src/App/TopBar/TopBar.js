@@ -1,7 +1,7 @@
 import React from 'react';
 import './TopBar.css';
 
-const TopBar = ({ toggleMenu, toggleDropDown }) => {
+const TopBar = ({ toggleMenu, toggleDropDown,isSignedIn }) => {
   const handleSearch = (e) => {
     const query = e.target.value;
     // Logic to handle search query
@@ -30,9 +30,17 @@ const TopBar = ({ toggleMenu, toggleDropDown }) => {
 
       <div className="RightTop">
         <div className="hamburger-menu" onClick={toggleDropDown}>
-          <div className="bar"></div>
-          <div className="bar"></div>
-          <div className="bar"></div>
+
+          {isSignedIn && (
+            <img src={isSignedIn.image} height="40px" width="40px" ></img>
+          )}
+          {!isSignedIn && (
+            <>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            <div className="bar"></div>
+            </>
+          )}
         </div>
       </div>
     </div>

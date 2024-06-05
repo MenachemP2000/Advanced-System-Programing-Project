@@ -16,6 +16,8 @@ const Comment = ({
   commentList,
   onCommentsChange,
   setCommentList,
+  isSignedIn,
+  users
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isShowingReplies, setIsShowingReplies] = useState(false);
@@ -26,7 +28,7 @@ const Comment = ({
   const [userLikedComment, setUserLikedComment] = useState(false); // State to track if current user has liked the comment
   const [replyLikes, setReplyLikes] = useState({}); // State to manage likes of replies
   const [userLikedReplies, setUserLikedReplies] = useState({}); // State to track if current user has liked each reply
-
+  const [author, setAuthor] = useState(null);
   const editTextareaRef = useRef(null);
 
   useEffect(() => {
@@ -42,6 +44,8 @@ const Comment = ({
     comment.replies.forEach(reply => {
       initialUserLikedReplies[reply.id] = false;
     });
+
+    setAuthor(users.find(author => author.username === comment.user));
     setUserLikedReplies(initialUserLikedReplies);
   }, [comment.replies]);
 
@@ -130,15 +134,20 @@ const Comment = ({
   const handleSendAddReply = (replyId) => {
     handleAddReply(replyId, comment.id);
   };
-  const handleSendEditReply = (replyId ,editedContent) => {
+  const handleSendEditReply = (replyId, editedContent) => {
     handleEditReply(replyId, comment.id, editedContent);
   };
 
   const isLongComment = comment.content.length > 100;
 
   return (
-    <div className="comment" key={comment.id}>
-      <p>@{comment.user}</p>
+    <div id="outercomment">
+      {author && (
+        <div><img src={author.image} height="50px" width="50px" ></img></div>
+      )}
+    
+    <div className="comment" id="innercomment" key={comment.id}>
+      <div>@{comment.user}</div>
       {isEditing ? (
         <div>
           <textarea
@@ -167,10 +176,10 @@ const Comment = ({
           </div>
         </div>
       ) : (
-        <p>{isExpanded || !isLongComment ? comment.content : `${comment.content.substring(0, 100)}...` }</p>
+        <p>{isExpanded || !isLongComment ? comment.content : `${comment.content.substring(0, 100)}...`}</p>
       )}
       <div className="button-container">
-        {!isEditing && (
+        {(!isEditing && (comment.user == isSignedIn.username)) && (
           <>
             <button
               type="button"
@@ -189,7 +198,7 @@ const Comment = ({
               Delete
             </button>
           </>
-        )}
+        )}  
       </div>
       {isLongComment && (
         <button className="btn btn-link" onClick={toggleReadMore}>
@@ -197,17 +206,18 @@ const Comment = ({
         </button>
       )}
       <div>
-        
-        <button className="btn btn-link" onClick={showReplyForm}>
-          {'Reply'}
-        </button>
+        {isSignedIn && (
+          <button className="btn btn-link" onClick={showReplyForm}>
+            {'Reply'}
+          </button>
+        )}
         {userLikedComment ? (
-          <button className="btn btn-link" onClick={handleUnlikeComment}>
-             ({commentLikes}) Unlike
+          <button className="btn btn-primary" onClick={handleUnlikeComment}>
+            {commentLikes} Unlike
           </button>
         ) : (
-          <button className="btn btn-link" onClick={handleLikeComment}>
-            ({commentLikes}) Like 
+          <button className="btn btn-primary" onClick={handleLikeComment}>
+            {commentLikes} Like
           </button>
         )}
       </div>
@@ -236,32 +246,36 @@ const Comment = ({
       <div>
         {comment.replies.length > 0 && (
           <button className="btn btn-link" onClick={toggleShowReplies}>
-            {isShowingReplies ? '^ ' + comment.replies.length +' replies' : '˅ ' + comment.replies.length +' replies'}
+            {isShowingReplies ? '^ ' + comment.replies.length + ' replies' : '˅ ' + comment.replies.length + ' replies'}
           </button>
         )}
       </div>
-        <div className={`replies ${isShowingReplies ? 'show' : 'hide'}`}>
-          {comment.replies.map(reply => (
-            <Reply
-              key={reply.id}
-              reply={reply}
-              handleLikeReply={handleLikeReply}
-              handleUnlikeReply={handleUnlikeReply}
-              handleAddReply={handleSendAddReply}
-              handleEditReply={handleSendEditReply}
-              handleDeleteReply={handleSendDeleteReply}
-              handleReplyChange={handleReplyChange}
-              userLikedReply={userLikedReplies[reply.id]}
-              replyLikes={replyLikes[reply.id] || 0}
-              comment={comment}
-              newReply={newReply}
-              handleReplyContentChange={handleReplyContentChange}
-              commentList={commentList}
-              onCommentsChange={onCommentsChange}
-              setCommentList={setCommentList}
-            />
-          ))}
-        </div>
+      <div className={`replies ${isShowingReplies ? 'show' : 'hide'}`}>
+        {comment.replies.map(reply => (
+          <Reply
+            key={reply.id}
+            reply={reply}
+            handleLikeReply={handleLikeReply}
+            handleUnlikeReply={handleUnlikeReply}
+            handleAddReply={handleSendAddReply}
+            handleEditReply={handleSendEditReply}
+            handleDeleteReply={handleSendDeleteReply}
+            handleReplyChange={handleReplyChange}
+            userLikedReply={userLikedReplies[reply.id]}
+            replyLikes={replyLikes[reply.id] || 0}
+            comment={comment}
+            newReply={newReply}
+            handleReplyContentChange={handleReplyContentChange}
+            commentList={commentList}
+            onCommentsChange={onCommentsChange}
+            setCommentList={setCommentList}
+            isSignedIn={isSignedIn} 
+            users ={users}
+            
+          />
+        ))}
+      </div>
+    </div>
     </div>
   );
 };

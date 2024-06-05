@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './Description.css';
 
-const Description = ({ description, onSave }) => {
+const Description = ({ description, onSave, isSignedIn, username }) => {
   const [currentDescription, setCurrentDescription] = useState(description);
   const [isEditing, setIsEditing] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -54,15 +54,15 @@ const Description = ({ description, onSave }) => {
             onChange={handleTextareaChange}
           ></textarea>
           <div className="button-container">
-            <button 
-              className="btn btn-primary save-button" 
+            <button
+              className="btn btn-primary save-button"
               onClick={handleSaveClick}
               aria-label="Save description"
             >
               Save
             </button>
-            <button 
-              className="btn btn-primary cancel-button" 
+            <button
+              className="btn btn-primary cancel-button"
               onClick={handleCancelClick}
               aria-label="Cancel editing"
             >
@@ -78,15 +78,18 @@ const Description = ({ description, onSave }) => {
               {isExpanded ? "Show Less" : "Show More"}
             </button>
           )}
-          <div className="button-container">
-            <button 
-              className="btn btn-primary edit-button" 
-              onClick={handleEditClick}
-              aria-label="Edit description"
-            >
-              Edit
-            </button>
-          </div>
+          { ( username == isSignedIn.username ) && (
+            <div className="button-container">
+              <button
+                className="btn btn-primary edit-button"
+                onClick={handleEditClick}
+                aria-label="Edit description"
+              >
+                Edit
+                
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

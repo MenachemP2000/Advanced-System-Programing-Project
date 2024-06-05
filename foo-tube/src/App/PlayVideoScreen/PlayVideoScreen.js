@@ -6,21 +6,23 @@ import Comments from './Comments/Comments';
 import Description from './Description/Description';
 import videoData from './MetaData/videos.json'; // Corrected the import path
 
-const PlayVideoScreen = ({ toggleScreen }) => {
+const PlayVideoScreen = ({ toggleScreen, isSignedIn, users }) => {
   const { id } = useParams();
   const [video, setVideo] = useState(null);
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
+  const [author, setAuthor] = useState(null);
 
 
   useEffect(() => {
-    
+
     toggleScreen("PlayVideoScreen");
     const fetchVideo = () => {
       const video = videoData.videos.find(v => v.id === id);
       if (video) {
         setVideo(video);
         setLikeCount(video.likeCount || 0);  // Assuming your video data has a likeCount field
+        setAuthor(users.find(author => author.username === video.username));
       }
     };
     fetchVideo();
@@ -42,7 +44,7 @@ const PlayVideoScreen = ({ toggleScreen }) => {
         await navigator.share({
           title: `Check out this video: ${video.title}`,
           text: video.description,
-          url: `https://yourvideo.url/video/${id}`
+          url: `/video/${id}`
         });
         console.log('Successfully shared.');
       } else {
@@ -74,16 +76,26 @@ const PlayVideoScreen = ({ toggleScreen }) => {
           <source src={video.source} type="video/mp4" />
         </video>
         <div className="videoTitle">{video.title}</div>
-        <div className="buttonContainer">
-          <button type="button" className="btn btn-primary" onClick={handleLike}>
-            {liked ? 'Unlike' : 'Like'} {likeCount}
-          </button>
-          <button type="button" className="btn btn-primary" onClick={handleShare}>
-            Share
-          </button>
+        <div className="videoProfile">
+          <div id="profilepicandname">
+            <img src={author.image} height="50px" width="50px" ></img>
+            <div id="profilename">
+              {author.username}
+            </div>
+
+          </div>
+          <div className="buttonContainer">
+            <button type="button" className="btn btn-primary" onClick={handleLike}>
+              {liked ? 'Unlike' : 'Like'} {likeCount}
+            </button>
+            <button type="button" className="btn btn-primary" onClick={handleShare}>
+              Share
+            </button>
+          </div>
+
         </div>
-        <Description description={video.description} onSave={handleSaveDescription} />
-        <Comments comments={video.comments} onCommentsChange={handleCommentsChange} />
+        <Description description={video.description} username={video.username} isSignedIn={isSignedIn} onSave={handleSaveDescription} />
+        <Comments comments={video.comments} users={users} isSignedIn={isSignedIn} onCommentsChange={handleCommentsChange} />
       </div>
       <div className="sidebar">
         <RelatedVideos />

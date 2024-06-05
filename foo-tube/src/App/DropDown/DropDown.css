@@ -3,16 +3,14 @@
     top: 60px; 
     right: 0;
     width: 250px;
-    height: calc(100% - 60px); 
     background-color: inherit;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     z-index: 1000;
-    transform: translateY(100%) ;
-    transition: transform 0s ease;
+    display: none;
 }
 
 .DropDown.open {
-    transform: translateY(0);
+    display: block;
 }
 
 .DropDown ul {
@@ -32,4 +30,8 @@
 
 .DropDown ul li a:hover {
     text-decoration: underline;
+}
+.profile-container{
+    display: flex;
+    flex-direction: row;
 }

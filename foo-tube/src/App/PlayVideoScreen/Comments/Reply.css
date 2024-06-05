@@ -1,18 +1,11 @@
-.replies.hide {
-    display: none;
-  }
-  
-  .replies.show {
-    display: inherit;
-  }
 
-  #outercomment{
+#outercomment{
     display: flex;
     justify-content: row;
     align-content: space-between;
     margin: 10px;
   }
-  #innercomment{
+  #innerreply{
 
     margin: 10px;
     width: 100%;

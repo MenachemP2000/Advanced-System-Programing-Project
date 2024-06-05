@@ -3,6 +3,12 @@
         "username": "meny",
         "displayname": "Meny Parente",
         "password": "meny1234",
-        "image": "/pictures/Screenshot 2024-06-05 142711.png"
+        "image": "/pictures/users/meny.png"
+    },
+    {
+        "username": "baby",
+        "displayname": "Byby Shark",
+        "password": "baby1234",
+        "image": "/pictures/users/baby.jpeg"
     }
 ]
