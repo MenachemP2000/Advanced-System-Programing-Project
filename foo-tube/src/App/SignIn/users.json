@@ -7,8 +7,14 @@
     },
     {
         "username": "baby",
-        "displayname": "Byby Shark",
+        "displayname": "Baby Shark",
         "password": "baby1234",
+        "image": "/pictures/users/baby.jpeg"
+    },
+    {
+        "username": "kobi",
+        "displayname": "Kobi Small",
+        "password": "kobi1234",
         "image": "/pictures/users/baby.jpeg"
     }
 ]

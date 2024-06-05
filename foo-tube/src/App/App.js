@@ -67,7 +67,6 @@ function App() {
           <Route path="/createaccount" element={<CreateAccount setSignedInStatus={setSignedInStatus} users={users} addUser={addUser} isSignedIn={isSignedIn} toggleScreen={toggleScreen}  toggleSignendIn={toggleSignendIn} />} />
           <Route path="/" element={<Home toggleScreen={toggleScreen} isSignedIn={isSignedIn} />} /> {/* Define a route for the root URL */}
           <Route path="/video/:id" element={<PlayVideoScreen users={users} toggleScreen={toggleScreen} isSignedIn={isSignedIn} />} />
-          {/* Add other routes here if needed */}
         </Routes>
       </div>
     </Router>

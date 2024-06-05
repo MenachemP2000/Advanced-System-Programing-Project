@@ -8,6 +8,11 @@ const Description = ({ description, onSave, isSignedIn, username }) => {
   const textareaRef = useRef(null);
 
   useEffect(() => {
+    // Update current description when the description prop changes
+    setCurrentDescription(description);
+  }, [description]);
+
+  useEffect(() => {
     // Set the initial height of the textarea based on its content
     if (textareaRef.current && isEditing) {
       textareaRef.current.style.height = 'auto';
@@ -43,7 +48,6 @@ const Description = ({ description, onSave, isSignedIn, username }) => {
 
   return (
     <div className="description-container">
-      <h2>Description</h2>
       {isEditing ? (
         <div className="description-edit">
           <textarea

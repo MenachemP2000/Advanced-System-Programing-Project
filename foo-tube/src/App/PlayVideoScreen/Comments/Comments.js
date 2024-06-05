@@ -200,6 +200,7 @@ const Comments = ({ comments, onCommentsChange ,isSignedIn ,users }) => {
           commentList={commentList}
           onCommentsChange={onCommentsChange}
           setCommentList={setCommentList}
+          users ={users}
         />
       ))}
     </div>

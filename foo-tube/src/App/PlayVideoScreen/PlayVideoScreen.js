@@ -8,25 +8,24 @@ import videoData from './MetaData/videos.json'; // Corrected the import path
 
 const PlayVideoScreen = ({ toggleScreen, isSignedIn, users }) => {
   const { id } = useParams();
-  const [video, setVideo] = useState(null);
+  const [video, setVideo] = useState(false);
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [author, setAuthor] = useState(null);
 
 
   useEffect(() => {
-
     toggleScreen("PlayVideoScreen");
     const fetchVideo = () => {
       const video = videoData.videos.find(v => v.id === id);
       if (video) {
         setVideo(video);
-        setLikeCount(video.likeCount || 0);  // Assuming your video data has a likeCount field
+        setLikeCount(video.likeCount || 0);
         setAuthor(users.find(author => author.username === video.username));
       }
     };
     fetchVideo();
-  }, [id]);
+  }, [id, toggleScreen, users]);
 
   const handleLike = () => {
     if (liked) {
@@ -72,9 +71,7 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn, users }) => {
   return (
     <div className='PlayVideoScreen'>
       <div className="videoContainer">
-        <video className="VideoPlayer" controls>
-          <source src={video.source} type="video/mp4" />
-        </video>
+        <video src={video.source} type="video/mp4" className="VideoPlayer" controls />
         <div className="videoTitle">{video.title}</div>
         <div className="videoProfile">
           <div id="profilepicandname">
@@ -98,7 +95,7 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn, users }) => {
         <Comments comments={video.comments} users={users} isSignedIn={isSignedIn} onCommentsChange={handleCommentsChange} />
       </div>
       <div className="sidebar">
-        <RelatedVideos />
+        <RelatedVideos  videoData={videoData} />
       </div>
     </div>
   );
