@@ -87,6 +87,7 @@ const CreateAccount = ({ addUser, toggleSignendIn, toggleScreen, isSignedIn, use
                         <input
                             type="text"
                             id="displayname"
+                            placeholder="Enter both first and last name"
                             value={displayname}
                             onChange={(e) => setDisplayname(e.target.value)}
                             required
@@ -97,6 +98,7 @@ const CreateAccount = ({ addUser, toggleSignendIn, toggleScreen, isSignedIn, use
                         <input
                             type="text"
                             id="username"
+                            placeholder="Enter a unique Username "
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             required
@@ -107,6 +109,7 @@ const CreateAccount = ({ addUser, toggleSignendIn, toggleScreen, isSignedIn, use
                         <input
                             type="password"
                             id="password"
+                            placeholder="Password length need to be atleast 8"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
@@ -117,13 +120,14 @@ const CreateAccount = ({ addUser, toggleSignendIn, toggleScreen, isSignedIn, use
                         <input
                             type="password"
                             id="passwordAgain"
+                            placeholder="Include both letters and numbers "
                             value={passwordAgain}
                             onChange={(e) => setPasswordAgain(e.target.value)}
                             required
                         />
                     </div>
                     <div className="input-group">
-                        <label htmlFor="image">Upload Image</label>
+                        <label htmlFor="image">Profile Image</label>
                         <input
                             type="file"
                             id="image"
@@ -134,6 +138,7 @@ const CreateAccount = ({ addUser, toggleSignendIn, toggleScreen, isSignedIn, use
                     </div>
                     {error && <div className="error-message">{error}</div>}
                     <button type="submit" className="create-account">Create Account</button>
+                    
                 </form>
             </div>
         </div>
