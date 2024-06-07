@@ -208,19 +208,6 @@ const Comment = ({
     setThisComment(updatedComment);
     onCommentChange(updatedComment);
   };
-  const handleEditReply = (replyId, editedContent) => {
-    if (editedContent && editedContent.trim() !== '') {
-      const updatedReplies = thisComment.replies.map(reply =>
-        reply.id === replyId ? { ...reply, content: editedContent } : reply
-      );
-      const updatedComment = {
-        ...thisComment,
-        replies: updatedReplies
-      };
-      setThisComment(updatedComment);
-      onCommentChange(updatedComment);
-    }
-  };
   const handleReply = (e) => {
     e.preventDefault();
     handleAddReply(e, comment.id);
@@ -234,10 +221,6 @@ const Comment = ({
   const handleSendAddReply = (replyId) => {
     handleAddReply(replyId, comment.id);
   };
-  const handleSendEditReply = (replyId, editedContent) => {
-    handleEditReply(replyId, editedContent);
-  };
-
   const isLongComment = comment.content.length > 100;
 
   return (
@@ -358,7 +341,6 @@ const Comment = ({
               reply={reply}
               key={reply.id}
               handleAddReply={handleSendAddReply}
-              handleEditReply={handleSendEditReply}
               handleDeleteReply={handleSendDeleteReply}
               handleReplyChange={handleReplyChange}
               handleCommentReplyChange={handleCommentReplyChange}

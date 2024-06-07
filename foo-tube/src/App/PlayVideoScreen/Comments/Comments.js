@@ -13,7 +13,6 @@ const Comments = ({
   videos
 }) => {
   const [newComment, setNewComment] = useState('');
-
   const [commentList, setCommentList] = useState([]);
   const [isCommentFormVisible, setIsCommentFormVisible] = useState(false);
   const commentTextareaRef = useRef(null);
@@ -22,6 +21,13 @@ const Comments = ({
     setCommentList(videos.find(video => video.id === videoId).comments);
   }, [videos, videoId]);
   
+  useEffect(() => {
+    if (commentTextareaRef.current) {
+      commentTextareaRef.current.style.height = 'auto';
+      commentTextareaRef.current.style.height = commentTextareaRef.current.scrollHeight + 'px';
+    }
+  }, [newComment]);
+
   const handleDeleteComment = (commentId) => {
     const updatedComments = commentList.filter(comment => comment.id !== commentId);
     setCommentList(updatedComments);
@@ -69,14 +75,6 @@ const Comments = ({
       return updatedComments; 
     });
   };
-
-  useEffect(() => {
-    if (commentTextareaRef.current) {
-      commentTextareaRef.current.style.height = 'auto';
-      commentTextareaRef.current.style.height = commentTextareaRef.current.scrollHeight + 'px';
-    }
-  }, [newComment]);
-
   return (
     <div className="comments-container">
       <h2>{commentList.length} Comments</h2>
