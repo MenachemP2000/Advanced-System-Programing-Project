@@ -1,17 +1,16 @@
 
-#outercomment{
-    display: flex;
-    justify-content: row;
-    align-content: space-between;
-    margin: 10px;
+#outerreply{
+  display: flex;
+  justify-content: row;
+  align-content: space-between;
+  margin: 0px;
   }
   #innerreply{
 
-    margin: 10px;
     width: 100%;
-    margin-top: 15px;
-    border: 1px solid #ccc;
+    margin-top: 0px;
     border-radius: 4px;
-    padding: 10px;
+    padding: 10px;  
     font-size: 14px;
+    border: 0px;
   }

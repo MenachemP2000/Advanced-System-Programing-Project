@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './Description.css';
 
-const Description = ({ description, onSave, isSignedIn, username }) => {
+const Description = ({ description, onSave, isSignedIn, username, views }) => {
   const [currentDescription, setCurrentDescription] = useState(description);
   const [isEditing, setIsEditing] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -22,7 +22,7 @@ const Description = ({ description, onSave, isSignedIn, username }) => {
 
   const handleEditClick = () => {
     setIsEditing(true);
-    setIsExpanded(true); // Automatically expand textarea in edit mode
+    setIsExpanded(true); 
   };
 
   const handleSaveClick = () => {
@@ -37,7 +37,6 @@ const Description = ({ description, onSave, isSignedIn, username }) => {
 
   const handleTextareaChange = () => {
     setCurrentDescription(textareaRef.current.value);
-    // Automatically adjust the height of the textarea
     textareaRef.current.style.height = 'auto';
     textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
   };
@@ -76,6 +75,7 @@ const Description = ({ description, onSave, isSignedIn, username }) => {
         </div>
       ) : (
         <div className="description-view">
+          <div>{views} views</div>
           <p>{isExpanded ? currentDescription : currentDescription.substring(0, 100)}</p>
           {currentDescription.length > 100 && (
             <button className="btn btn-link" onClick={toggleReadMore}>

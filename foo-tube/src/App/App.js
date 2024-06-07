@@ -1,5 +1,5 @@
 // App.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 import TopBar from './TopBar/TopBar';
@@ -11,6 +11,7 @@ import SignIn from './SignIn/SignIn';
 import './App.css';
 import CreateAccount from './SignIn/CreateAccount';
 import UserData from './SignIn/users.json'
+import videoData from './PlayVideoScreen/MetaData/videos.json'; // Corrected the import path
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -19,15 +20,72 @@ function App() {
   const [screen, setScreen] = useState(false);
   const [isSignedIn, setSignedInStatus] = useState(false);
   const [users, setUsers] = useState(UserData);
+  const [videos, setVideos] = useState(videoData.videos);
+
+  const likeVideo = (videoId) => {
+    setVideos(prevVideos => {
+      return prevVideos.map(video => {
+        if (video.id === videoId ) {
+          const newLikeCount = video.likeCount + 1;
+          const newUsersLikes = [...video.usersLikes, isSignedIn];          
+          return { ...video, likeCount: newLikeCount, usersLikes: newUsersLikes };
+        }
+        return video;
+      });
+    });
+  };
+
+  const unlikeVideo = (videoId) => {
+    setVideos(prevVideos => {
+      return prevVideos.map(video => {
+        if (video.id === videoId) {
+          const newLikeCount = Math.max(video.likeCount - 1, 0);
+          const newUsersLikes = video.usersLikes.filter(user => user !== isSignedIn);
+          return { ...video, likeCount: newLikeCount, usersLikes: newUsersLikes };
+        }
+        return video;
+      });
+    });
+  };
+
+  
+  const likeComment = (videoId , commentId) => {
+    setVideos(prevVideos => {
+      return prevVideos.map(video => {
+        if (video.id === videoId ) {
+          const newLikeCount = video.likeCount + 1;
+          const newUsersLikes = [...video.usersLikes, isSignedIn];          
+          return { ...video, likeCount: newLikeCount, usersLikes: newUsersLikes };
+        }
+        return video;
+      });
+    });
+  };
+
+  const unlikeComment = (videoId) => {
+    setVideos(prevVideos => {
+      return prevVideos.map(video => {
+        if (video.id === videoId) {
+          const newLikeCount = Math.max(video.likeCount - 1, 0);
+          const newUsersLikes = video.usersLikes.filter(user => user !== isSignedIn);
+          return { ...video, likeCount: newLikeCount, usersLikes: newUsersLikes };
+        }
+        return video;
+      });
+    });
+  };
+  
+
+
 
   const addUser = (user) => {
-      setUsers((prevUsers) => [...prevUsers, user]);
+    setUsers((prevUsers) => [...prevUsers, user]);
   };
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
-  
+
   const toggleDropDown = () => {
     setDropDownOpen(!dropDownOpen);
   };
@@ -36,12 +94,16 @@ function App() {
     setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
   };
 
+  useEffect(() => {
+    document.body.className = theme;
+  }, [theme]);
+
   const toggleSignendIn = (username) => {
     if (username) {
       setSignedInStatus(users.find(user => user.username === username));
-      
+
     }
-    else{
+    else {
       setSignedInStatus(false);
     }
   };
@@ -53,20 +115,20 @@ function App() {
   return (
     <Router>
       <div className={`App ${theme}`}>
-      {!(screen =="SignIn" || screen == "CreateAccount") && (
-        <>
-        <TopBar toggleMenu={toggleMenu} toggleDropDown={toggleDropDown}  isSignedIn={isSignedIn} />
-        <Menu isOpen={menuOpen} />
-        <DropDown  isOpen={dropDownOpen} isSignedIn={isSignedIn} toggleTheme={toggleTheme} toggleSignendIn={toggleSignendIn}/>
-        {menuOpen && <div className="Overlay" onClick={toggleMenu}></div>}
-        </>
-      )}
-        
+        {!(screen == "SignIn" || screen == "CreateAccount") && (
+          <>
+            <TopBar toggleMenu={toggleMenu} toggleDropDown={toggleDropDown} isSignedIn={isSignedIn} />
+            <Menu isOpen={menuOpen} />
+            <DropDown isOpen={dropDownOpen} isSignedIn={isSignedIn} toggleTheme={toggleTheme} toggleSignendIn={toggleSignendIn} />
+            {menuOpen && <div className="Overlay" onClick={toggleMenu}></div>}
+          </>
+        )}
+
         <Routes>
-          <Route path="/signin" element={<SignIn users={users} setUsers={setUsers} toggleScreen={toggleScreen} isSignedIn={isSignedIn}  toggleSignendIn={toggleSignendIn} />} />
-          <Route path="/createaccount" element={<CreateAccount setSignedInStatus={setSignedInStatus} users={users} addUser={addUser} isSignedIn={isSignedIn} toggleScreen={toggleScreen}  toggleSignendIn={toggleSignendIn} />} />
+          <Route path="/signin" element={<SignIn users={users} setUsers={setUsers} toggleScreen={toggleScreen} isSignedIn={isSignedIn} toggleSignendIn={toggleSignendIn} />} />
+          <Route path="/createaccount" element={<CreateAccount setSignedInStatus={setSignedInStatus} users={users} addUser={addUser} isSignedIn={isSignedIn} toggleScreen={toggleScreen} toggleSignendIn={toggleSignendIn} />} />
           <Route path="/" element={<Home toggleScreen={toggleScreen} isSignedIn={isSignedIn} />} /> {/* Define a route for the root URL */}
-          <Route path="/video/:id" element={<PlayVideoScreen users={users} toggleScreen={toggleScreen} isSignedIn={isSignedIn} />} />
+          <Route path="/video/:id" element={<PlayVideoScreen videos={videos} videoData={videoData} unlikeVideo={unlikeVideo}  likeVideo={likeVideo} users={users} toggleScreen={toggleScreen} isSignedIn={isSignedIn} />} />
         </Routes>
       </div>
     </Router>

@@ -117,7 +117,7 @@ const Reply = ({
     )}
     <div className="reply" id="innerreply" key={reply.id}>
       {!isEditing && (<>
-        <p>@{reply.user}</p>
+        <div>@{reply.user}</div>
         <div>
           <p>{isExpanded ? reply.content : reply.content.substring(0, 100)}</p>
           {isLongReply && (

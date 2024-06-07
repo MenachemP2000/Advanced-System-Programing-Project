@@ -24,12 +24,13 @@ const Comment = ({
   const [isReplyFormVisible, setIsReplyFormVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(comment.content);
-  const [commentLikes, setCommentLikes] = useState(0); // State to manage likes of comments
-  const [userLikedComment, setUserLikedComment] = useState(false); // State to track if current user has liked the comment
-  const [replyLikes, setReplyLikes] = useState({}); // State to manage likes of replies
-  const [userLikedReplies, setUserLikedReplies] = useState({}); // State to track if current user has liked each reply
+  const [replyLikes, setReplyLikes] = useState({});
+  const [userLikedReplies, setUserLikedReplies] = useState({});
   const [author, setAuthor] = useState(null);
   const editTextareaRef = useRef(null);
+  const [commentLikes, setCommentLikes] = useState(0);
+  const [userLikedComment, setUserLikedComment] = useState(false);
+  const [usersLikedComment, setUsersLikedComment] = useState([]);
 
   useEffect(() => {
     if (isEditing && editTextareaRef.current) {
@@ -37,6 +38,23 @@ const Comment = ({
       editTextareaRef.current.style.height = editTextareaRef.current.scrollHeight + 'px';
     }
   }, [isEditing, editContent]);
+
+  useEffect(() => {
+    if (comment.usersLiked) {
+      setUsersLikedComment(comment.usersLiked);
+    }
+  }, [comment]);
+
+  useEffect(() => {
+    if (usersLikedComment.includes(isSignedIn)) {
+      setUserLikedComment(true);
+    }
+    else {
+      setUserLikedComment(false);
+    }
+    setCommentLikes(usersLikedComment.length)
+  }, [comment, usersLikedComment, isSignedIn]);
+
 
   useEffect(() => {
     // Initialize userLikedReplies state for each reply
@@ -97,13 +115,15 @@ const Comment = ({
   };
 
   const handleLikeComment = () => {
-    setUserLikedComment(true);
-    setCommentLikes(commentLikes + 1);
+    setUsersLikedComment(prevUsersLikedComment => {
+      return [...prevUsersLikedComment, isSignedIn];
+    });
   };
 
   const handleUnlikeComment = () => {
-    setUserLikedComment(false);
-    setCommentLikes(Math.max(commentLikes - 1, 0));
+    setUsersLikedComment(prevUsersLikedComment => {
+      return prevUsersLikedComment.filter(user => user !== isSignedIn);
+    });
   };
 
   const handleLikeReply = (replyId) => {
@@ -145,137 +165,139 @@ const Comment = ({
       {author && (
         <div><img src={author.image} height="50px" width="50px" ></img></div>
       )}
-    
-    <div className="comment" id="innercomment" key={comment.id}>
-      <div>@{comment.user}</div>
-      {isEditing ? (
-        <div>
-          <textarea
-            ref={editTextareaRef}
-            value={editContent}
-            onChange={handleEditContentChange}
-            className="edit-textarea"
-          />
-          <div className="button-container">
-            <button
-              type="button"
-              className="btn btn-primary save-button"
-              onClick={handleSaveEdit}
-              aria-label="Save edit"
-            >
-              Save
-            </button>
-            <button
-              type="button"
-              className="btn btn-primary cancel-button"
-              onClick={handleCancelEdit}
-              aria-label="Cancel edit"
-            >
-              Cancel
-            </button>
+
+      <div className="comment" id="innercomment" key={comment.id}>
+        <div>@{comment.user}</div>
+        {isEditing ? (
+          <div>
+            <textarea
+              ref={editTextareaRef}
+              value={editContent}
+              onChange={handleEditContentChange}
+              className="edit-textarea"
+            />
+            <div className="button-container">
+              <button
+                type="button"
+                className="btn btn-primary save-button"
+                onClick={handleSaveEdit}
+                aria-label="Save edit"
+              >
+                Save
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary cancel-button"
+                onClick={handleCancelEdit}
+                aria-label="Cancel edit"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
-        </div>
-      ) : (
-        <p>{isExpanded || !isLongComment ? comment.content : `${comment.content.substring(0, 100)}...`}</p>
-      )}
-      <div className="button-container">
-        {(!isEditing && (comment.user == isSignedIn.username)) && (
-          <>
-            <button
-              type="button"
-              className="btn btn-primary edit-button"
-              onClick={() => setIsEditing(true)}
-              aria-label="Edit comment"
-            >
-              Edit
-            </button>
-            <button
-              type="button"
-              className="btn btn-primary delete-button"
-              onClick={() => handleDeleteComment(comment.id)}
-              aria-label="Delete comment"
-            >
-              Delete
-            </button>
-          </>
-        )}  
-      </div>
-      {isLongComment && (
-        <button className="btn btn-link" onClick={toggleReadMore}>
-          {isExpanded ? 'Show Less' : 'Show More'}
-        </button>
-      )}
-      <div>
-        {isSignedIn && (
-          <button className="btn btn-link" onClick={showReplyForm}>
-            {'Reply'}
-          </button>
-        )}
-        {userLikedComment ? (
-          <button className="btn btn-primary" onClick={handleUnlikeComment}>
-            {commentLikes} Unlike
-          </button>
         ) : (
-          <button className="btn btn-primary" onClick={handleLikeComment}>
-            {commentLikes} Like
+          <p>{isExpanded || !isLongComment ? comment.content : `${comment.content.substring(0, 100)}...`}</p>
+        )}
+        <div className="button-container">
+          {(!isEditing && (comment.user == isSignedIn.username)) && (
+            <>
+              <button
+                type="button"
+                className="btn btn-primary edit-button"
+                onClick={() => setIsEditing(true)}
+                aria-label="Edit comment"
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary delete-button"
+                onClick={() => handleDeleteComment(comment.id)}
+                aria-label="Delete comment"
+              >
+                Delete
+              </button>
+            </>
+          )}
+        </div>
+        {isLongComment && (
+          <button className="btn btn-link" onClick={toggleReadMore}>
+            {isExpanded ? 'Show Less' : 'Show More'}
           </button>
         )}
-      </div>
-      {isReplyFormVisible && (
-        <form onSubmit={handleReply}>
-          <textarea
-            value={newReply[comment.id] || ''}
-            onChange={handleReplyContentChange}
-            placeholder="Reply to this comment..."
-            className="reply-textarea"
-          ></textarea>
-          <div className="button-container">
-            <button className="btn btn-primary cancel-button" onClick={hideReplyForm}>
-              {'Cancel'}
+        <div>
+          {isSignedIn && (
+            <button className="btn btn-link" onClick={showReplyForm}>
+              {'Reply'}
             </button>
-            <button
-              className="btn btn-primary submit-button"
-              type="submit"
-              aria-label="Add reply"
-            >
-              Reply
+          )}
+          {(isSignedIn && userLikedComment) && (
+            <button className="btn btn-primary" onClick={handleUnlikeComment}>
+              {commentLikes} Unlike
             </button>
-          </div>
-        </form>
-      )}
-      <div>
-        {comment.replies.length > 0 && (
-          <button className="btn btn-link" onClick={toggleShowReplies}>
-            {isShowingReplies ? '^ ' + comment.replies.length + ' replies' : '˅ ' + comment.replies.length + ' replies'}
-          </button>
+          )}
+          
+          {(isSignedIn && !userLikedComment) && (
+            <button className="btn btn-primary" onClick={handleLikeComment}>
+              {commentLikes} Like
+            </button>
+          )}
+        </div>
+        {isReplyFormVisible && (
+          <form onSubmit={handleReply}>
+            <textarea
+              value={newReply[comment.id] || ''}
+              onChange={handleReplyContentChange}
+              placeholder="Reply to this comment..."
+              className="reply-textarea"
+            ></textarea>
+            <div className="button-container">
+              <button className="btn btn-primary cancel-button" onClick={hideReplyForm}>
+                {'Cancel'}
+              </button>
+              <button
+                className="btn btn-primary submit-button"
+                type="submit"
+                aria-label="Add reply"
+              >
+                Reply
+              </button>
+            </div>
+          </form>
         )}
+        <div>
+          {comment.replies.length > 0 && (
+            <button className="btn btn-link" onClick={toggleShowReplies}>
+              {isShowingReplies ? '^ ' + comment.replies.length + ' replies' : '˅ ' + comment.replies.length + ' replies'}
+            </button>
+          )}
+        </div>
+        <div className={`replies ${isShowingReplies ? 'show' : 'hide'}`}>
+          {comment.replies.map(reply => (
+            <Reply
+              key={reply.id}
+              reply={reply}
+              handleLikeReply={handleLikeReply}
+              handleUnlikeReply={handleUnlikeReply}
+              handleAddReply={handleSendAddReply}
+              handleEditReply={handleSendEditReply}
+              handleDeleteReply={handleSendDeleteReply}
+              handleReplyChange={handleReplyChange}
+              userLikedReply={userLikedReplies[reply.id]}
+              replyLikes={replyLikes[reply.id] || 0}
+              comment={comment}
+              newReply={newReply}
+              handleReplyContentChange={handleReplyContentChange}
+              commentList={commentList}
+              onCommentsChange={onCommentsChange}
+              setCommentList={setCommentList}
+              isSignedIn={isSignedIn}
+              users={users}
+
+            />
+          ))}
+        </div>
       </div>
-      <div className={`replies ${isShowingReplies ? 'show' : 'hide'}`}>
-        {comment.replies.map(reply => (
-          <Reply
-            key={reply.id}
-            reply={reply}
-            handleLikeReply={handleLikeReply}
-            handleUnlikeReply={handleUnlikeReply}
-            handleAddReply={handleSendAddReply}
-            handleEditReply={handleSendEditReply}
-            handleDeleteReply={handleSendDeleteReply}
-            handleReplyChange={handleReplyChange}
-            userLikedReply={userLikedReplies[reply.id]}
-            replyLikes={replyLikes[reply.id] || 0}
-            comment={comment}
-            newReply={newReply}
-            handleReplyContentChange={handleReplyContentChange}
-            commentList={commentList}
-            onCommentsChange={onCommentsChange}
-            setCommentList={setCommentList}
-            isSignedIn={isSignedIn} 
-            users ={users}
-            
-          />
-        ))}
-      </div>
-    </div>
     </div>
   );
 };

@@ -11,6 +11,10 @@
         "duration": "00:10",
         "username": "meny",
         "likeCount": 0,
+        "views": 0,
+        "usersLikes": ["meny"
+        ],
+
         "comments": [
           {
             "id": "c1",
@@ -46,6 +50,8 @@
         "duration": "00:10",
         "username": "baby",
         "likeCount": 0,
+        "views": 0,
+        "usersLikes": [],
         "comments": [
         ]
       },
@@ -60,6 +66,8 @@
         "duration": "00:10",
         "username": "kobi",
         "likeCount": 0,
+        "views": 0,
+        "usersLikes": [],
         "comments": [
         ]
       },
@@ -74,6 +82,8 @@
         "duration": "00:10",
         "username": "kobi",
         "likeCount": 0,
+        "views": 0,
+        "usersLikes": [],
         "comments": [
         ]
       },
@@ -88,6 +98,8 @@
         "duration": "00:10",
         "username": "kobi",
         "likeCount": 0,
+        "views": 0,
+        "usersLikes": [],
         "comments": [
         ]
       },
@@ -102,6 +114,8 @@
         "duration": "00:10",
         "username": "kobi",
         "likeCount": 0,
+        "views": 0,
+        "usersLikes": [],
         "comments": [
         ]
       },
@@ -116,6 +130,8 @@
         "duration": "00:10",
         "username": "kobi",
         "likeCount": 0,
+        "views": 0,
+        "usersLikes": [],
         "comments": [
         ]
       },
@@ -130,6 +146,8 @@
         "duration": "00:10",
         "username": "kobi",
         "likeCount": 0,
+        "views": 0,
+        "usersLikes": [],
         "comments": [
         ]
       },
@@ -144,6 +162,8 @@
         "duration": "00:10",
         "username": "kobi",
         "likeCount": 0,
+        "views": 0,
+        "usersLikes": [],
         "comments": [
         ]
       },
@@ -158,6 +178,8 @@
         "duration": "00:10",
         "username": "kobi",
         "likeCount": 0,
+        "views": 0,
+        "usersLikes": [],
         "comments": [
         ]
       },
@@ -172,6 +194,8 @@
         "duration": "00:10",
         "username": "kobi",
         "likeCount": 0,
+        "views": 0,
+        "usersLikes": [],
         "comments": [
         ]
       },
@@ -186,6 +210,8 @@
         "duration": "00:10",
         "username": "kobi",
         "likeCount": 0,
+        "views": 0,
+        "usersLikes": [],
         "comments": [
         ]
       }

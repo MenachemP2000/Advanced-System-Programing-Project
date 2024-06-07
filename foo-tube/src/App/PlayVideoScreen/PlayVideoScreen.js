@@ -4,9 +4,8 @@ import './PlayVideoScreen.css';
 import RelatedVideos from './RelatedVideos/RelatedVideos';
 import Comments from './Comments/Comments';
 import Description from './Description/Description';
-import videoData from './MetaData/videos.json'; // Corrected the import path
 
-const PlayVideoScreen = ({ toggleScreen, isSignedIn, users }) => {
+const PlayVideoScreen = ({ toggleScreen, isSignedIn, users, likeVideo, unlikeVideo, videoData, videos }) => {
   const { id } = useParams();
   const [video, setVideo] = useState(false);
   const [liked, setLiked] = useState(false);
@@ -17,7 +16,7 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn, users }) => {
   useEffect(() => {
     toggleScreen("PlayVideoScreen");
     const fetchVideo = () => {
-      const video = videoData.videos.find(v => v.id === id);
+      const video = videos.find(v => v.id === id);
       if (video) {
         setVideo(video);
         setLikeCount(video.likeCount || 0);
@@ -27,14 +26,26 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn, users }) => {
     fetchVideo();
   }, [id, toggleScreen, users]);
 
-  const handleLike = () => {
-    if (liked) {
-      setLikeCount(prevCount => prevCount - 1);
-      setLiked(false);
-    } else {
-      setLikeCount(prevCount => prevCount + 1);
+  useEffect(() => {
+    setLikeCount(video.likeCount);
+  }, [video , video.usersLikes]);
+
+  useEffect(() => {
+    if (video.usersLikes && video.usersLikes.length > 0 && video.usersLikes.find(user => user === isSignedIn))
+      {
       setLiked(true);
+    } else {
+
+      setLiked(false);
     }
+  }, [isSignedIn, video.usersLikes]);
+
+
+  const handleLike = () => {
+      likeVideo(video.id);
+  };
+  const handleUnlike = () => {
+      unlikeVideo(video.id);
   };
 
   const handleShare = async () => {
@@ -82,20 +93,37 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn, users }) => {
 
           </div>
           <div className="buttonContainer">
-            <button type="button" className="btn btn-primary" onClick={handleLike}>
-              {liked ? 'Unlike' : 'Like'} {likeCount}
-            </button>
+            {isSignedIn && liked && (
+              <div>
+
+              <button type="button" className="btn btn-primary bi bi-hand-thumbs-up" onClick={handleUnlike}>
+                {'Unlike'} {likeCount}
+              </button>
+              </div>
+            )}
+            
+            {isSignedIn && !liked && (
+              <div>
+              <button type="button" className="btn btn-primary bi bi-hand-thumbs-up" onClick={handleLike}>
+                {'Like'} {likeCount}
+              </button>
+              </div>
+            )}
             <button type="button" className="btn btn-primary" onClick={handleShare}>
               Share
             </button>
           </div>
 
         </div>
-        <Description description={video.description} username={video.username} isSignedIn={isSignedIn} onSave={handleSaveDescription} />
+        <Description views={video.views} description={video.description} username={video.username} isSignedIn={isSignedIn} onSave={handleSaveDescription} />
+
+        <div className="sidebarSmall">
+          <RelatedVideos videos={videos} videoData={videoData} />
+        </div>
         <Comments comments={video.comments} users={users} isSignedIn={isSignedIn} onCommentsChange={handleCommentsChange} />
       </div>
-      <div className="sidebar">
-        <RelatedVideos  videoData={videoData} />
+      <div className="sidebarBig">
+        <RelatedVideos videoData={videoData} videos={videos} />
       </div>
     </div>
   );

@@ -6,11 +6,12 @@
 .videoContainer {
   flex: 2;
   margin-right: 20px;
+  width: 100%;
 }
 
 .VideoPlayer {
+  justify-content: flex-start; 
   width: 100%;
-  height: 30%;
   border-radius: 8px;
   margin-bottom: 10px;
 }
@@ -56,4 +57,18 @@
 }
 #profilename{
   padding: 10px;
+}
+
+
+@media (max-width:900px) {
+    .videoContainer{
+      margin-right: 0px;}
+    .sidebarBig {display: none;}
+    .PlayVideoScreen {display:flex;flex-direction:column;}
+        .sidebar {order:2;}
+        .videoContainer {order:1;}
+        .comments {order:3;}
+}
+@media (min-width:900px) {
+  .sidebarSmall {display: none;}
 }

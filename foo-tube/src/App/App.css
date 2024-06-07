@@ -1,6 +1,7 @@
 * {
   text-align: start;
   unicode-bidi: plaintext;
+  overflow-x: hidden;
 }
 
 body {
@@ -9,6 +10,15 @@ body {
   height: 100%;
   margin-top: 60px;
 }
+body.light{
+  background-color: white;
+  color: black;
+}
+body.dark{
+  background-color: black;
+  color: white;
+}
+
 
 .Overlay {
   position: fixed;
@@ -27,7 +37,6 @@ body {
 .App{
   width: 100%;
   height:max-content;
-  padding: 20px;
 }
 
 .App.light {
