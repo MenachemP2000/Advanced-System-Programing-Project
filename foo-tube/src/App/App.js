@@ -22,6 +22,12 @@ function App() {
   const [users, setUsers] = useState(UserData);
   const [videos, setVideos] = useState(videoData.videos);
 
+  
+  useEffect(() => {
+    console.log(videos);
+  }, [videos]);
+  
+
   const likeVideo = (videoId) => {
     setVideos(prevVideos => {
       return prevVideos.map(video => {
@@ -87,14 +93,12 @@ function App() {
   const handleVideoChange = (newVideo) => {
     setVideos(prevVideos => {
       const videoIndex = prevVideos.findIndex(video => video.id === newVideo.id);
-  
       if (videoIndex !== -1) {
         return prevVideos.map((video, index) => index === videoIndex ? newVideo : video);
       } else {
         return [...prevVideos, newVideo];
       }
     });
-    console.log(videos);
   };
 
 

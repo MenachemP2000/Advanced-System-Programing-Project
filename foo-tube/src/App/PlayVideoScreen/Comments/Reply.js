@@ -62,19 +62,22 @@ const Reply = ({
   
   useEffect(() => {
     setUsersLikedReply(thisReply.usersLikes);
+  }, [thisReply]);
+  
+  useEffect(() => {
+    setUsersLikedReply(thisReply.usersLikes);
     if (usersLikedReply) {
       setTotaluserLikes(usersLikedReply.length);
     }
-  }, [thisReply, usersLikedReply]);
+  }, [usersLikedReply]);
 
   useEffect(() => {
-    console.log(usersLikedReply);
     if (usersLikedReply && usersLikedReply.length > 0 && usersLikedReply.find(user => user === isSignedIn.username)) {
       setUserLikedReply(true);
     } else {
       setUserLikedReply(false);
     }
-  }, [isSignedIn, thisReply, usersLikedReply]);
+  }, [isSignedIn,, usersLikedReply]);
 
   const handleLikeReply = () => {
     const newUsersLikes = [...thisReply.usersLikes, isSignedIn.username];
@@ -99,14 +102,14 @@ const Reply = ({
       if (replyContent && replyContent.trim() !== '') {
         const newReply = {
           id: uuidv4(),
-          user: isSignedIn.username, // Y
+          user: isSignedIn.username,
           content: replyContent,
           usersLikes: []
         }
         updatedComments[commentIndex].replies.push(newReply);
         setCommentList(updatedComments);
-        onCommentsChange(updatedComments); // Notify parent component about the change
-        setNewReply(prevState => ({ ...prevState, [commentId]: '' })); // Clear the reply input
+        onCommentsChange(updatedComments); 
+        setNewReply(prevState => ({ ...prevState, [commentId]: '' })); 
       }
     }
   };

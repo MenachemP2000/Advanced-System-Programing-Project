@@ -77,6 +77,7 @@ const Comments = ({
       } else {
         updatedComments = [...prevComments, newComment];
       }
+      console.log(updatedComments);
       onCommentsChange(updatedComments);
       return updatedComments; 
     });

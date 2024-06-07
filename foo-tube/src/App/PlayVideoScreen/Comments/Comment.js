@@ -163,7 +163,7 @@ const Comment = ({
         ...thisComment,
         replies: updatedReplies
       };
-  
+      setThisComment(updatedComment);
       onCommentChange(updatedComment);
   
       return updatedReplies;
