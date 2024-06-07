@@ -9,18 +9,12 @@ const Comment = ({
   comment,
   handleEditComment,
   handleDeleteComment,
-  handleAddReply,
-  handleDeleteReply,
-  handleEditReply,
-  handleReplyChange,
-  newReply,
   commentList,
   onCommentChange,
   setCommentList,
   isSignedIn,
   users,
   onCommentsChange,
-  handleEditReplyLikes
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isShowingReplies, setIsShowingReplies] = useState(false);
@@ -29,6 +23,7 @@ const Comment = ({
   const [editContent, setEditContent] = useState(comment.content);
   const [author, setAuthor] = useState(null);
   const editTextareaRef = useRef(null);
+  const [newReply, setNewReply] = useState({});
 
   const [thisComment, setThisComment] = useState(comment);
   const [usersLikedComment, setUsersLikedComment] = useState([]);
@@ -64,17 +59,19 @@ const Comment = ({
     fetchComment();
   }, [key, users]);
 
-
+  
   useEffect(() => {
     setUsersLikedComment(thisComment.usersLikes);
     setTotaluserLikes(usersLikedComment.length);
   }, [thisComment, usersLikedComment]);
-  
+
   useEffect(() => {
-    
     setCurrentCommentReplies(thisComment.replies);
+  }, [thisComment]);
+
+  useEffect(() => {
     setCurrentCommentRepliesLength(currentCommentReplies.length);
-  }, [thisComment, currentCommentReplies]);
+  }, [currentCommentReplies]);
 
   useEffect(() => {
     if (usersLikedComment && usersLikedComment.length > 0 && usersLikedComment.find(user => user === isSignedIn.username)) {
@@ -143,7 +140,81 @@ const Comment = ({
     e.target.style.height = 'auto';
     e.target.style.height = e.target.scrollHeight + 'px';
   };
+  
+  const handleReplyChange = (e, commentId) => {
+    const { value } = e.target;
+    setNewReply(prevState => ({ ...prevState, [commentId]: value }));
+  };
 
+
+  const handleCommentReplyChange = (newReply) => {
+    setCurrentCommentReplies(prevReplies => {
+      // Find the index of the reply to be updated
+      const replyIndex = prevReplies.findIndex(reply => reply.id === newReply.id);
+  
+      let updatedReplies;
+      if (replyIndex !== -1) {
+        updatedReplies = prevReplies.map((reply, index) => index === replyIndex ? newReply : reply);
+      } else {
+        updatedReplies = [...prevReplies, newReply];
+      }
+  
+      const updatedComment = {
+        ...thisComment,
+        replies: updatedReplies
+      };
+  
+      onCommentChange(updatedComment);
+  
+      return updatedReplies;
+    });
+  };
+  
+
+
+  const handleAddReply = (e, commentId) => {
+    e.preventDefault();
+    const replyContent = newReply[commentId];
+    if (replyContent && replyContent.trim() !== '') {
+      const newReplyObject = {
+        id: uuidv4(),
+        user: isSignedIn.username,
+        content: replyContent,
+        usersLikes: []
+      };
+      const updatedReplies = [...thisComment.replies, newReplyObject];
+      const updatedComment = {
+        ...thisComment,
+        replies: updatedReplies
+      };
+      setThisComment(updatedComment);
+      onCommentChange(updatedComment);
+      setNewReply(prevState => ({ ...prevState, [commentId]: '' }));
+    }
+  };
+
+  const handleDeleteReply = (replyId) => {
+    const updatedReplies = thisComment.replies.filter(reply => reply.id !== replyId);
+    const updatedComment = {
+      ...thisComment,
+      replies: updatedReplies
+    };
+    setThisComment(updatedComment);
+    onCommentChange(updatedComment);
+  };
+  const handleEditReply = (replyId, editedContent) => {
+    if (editedContent && editedContent.trim() !== '') {
+      const updatedReplies = thisComment.replies.map(reply =>
+        reply.id === replyId ? { ...reply, content: editedContent } : reply
+      );
+      const updatedComment = {
+        ...thisComment,
+        replies: updatedReplies
+      };
+      setThisComment(updatedComment);
+      onCommentChange(updatedComment);
+    }
+  };
   const handleReply = (e) => {
     e.preventDefault();
     handleAddReply(e, comment.id);
@@ -151,13 +222,14 @@ const Comment = ({
   };
 
   const handleSendDeleteReply = (replyId) => {
-    handleDeleteReply(replyId, comment.id);
+    handleDeleteReply(replyId);
   };
+  
   const handleSendAddReply = (replyId) => {
     handleAddReply(replyId, comment.id);
   };
   const handleSendEditReply = (replyId, editedContent) => {
-    handleEditReply(replyId, comment.id, editedContent);
+    handleEditReply(replyId, editedContent);
   };
 
   const isLongComment = comment.content.length > 100;
@@ -275,7 +347,7 @@ const Comment = ({
           )}
         </div>
         <div className={`replies ${isShowingReplies ? 'show' : 'hide'}`}>
-          {comment.replies.map(reply => (
+          {currentCommentReplies.map(reply => (
             <Reply
               reply={reply}
               key={reply.id}
@@ -283,6 +355,7 @@ const Comment = ({
               handleEditReply={handleSendEditReply}
               handleDeleteReply={handleSendDeleteReply}
               handleReplyChange={handleReplyChange}
+              handleCommentReplyChange={handleCommentReplyChange}
               comment={thisComment}
               newReply={newReply}
               handleReplyContentChange={handleReplyContentChange}
@@ -291,7 +364,6 @@ const Comment = ({
               setCommentList={setCommentList}
               isSignedIn={isSignedIn}
               users={users}
-              handleEditReplyLikes={handleEditReplyLikes}
 
             />
           ))}

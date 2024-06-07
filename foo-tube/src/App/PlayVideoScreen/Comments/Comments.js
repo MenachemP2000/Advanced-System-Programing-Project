@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from 'uuid'; // Import uuidv4
 import Comment from './Comment';
 
 const Comments = ({
-  comments,
   onCommentsChange,
   isSignedIn,
   users,
@@ -14,7 +13,6 @@ const Comments = ({
   videos
 }) => {
   const [newComment, setNewComment] = useState('');
-  const [newReply, setNewReply] = useState({});
 
   const [commentList, setCommentList] = useState([]);
   const [isCommentFormVisible, setIsCommentFormVisible] = useState(false);
@@ -54,106 +52,6 @@ const Comments = ({
     }
   };
 
-  const handleAddReply = (e, commentId) => {
-    e.preventDefault();
-    const commentIndex = commentList.findIndex(comment => comment.id === commentId);
-    if (commentIndex !== -1) {
-      const updatedComments = [...commentList];
-      const replyContent = newReply[commentId];
-      if (replyContent && replyContent.trim() !== '') {
-        updatedComments[commentIndex].replies.push({
-          id: uuidv4(),
-          user: isSignedIn.username, // You can set the user dynamically based on authentication
-          content: replyContent,
-          usersLikes: []
-        });
-        setCommentList(updatedComments);
-        onCommentsChange(updatedComments); 
-        setNewReply(prevState => ({ ...prevState, [commentId]: '' })); // Clear the reply input
-      }
-    }
-  };
-
-  const handleEditReply = (replyId, commentId, editedContent) => {
-    const commentIndex = commentList.findIndex(comment => comment.id === commentId);
-
-    if (commentIndex !== -1) {
-      const replyIndex = commentList[commentIndex].replies.findIndex(reply => reply.id === replyId);
-
-      if (replyIndex !== -1) {
-        // Create a copy of the commentList and the replies array
-        const updatedComments = [...commentList];
-        const updatedReplies = [...updatedComments[commentIndex].replies];
-
-        // Update the content of the reply
-        updatedReplies[replyIndex] = {
-          ...updatedReplies[replyIndex],
-          content: editedContent
-        };
-
-        // Update the replies array in the comment
-        updatedComments[commentIndex] = {
-          ...updatedComments[commentIndex],
-          replies: updatedReplies
-        };
-
-        setCommentList(updatedComments);
-        onCommentsChange(updatedComments);
-      }
-    }
-  };
-
-  const handleEditReplyLikes = (replyId, commentId, replyLikes) => {
-    const commentIndex = commentList.findIndex(comment => comment.id === commentId);
-
-    if (commentIndex !== -1) {
-      const replyIndex = commentList[commentIndex].replies.findIndex(reply => reply.id === replyId);
-
-      if (replyIndex !== -1) {
-        // Create a copy of the commentList and the replies array
-        const updatedComments = [...commentList];
-        const updatedReplies = [...updatedComments[commentIndex].replies];
-
-        updatedReplies[replyIndex] = {
-          ...updatedReplies[replyIndex],
-          usersLikes: replyLikes
-        };
-
-        // Update the replies array in the comment
-        updatedComments[commentIndex] = {
-          ...updatedComments[commentIndex],
-          replies: updatedReplies
-        };
-        console.log(updatedComments);
-        setCommentList(updatedComments);
-        onCommentsChange(updatedComments);
-      }
-    }
-  };
-
-
-
-  const handleDeleteReply = (replyId, commentId) => {
-    const commentIndex = commentList.findIndex(comment => comment.id === commentId);
-
-    if (commentIndex !== -1) {
-      const updatedReplies = commentList[commentIndex].replies.filter(reply => reply.id !== replyId);
-      const updatedComments = [...commentList];
-      updatedComments[commentIndex] = {
-        ...updatedComments[commentIndex],
-        replies: updatedReplies
-      };
-      setCommentList(updatedComments);
-      onCommentsChange(updatedComments);
-
-    }
-  };
-  
-  const handleReplyChange = (e, commentId) => {
-    const { value } = e.target;
-    setNewReply(prevState => ({ ...prevState, [commentId]: value }));
-  };
-
   const handleCancelEdit = () => {
     setNewComment('');
     setIsCommentFormVisible(false);
@@ -180,7 +78,6 @@ const Comments = ({
         updatedComments = [...prevComments, newComment];
       }
       onCommentsChange(updatedComments);
-      
       return updatedComments; 
     });
   };
@@ -240,18 +137,12 @@ const Comments = ({
           index={index}
           handleEditComment={handleEditComment}
           handleDeleteComment={handleDeleteComment}
-          handleAddReply={handleAddReply}
-          handleEditReply={handleEditReply}
-          handleDeleteReply={handleDeleteReply}
-          handleReplyChange={handleReplyChange}
-          newReply={newReply}
           commentList={commentList}
           onCommentChange={handleCommentChange}
           setCommentList={setCommentList}
           videoId={videoId}
           videos={videos}
           onCommentsChange={onCommentsChange}
-          handleEditReplyLikes={handleEditReplyLikes}
         />
       ))}
     </div>

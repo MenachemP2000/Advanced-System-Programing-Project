@@ -13,7 +13,7 @@ const Reply = ({
   setCommentList,
   isSignedIn,
   users,
-  handleEditReplyLikes
+  handleCommentReplyChange
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -78,17 +78,18 @@ const Reply = ({
 
   const handleLikeReply = () => {
     const newUsersLikes = [...thisReply.usersLikes, isSignedIn.username];
-    let updatedReply = { ...thisReply, usersLikes: newUsersLikes };
+    const updatedReply = { ...thisReply, usersLikes: newUsersLikes };
     setThisReply(updatedReply);
-    handleEditReplyLikes(thisReply.id, comment.id,newUsersLikes );
+    handleCommentReplyChange(updatedReply);
   };
 
   const handleUnlikeReply = () => {
     const newUsersLikes = thisReply.usersLikes.filter(user => user !== isSignedIn.username);
     const updatedReply = { ...thisReply, usersLikes: newUsersLikes };
     setThisReply(updatedReply);
-    handleEditReplyLikes(thisReply.id, comment.id,newUsersLikes );
+    handleCommentReplyChange(updatedReply);
   };
+
   const handleAddReply = (e, commentId) => {
     e.preventDefault();
     const commentIndex = commentList.findIndex(comment => comment.id === commentId);
@@ -96,12 +97,13 @@ const Reply = ({
       const updatedComments = [...commentList];
       const replyContent = newReply[commentId];
       if (replyContent && replyContent.trim() !== '') {
-        updatedComments[commentIndex].replies.push({
+        const newReply = {
           id: uuidv4(),
           user: isSignedIn.username, // Y
           content: replyContent,
           usersLikes: []
-        });
+        }
+        updatedComments[commentIndex].replies.push(newReply);
         setCommentList(updatedComments);
         onCommentsChange(updatedComments); // Notify parent component about the change
         setNewReply(prevState => ({ ...prevState, [commentId]: '' })); // Clear the reply input
