@@ -22,18 +22,6 @@ const Comments = ({
     setCommentList(videos.find(video => video.id === videoId).comments);
   }, [videos, videoId]);
   
-
-  const handleEditComment = (commentId, content) => {
-    const updatedComments = commentList.map(comment => {
-      if (comment.id === commentId) {
-        return { ...comment, content };
-      }
-      return comment;
-    });
-    setCommentList(updatedComments);
-    onCommentsChange(updatedComments);  
-  };
-
   const handleDeleteComment = (commentId) => {
     const updatedComments = commentList.filter(comment => comment.id !== commentId);
     setCommentList(updatedComments);
@@ -66,7 +54,6 @@ const Comments = ({
     e.target.style.height = e.target.scrollHeight + 'px';
   };
   
-
   const handleCommentChange = (newComment) => {
     setCommentList(prevComments => {
       const commentIndex = prevComments.findIndex(comment => comment.id === newComment.id);
@@ -82,8 +69,6 @@ const Comments = ({
       return updatedComments; 
     });
   };
-  
-  
 
   useEffect(() => {
     if (commentTextareaRef.current) {
@@ -136,7 +121,6 @@ const Comments = ({
           key={comment.id}
           comment={comment}
           index={index}
-          handleEditComment={handleEditComment}
           handleDeleteComment={handleDeleteComment}
           commentList={commentList}
           onCommentChange={handleCommentChange}

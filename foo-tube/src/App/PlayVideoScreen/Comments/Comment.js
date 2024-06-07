@@ -7,7 +7,6 @@ import './Comment.css';
 const Comment = ({
   key,
   comment,
-  handleEditComment,
   handleDeleteComment,
   commentList,
   onCommentChange,
@@ -59,7 +58,6 @@ const Comment = ({
     fetchComment();
   }, [key, users]);
 
-  
   useEffect(() => {
     setUsersLikedComment(thisComment.usersLikes);
     setTotaluserLikes(usersLikedComment.length);
@@ -119,8 +117,18 @@ const Comment = ({
     setIsReplyFormVisible(!isReplyFormVisible);
   };
 
+  const handleEditComment = (editContent) => {
+    const updatedComment = {
+      ...thisComment,
+      content: editContent
+    };
+    setThisComment(updatedComment);
+    onCommentChange(updatedComment);
+  };
+
+
   const handleSaveEdit = () => {
-    handleEditComment(comment.id, editContent);
+    handleEditComment(editContent);
     setIsEditing(false);
   };
 
@@ -140,7 +148,7 @@ const Comment = ({
     e.target.style.height = 'auto';
     e.target.style.height = e.target.scrollHeight + 'px';
   };
-  
+
   const handleReplyChange = (e, commentId) => {
     const { value } = e.target;
     setNewReply(prevState => ({ ...prevState, [commentId]: value }));
@@ -151,26 +159,24 @@ const Comment = ({
     setCurrentCommentReplies(prevReplies => {
       // Find the index of the reply to be updated
       const replyIndex = prevReplies.findIndex(reply => reply.id === newReply.id);
-  
+
       let updatedReplies;
       if (replyIndex !== -1) {
         updatedReplies = prevReplies.map((reply, index) => index === replyIndex ? newReply : reply);
       } else {
         updatedReplies = [...prevReplies, newReply];
       }
-  
+
       const updatedComment = {
         ...thisComment,
         replies: updatedReplies
       };
       setThisComment(updatedComment);
       onCommentChange(updatedComment);
-  
+
       return updatedReplies;
     });
   };
-  
-
 
   const handleAddReply = (e, commentId) => {
     e.preventDefault();
@@ -224,7 +230,7 @@ const Comment = ({
   const handleSendDeleteReply = (replyId) => {
     handleDeleteReply(replyId);
   };
-  
+
   const handleSendAddReply = (replyId) => {
     handleAddReply(replyId, comment.id);
   };
