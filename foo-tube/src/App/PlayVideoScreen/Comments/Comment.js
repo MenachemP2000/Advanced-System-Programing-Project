@@ -5,6 +5,7 @@ import Reply from './Reply'; // Import Reply component
 import './Comment.css';
 
 const Comment = ({
+  key,
   comment,
   handleEditComment,
   handleDeleteComment,
@@ -14,23 +15,25 @@ const Comment = ({
   handleReplyChange,
   newReply,
   commentList,
-  onCommentsChange,
+  onCommentChange,
   setCommentList,
   isSignedIn,
-  users
+  users,
+  onCommentsChange,
+  handleEditReplyLikes
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isShowingReplies, setIsShowingReplies] = useState(false);
   const [isReplyFormVisible, setIsReplyFormVisible] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(comment.content);
-  const [replyLikes, setReplyLikes] = useState({});
-  const [userLikedReplies, setUserLikedReplies] = useState({});
   const [author, setAuthor] = useState(null);
   const editTextareaRef = useRef(null);
-  const [commentLikes, setCommentLikes] = useState(0);
-  const [userLikedComment, setUserLikedComment] = useState(false);
+
+  const [thisComment, setThisComment] = useState(comment);
   const [usersLikedComment, setUsersLikedComment] = useState([]);
+  const [userLikedComment, setUserLikedComment] = useState(false);
+  const [totalUserLikes, setTotaluserLikes] = useState(0);
 
   useEffect(() => {
     if (isEditing && editTextareaRef.current) {
@@ -40,31 +43,54 @@ const Comment = ({
   }, [isEditing, editContent]);
 
   useEffect(() => {
-    if (comment.usersLiked) {
-      setUsersLikedComment(comment.usersLiked);
-    }
-  }, [comment]);
+    const fetchComment = () => {
+      const currentComment = commentList.find(c => c.id === key);
+      if (currentComment) {
+        setThisComment(currentComment);
+        setUsersLikedComment(currentComment.usersLikes);
+        setTotaluserLikes(usersLikedComment.length || 0);
+        setAuthor(users.find(author => author.username === currentComment.username));
+      }
+      if (usersLikedComment && usersLikedComment.length > 0 && usersLikedComment.find(user => user === isSignedIn.username)) {
+        setUserLikedComment(true);
+      } else {
+        setUserLikedComment(false);
+      }
+    };
+    fetchComment();
+  }, [key, users]);
+
 
   useEffect(() => {
-    if (usersLikedComment.includes(isSignedIn)) {
+    setUsersLikedComment(thisComment.usersLikes);
+    setTotaluserLikes(usersLikedComment.length);
+  }, [thisComment, usersLikedComment]);
+
+  useEffect(() => {
+    if (usersLikedComment && usersLikedComment.length > 0 && usersLikedComment.find(user => user === isSignedIn.username)) {
       setUserLikedComment(true);
-    }
-    else {
+    } else {
       setUserLikedComment(false);
     }
-    setCommentLikes(usersLikedComment.length)
-  }, [comment, usersLikedComment, isSignedIn]);
+  }, [isSignedIn, thisComment, usersLikedComment]);
 
+
+  const handleLikeComment = () => {
+    const newUsersLikes = [...thisComment.usersLikes, isSignedIn.username];
+    let updatedComment = { ...thisComment, usersLikes: newUsersLikes };
+    setThisComment(updatedComment);
+    onCommentChange(updatedComment);
+  };
+
+  const handleUnlikeComment = () => {
+    const newUsersLikes = thisComment.usersLikes.filter(user => user !== isSignedIn.username);
+    const updatedComment = { ...thisComment, usersLikes: newUsersLikes };
+    setThisComment(updatedComment);
+    onCommentChange(updatedComment);
+  };
 
   useEffect(() => {
-    // Initialize userLikedReplies state for each reply
-    const initialUserLikedReplies = {};
-    comment.replies.forEach(reply => {
-      initialUserLikedReplies[reply.id] = false;
-    });
-
     setAuthor(users.find(author => author.username === comment.user));
-    setUserLikedReplies(initialUserLikedReplies);
   }, [comment.replies]);
 
   const toggleShowReplies = () => {
@@ -112,40 +138,6 @@ const Comment = ({
     e.preventDefault();
     handleAddReply(e, comment.id);
     hideReplyForm();
-  };
-
-  const handleLikeComment = () => {
-    setUsersLikedComment(prevUsersLikedComment => {
-      return [...prevUsersLikedComment, isSignedIn];
-    });
-  };
-
-  const handleUnlikeComment = () => {
-    setUsersLikedComment(prevUsersLikedComment => {
-      return prevUsersLikedComment.filter(user => user !== isSignedIn);
-    });
-  };
-
-  const handleLikeReply = (replyId) => {
-    setUserLikedReplies(prevUserLikedReplies => ({
-      ...prevUserLikedReplies,
-      [replyId]: true,
-    }));
-    setReplyLikes(prevLikes => ({
-      ...prevLikes,
-      [replyId]: (prevLikes[replyId] || 0) + 1,
-    }));
-  };
-
-  const handleUnlikeReply = (replyId) => {
-    setUserLikedReplies(prevUserLikedReplies => ({
-      ...prevUserLikedReplies,
-      [replyId]: false,
-    }));
-    setReplyLikes(prevLikes => ({
-      ...prevLikes,
-      [replyId]: Math.max((prevLikes[replyId] || 0) - 1, 0),
-    }));
   };
 
   const handleSendDeleteReply = (replyId) => {
@@ -233,13 +225,13 @@ const Comment = ({
           )}
           {(isSignedIn && userLikedComment) && (
             <button className="btn btn-primary" onClick={handleUnlikeComment}>
-              {commentLikes} Unlike
+              {totalUserLikes} Unlike
             </button>
           )}
-          
+
           {(isSignedIn && !userLikedComment) && (
             <button className="btn btn-primary" onClick={handleLikeComment}>
-              {commentLikes} Like
+              {totalUserLikes} Like
             </button>
           )}
         </div>
@@ -275,16 +267,12 @@ const Comment = ({
         <div className={`replies ${isShowingReplies ? 'show' : 'hide'}`}>
           {comment.replies.map(reply => (
             <Reply
-              key={reply.id}
               reply={reply}
-              handleLikeReply={handleLikeReply}
-              handleUnlikeReply={handleUnlikeReply}
+              key={reply.id}
               handleAddReply={handleSendAddReply}
               handleEditReply={handleSendEditReply}
               handleDeleteReply={handleSendDeleteReply}
               handleReplyChange={handleReplyChange}
-              userLikedReply={userLikedReplies[reply.id]}
-              replyLikes={replyLikes[reply.id] || 0}
               comment={comment}
               newReply={newReply}
               handleReplyContentChange={handleReplyContentChange}
@@ -293,6 +281,7 @@ const Comment = ({
               setCommentList={setCommentList}
               isSignedIn={isSignedIn}
               users={users}
+              handleEditReplyLikes={handleEditReplyLikes}
 
             />
           ))}

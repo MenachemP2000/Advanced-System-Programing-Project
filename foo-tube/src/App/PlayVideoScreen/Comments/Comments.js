@@ -3,16 +3,27 @@ import './Comments.css';
 import { v4 as uuidv4 } from 'uuid'; // Import uuidv4
 import Comment from './Comment';
 
-const Comments = ({ comments, onCommentsChange ,isSignedIn ,users }) => {
+const Comments = ({
+  comments,
+  onCommentsChange,
+  isSignedIn,
+  users,
+  likeComment,
+  unlikeComment,
+  videoId,
+  videos
+}) => {
   const [newComment, setNewComment] = useState('');
   const [newReply, setNewReply] = useState({});
+
   const [commentList, setCommentList] = useState([]);
   const [isCommentFormVisible, setIsCommentFormVisible] = useState(false);
   const commentTextareaRef = useRef(null);
 
   useEffect(() => {
-    setCommentList(comments);
-  }, [comments]);
+    setCommentList(videos.find(video => video.id === videoId).comments);
+  }, [videos, videoId]);
+  
 
   const handleEditComment = (commentId, content) => {
     const updatedComments = commentList.map(comment => {
@@ -22,13 +33,13 @@ const Comments = ({ comments, onCommentsChange ,isSignedIn ,users }) => {
       return comment;
     });
     setCommentList(updatedComments);
-    onCommentsChange(updatedComments);  // Notify parent component about the change
+    onCommentsChange(updatedComments);  
   };
 
   const handleDeleteComment = (commentId) => {
     const updatedComments = commentList.filter(comment => comment.id !== commentId);
     setCommentList(updatedComments);
-    onCommentsChange(updatedComments);  // Notify parent component about the change
+    onCommentsChange(updatedComments);
   };
 
   const handleAddComment = (e) => {
@@ -36,12 +47,10 @@ const Comments = ({ comments, onCommentsChange ,isSignedIn ,users }) => {
     e.preventDefault();
     if (newComment.trim() !== '') {
       let updatedComments;
-        updatedComments = [...commentList, { id: uuidv4(), content: newComment, replies: [], user: author , date: Date.now() }]; // Generate a unique id
-      
-      setCommentList(updatedComments);
+      updatedComments = [...commentList,{ id: uuidv4(), content: newComment, replies: [], usersLikes: [], user: author, date: Date.now() }]; 
       setNewComment('');
       setIsCommentFormVisible(false);
-      onCommentsChange(updatedComments);  // Notify parent component about the change
+      onCommentsChange(updatedComments);  
     }
   };
 
@@ -55,73 +64,90 @@ const Comments = ({ comments, onCommentsChange ,isSignedIn ,users }) => {
         updatedComments[commentIndex].replies.push({
           id: uuidv4(),
           user: isSignedIn.username, // You can set the user dynamically based on authentication
-          content: replyContent
+          content: replyContent,
+          usersLikes: []
         });
         setCommentList(updatedComments);
-        onCommentsChange(updatedComments); // Notify parent component about the change
+        onCommentsChange(updatedComments); 
         setNewReply(prevState => ({ ...prevState, [commentId]: '' })); // Clear the reply input
       }
     }
   };
 
   const handleEditReply = (replyId, commentId, editedContent) => {
-    // Find the comment index in the commentList
     const commentIndex = commentList.findIndex(comment => comment.id === commentId);
-    
+
     if (commentIndex !== -1) {
-      // Find the reply index in the replies array of the comment
       const replyIndex = commentList[commentIndex].replies.findIndex(reply => reply.id === replyId);
-      
+
       if (replyIndex !== -1) {
         // Create a copy of the commentList and the replies array
         const updatedComments = [...commentList];
         const updatedReplies = [...updatedComments[commentIndex].replies];
-        
+
         // Update the content of the reply
         updatedReplies[replyIndex] = {
           ...updatedReplies[replyIndex],
           content: editedContent
         };
-        
+
         // Update the replies array in the comment
         updatedComments[commentIndex] = {
           ...updatedComments[commentIndex],
           replies: updatedReplies
         };
-        
-        // Update the state with the updated commentList
+
         setCommentList(updatedComments);
-        
-        // Notify the parent component about the change if needed
-        // onCommentsChange(updatedComments);
+        onCommentsChange(updatedComments);
       }
     }
   };
-  const handleDeleteReply = (replyId, commentId) => {
-    // Find the comment index in the commentList
+
+  const handleEditReplyLikes = (replyId, commentId, replyLikes) => {
     const commentIndex = commentList.findIndex(comment => comment.id === commentId);
-    
+
     if (commentIndex !== -1) {
-      // Filter out the reply with the specified id from the replies array
+      const replyIndex = commentList[commentIndex].replies.findIndex(reply => reply.id === replyId);
+
+      if (replyIndex !== -1) {
+        // Create a copy of the commentList and the replies array
+        const updatedComments = [...commentList];
+        const updatedReplies = [...updatedComments[commentIndex].replies];
+
+        updatedReplies[replyIndex] = {
+          ...updatedReplies[replyIndex],
+          usersLikes: replyLikes
+        };
+
+        // Update the replies array in the comment
+        updatedComments[commentIndex] = {
+          ...updatedComments[commentIndex],
+          replies: updatedReplies
+        };
+        console.log(updatedComments);
+        setCommentList(updatedComments);
+        onCommentsChange(updatedComments);
+      }
+    }
+  };
+
+
+
+  const handleDeleteReply = (replyId, commentId) => {
+    const commentIndex = commentList.findIndex(comment => comment.id === commentId);
+
+    if (commentIndex !== -1) {
       const updatedReplies = commentList[commentIndex].replies.filter(reply => reply.id !== replyId);
-      
-      // Create a copy of the commentList and update the replies array
       const updatedComments = [...commentList];
       updatedComments[commentIndex] = {
         ...updatedComments[commentIndex],
         replies: updatedReplies
       };
-      
-      // Update the state with the updated commentList
       setCommentList(updatedComments);
-      
-      // Notify the parent component about the change if needed
-      // onCommentsChange(updatedComments);
+      onCommentsChange(updatedComments);
+
     }
   };
-  
-  
-
   const handleReplyChange = (e, commentId) => {
     const { value } = e.target;
     setNewReply(prevState => ({ ...prevState, [commentId]: value }));
@@ -140,6 +166,25 @@ const Comments = ({ comments, onCommentsChange ,isSignedIn ,users }) => {
     e.target.style.height = 'auto';
     e.target.style.height = e.target.scrollHeight + 'px';
   };
+  
+
+  const handleCommentChange = (newComment) => {
+    setCommentList(prevComments => {
+      const commentIndex = prevComments.findIndex(comment => comment.id === newComment.id);
+    
+      let updatedComments;
+      if (commentIndex !== -1) { 
+        updatedComments = prevComments.map((comment, index) => index === commentIndex ? newComment : comment);
+      } else {
+        updatedComments = [...prevComments, newComment];
+      }
+      onCommentsChange(updatedComments);
+      
+      return updatedComments; 
+    });
+  };
+  
+  
 
   useEffect(() => {
     if (commentTextareaRef.current) {
@@ -152,41 +197,43 @@ const Comments = ({ comments, onCommentsChange ,isSignedIn ,users }) => {
     <div className="comments-container">
       <h2>{commentList.length} Comments</h2>
       {(isSignedIn) && (
-      <form onSubmit={handleAddComment}>
-        <textarea
-          ref={commentTextareaRef}
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          onFocus={handleTextareaFocus}
-          onInput={handleTextareaInput}
-          placeholder="Add your comment..."
-          className="comment-textarea"
-        ></textarea>
-        {isCommentFormVisible && (
-          <div className="button-container">
-            <button
-              type="button"
-              className="btn btn-primary cancel-button"
-              onClick={handleCancelEdit}
-              aria-label="Cancel editing"
-            >
-              Cancel
-            </button>
-            <button
-              className="btn btn-primary submit-button"
-              type="submit"
-              aria-label={'Comment'}
-            >
-              {'Comment'}
-            </button>
-          </div>
-        )}
-      </form>
+        <form onSubmit={handleAddComment}>
+          <textarea
+            ref={commentTextareaRef}
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            onFocus={handleTextareaFocus}
+            onInput={handleTextareaInput}
+            placeholder="Add your comment..."
+            className="comment-textarea"
+          ></textarea>
+          {isCommentFormVisible && (
+            <div className="button-container">
+              <button
+                type="button"
+                className="btn btn-primary cancel-button"
+                onClick={handleCancelEdit}
+                aria-label="Cancel editing"
+              >
+                Cancel
+              </button>
+              <button
+                className="btn btn-primary submit-button"
+                type="submit"
+                aria-label={'Comment'}
+              >
+                {'Comment'}
+              </button>
+            </div>
+          )}
+        </form>
       )}
       {commentList.map((comment, index) => (
         <Comment
-          users ={users}
-          isSignedIn ={isSignedIn}
+          likeComment={likeComment}
+          unlikeComment={unlikeComment}
+          users={users}
+          isSignedIn={isSignedIn}
           key={comment.id}
           comment={comment}
           index={index}
@@ -198,9 +245,12 @@ const Comments = ({ comments, onCommentsChange ,isSignedIn ,users }) => {
           handleReplyChange={handleReplyChange}
           newReply={newReply}
           commentList={commentList}
-          onCommentsChange={onCommentsChange}
+          onCommentChange={handleCommentChange}
           setCommentList={setCommentList}
-          users ={users}
+          videoId={videoId}
+          videos={videos}
+          onCommentsChange={onCommentsChange}
+          handleEditReplyLikes={handleEditReplyLikes}
         />
       ))}
     </div>

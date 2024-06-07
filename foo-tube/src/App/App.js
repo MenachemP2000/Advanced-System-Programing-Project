@@ -25,9 +25,9 @@ function App() {
   const likeVideo = (videoId) => {
     setVideos(prevVideos => {
       return prevVideos.map(video => {
-        if (video.id === videoId ) {
+        if (video.id === videoId) {
           const newLikeCount = video.likeCount + 1;
-          const newUsersLikes = [...video.usersLikes, isSignedIn];          
+          const newUsersLikes = [...video.usersLikes, isSignedIn];
           return { ...video, likeCount: newLikeCount, usersLikes: newUsersLikes };
         }
         return video;
@@ -48,33 +48,54 @@ function App() {
     });
   };
 
-  
-  const likeComment = (videoId , commentId) => {
+  const likeComment = (videoId, commentId) => {
     setVideos(prevVideos => {
       return prevVideos.map(video => {
-        if (video.id === videoId ) {
-          const newLikeCount = video.likeCount + 1;
-          const newUsersLikes = [...video.usersLikes, isSignedIn];          
-          return { ...video, likeCount: newLikeCount, usersLikes: newUsersLikes };
+        if (video.id === videoId) {
+          const updatedComments = video.comments.map(comment => {
+            if (comment.id === commentId) {
+              const newUsersLikes = [...comment.usersLikes, isSignedIn];
+              return { ...comment, usersLikes: newUsersLikes };
+            }
+            return comment;
+          });
+          return { ...video, comments: updatedComments };
         }
         return video;
       });
     });
   };
 
-  const unlikeComment = (videoId) => {
+  const unlikeComment = (videoId, commentId) => {
     setVideos(prevVideos => {
       return prevVideos.map(video => {
         if (video.id === videoId) {
-          const newLikeCount = Math.max(video.likeCount - 1, 0);
-          const newUsersLikes = video.usersLikes.filter(user => user !== isSignedIn);
-          return { ...video, likeCount: newLikeCount, usersLikes: newUsersLikes };
+          const updatedComments = video.comments.map(comment => {
+            if (comment.id === commentId) {
+              const newUsersLikes = comment.usersLikes.filter(user => user !== isSignedIn);
+              return { ...comment, usersLikes: newUsersLikes };
+            }
+            return comment;
+          });
+          return { ...video, comments: updatedComments };
         }
         return video;
       });
     });
   };
+
+  const handleVideoChange = (newVideo) => {
+    setVideos(prevVideos => {
+      const videoIndex = prevVideos.findIndex(video => video.id === newVideo.id);
   
+      if (videoIndex !== -1) {
+        return prevVideos.map((video, index) => index === videoIndex ? newVideo : video);
+      } else {
+        return [...prevVideos, newVideo];
+      }
+    });
+    console.log(videos);
+  };
 
 
 
@@ -128,7 +149,18 @@ function App() {
           <Route path="/signin" element={<SignIn users={users} setUsers={setUsers} toggleScreen={toggleScreen} isSignedIn={isSignedIn} toggleSignendIn={toggleSignendIn} />} />
           <Route path="/createaccount" element={<CreateAccount setSignedInStatus={setSignedInStatus} users={users} addUser={addUser} isSignedIn={isSignedIn} toggleScreen={toggleScreen} toggleSignendIn={toggleSignendIn} />} />
           <Route path="/" element={<Home toggleScreen={toggleScreen} isSignedIn={isSignedIn} />} /> {/* Define a route for the root URL */}
-          <Route path="/video/:id" element={<PlayVideoScreen videos={videos} videoData={videoData} unlikeVideo={unlikeVideo}  likeVideo={likeVideo} users={users} toggleScreen={toggleScreen} isSignedIn={isSignedIn} />} />
+          <Route path="/video/:id" element={<PlayVideoScreen
+            videos={videos}
+            videoData={videoData}
+            unlikeVideo={unlikeVideo}
+            likeVideo={likeVideo}
+            users={users}
+            toggleScreen={toggleScreen}
+            isSignedIn={isSignedIn}
+            unlikeComment={unlikeComment}
+            likeComment={likeComment}
+            onVideoChange={handleVideoChange}
+          />} />
         </Routes>
       </div>
     </Router>

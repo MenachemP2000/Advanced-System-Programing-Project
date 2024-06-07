@@ -3,19 +3,18 @@ import React, { useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid'; // Import uuidv4
 import './Reply.css'
 const Reply = ({
+  key,
   reply,
-  handleLikeReply,
-  handleUnlikeReply,
   handleEditReply,
   handleDeleteReply,
-  userLikedReply,
   replyLikes,
   comment,
   commentList,
   onCommentsChange,
   setCommentList,
   isSignedIn,
-  users
+  users,
+  handleEditReplyLikes
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -24,6 +23,12 @@ const Reply = ({
   const editTextareaRef = useRef(null);
   const [newReply, setNewReply] = useState({});
   const [author, setAuthor] = useState(null);
+
+  const [thisReply, setThisReply] = useState(reply);
+  const [usersLikedReply, setUsersLikedReply] = useState([]);
+  const [userLikedReply, setUserLikedReply] = useState(false);
+  const [totalUserLikes, setTotaluserLikes] = useState(0);
+
 
 
 
@@ -35,7 +40,56 @@ const Reply = ({
     setAuthor(users.find(author => author.username === reply.user));
   }, [isEditing, editedContent]);
 
+  
+  useEffect(() => {
+    const fetchReply = () => {
+      const currentReply = comment.replies.find(r => r.id === key);
+      if (currentReply) {
+        setThisReply(currentReply);
+        setUsersLikedReply(currentReply.usersLikes);
+        setTotaluserLikes(usersLikedReply.length || 0);
+        setAuthor(users.find(author => author.username === currentReply.username));
+      }
+      if (usersLikedReply && usersLikedReply.length > 0 && usersLikedReply.find(user => user === isSignedIn.username)) {
+        setUserLikedReply(true);
+        console.log(true);
+      } else {
+        setUserLikedReply(false);
+        console.log(false);
+      }
+    };
+    fetchReply();
+  }, [key, users]);
+  
+  useEffect(() => {
+    setUsersLikedReply(thisReply.usersLikes);
+    if (usersLikedReply) {
+      setTotaluserLikes(usersLikedReply.length);
+    }
+  }, [thisReply, usersLikedReply]);
 
+  useEffect(() => {
+    console.log(usersLikedReply);
+    if (usersLikedReply && usersLikedReply.length > 0 && usersLikedReply.find(user => user === isSignedIn.username)) {
+      setUserLikedReply(true);
+    } else {
+      setUserLikedReply(false);
+    }
+  }, [isSignedIn, thisReply, usersLikedReply]);
+
+  const handleLikeReply = () => {
+    const newUsersLikes = [...thisReply.usersLikes, isSignedIn.username];
+    let updatedReply = { ...thisReply, usersLikes: newUsersLikes };
+    setThisReply(updatedReply);
+    handleEditReplyLikes(thisReply.id, comment.id,newUsersLikes );
+  };
+
+  const handleUnlikeReply = () => {
+    const newUsersLikes = thisReply.usersLikes.filter(user => user !== isSignedIn.username);
+    const updatedReply = { ...thisReply, usersLikes: newUsersLikes };
+    setThisReply(updatedReply);
+    handleEditReplyLikes(thisReply.id, comment.id,newUsersLikes );
+  };
   const handleAddReply = (e, commentId) => {
     e.preventDefault();
     const commentIndex = commentList.findIndex(comment => comment.id === commentId);
@@ -46,7 +100,8 @@ const Reply = ({
         updatedComments[commentIndex].replies.push({
           id: uuidv4(),
           user: isSignedIn.username, // Y
-          content: replyContent
+          content: replyContent,
+          usersLikes: []
         });
         setCommentList(updatedComments);
         onCommentsChange(updatedComments); // Notify parent component about the change
@@ -144,21 +199,22 @@ const Reply = ({
                 {'Reply'}
               </button>
             )}
-            {!userLikedReply ? (
+            {(isSignedIn && !userLikedReply) && (
               <button
                 className="btn btn-primary like-button"
                 onClick={() => handleLikeReply(reply.id)}
                 aria-label="Like reply"
               >
-                {replyLikes} Like
+                {totalUserLikes} Like
               </button>
-            ) : (
+            )}
+            {(isSignedIn && userLikedReply) && (
               <button
                 className="btn btn-primary unlike-button"
                 onClick={() => handleUnlikeReply(reply.id)}
                 aria-label="Unlike reply"
-              >
-                Unlike
+                >
+                {totalUserLikes} Unlike
               </button>
             )}
             {isReplyFormVisible && (
