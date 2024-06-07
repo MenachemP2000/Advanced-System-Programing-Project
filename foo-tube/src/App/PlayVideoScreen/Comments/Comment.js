@@ -34,6 +34,8 @@ const Comment = ({
   const [usersLikedComment, setUsersLikedComment] = useState([]);
   const [userLikedComment, setUserLikedComment] = useState(false);
   const [totalUserLikes, setTotaluserLikes] = useState(0);
+  const [currentCommentReplies, setCurrentCommentReplies] = useState([]);
+  const [currentCommentRepliesLength, setCurrentCommentRepliesLength] = useState(0);
 
   useEffect(() => {
     if (isEditing && editTextareaRef.current) {
@@ -49,6 +51,8 @@ const Comment = ({
         setThisComment(currentComment);
         setUsersLikedComment(currentComment.usersLikes);
         setTotaluserLikes(usersLikedComment.length || 0);
+        setCurrentCommentReplies(currentComment.replies);
+        setCurrentCommentRepliesLength(currentCommentReplies.length || 0);
         setAuthor(users.find(author => author.username === currentComment.username));
       }
       if (usersLikedComment && usersLikedComment.length > 0 && usersLikedComment.find(user => user === isSignedIn.username)) {
@@ -65,6 +69,12 @@ const Comment = ({
     setUsersLikedComment(thisComment.usersLikes);
     setTotaluserLikes(usersLikedComment.length);
   }, [thisComment, usersLikedComment]);
+  
+  useEffect(() => {
+    
+    setCurrentCommentReplies(thisComment.replies);
+    setCurrentCommentRepliesLength(currentCommentReplies.length);
+  }, [thisComment, currentCommentReplies]);
 
   useEffect(() => {
     if (usersLikedComment && usersLikedComment.length > 0 && usersLikedComment.find(user => user === isSignedIn.username)) {
@@ -258,7 +268,7 @@ const Comment = ({
           </form>
         )}
         <div>
-          {comment.replies.length > 0 && (
+          {currentCommentRepliesLength > 0 && (
             <button className="btn btn-link" onClick={toggleShowReplies}>
               {isShowingReplies ? '^ ' + comment.replies.length + ' replies' : '˅ ' + comment.replies.length + ' replies'}
             </button>
@@ -273,7 +283,7 @@ const Comment = ({
               handleEditReply={handleSendEditReply}
               handleDeleteReply={handleSendDeleteReply}
               handleReplyChange={handleReplyChange}
-              comment={comment}
+              comment={thisComment}
               newReply={newReply}
               handleReplyContentChange={handleReplyContentChange}
               commentList={commentList}

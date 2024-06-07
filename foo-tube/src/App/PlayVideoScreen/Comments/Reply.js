@@ -7,7 +7,6 @@ const Reply = ({
   reply,
   handleEditReply,
   handleDeleteReply,
-  replyLikes,
   comment,
   commentList,
   onCommentsChange,

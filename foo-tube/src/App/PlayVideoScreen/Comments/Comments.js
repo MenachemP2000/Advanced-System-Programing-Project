@@ -148,6 +148,7 @@ const Comments = ({
 
     }
   };
+  
   const handleReplyChange = (e, commentId) => {
     const { value } = e.target;
     setNewReply(prevState => ({ ...prevState, [commentId]: value }));
