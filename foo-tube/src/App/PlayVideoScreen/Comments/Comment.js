@@ -157,9 +157,7 @@ const Comment = ({
 
   const handleCommentReplyChange = (newReply) => {
     setCurrentCommentReplies(prevReplies => {
-      // Find the index of the reply to be updated
       const replyIndex = prevReplies.findIndex(reply => reply.id === newReply.id);
-
       let updatedReplies;
       if (replyIndex !== -1) {
         updatedReplies = prevReplies.map((reply, index) => index === replyIndex ? newReply : reply);
