@@ -9,11 +9,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -27,7 +25,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -47,13 +44,6 @@ import com.example.aspp.R;
 import com.example.aspp.adapters.HomeRVAdapter;
 import com.example.aspp.objects.Video;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -197,7 +187,46 @@ public class HomeFragment extends Fragment {
         surveyListContainer.setAdapter(adp);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void searchByTag(String tags) {
+        if (tags.equals("")) {
+            adp = new HomeRVAdapter(getContext(), videoArrayList);
+            surveyListContainer.setAdapter(adp);
+            return;
+        }
+
+        ArrayList<Video> updatedArr = new ArrayList<>();
+        Set<Video> updatedSet = new HashSet<>();
+
+        for (Video v:videoArrayList) {
+            if (v.getTags().contains(tags.trim()))
+                updatedSet.add(v);
+//            else if (v.getPublisher().startsWith(tags.trim()))
+//                updatedSet.add(v);
+//            else if (v.getDescription().startsWith(tags.trim()))
+//                updatedSet.add(v);
+        }
+
+//        if (updatedSet.isEmpty()) {
+//            for (Video v:videoArrayList) {
+//                if (v.getTitle().contains(tags.trim()))
+//                    updatedSet.add(v);
+//                else if (v.getPublisher().contains(tags.trim()))
+//                    updatedSet.add(v);
+//                else if (v.getDescription().contains(tags.trim()))
+//                    updatedSet.add(v);
+//            }
+//        }
+
+        if (updatedSet.isEmpty()) {
+            Toast.makeText(getContext(), "We didn't find anything like that! are you sure it even exists?", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        updatedArr.addAll(updatedSet);
+        adp = new HomeRVAdapter(getContext(), updatedArr);
+        surveyListContainer.setAdapter(adp);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_home, container, false);
@@ -292,7 +321,7 @@ public class HomeFragment extends Fragment {
 
         final Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.bottom_sheet_layout);
+        dialog.setContentView(R.layout.home_bottom_sheet_layout);
 
 //        LinearLayout layout_download = dialog.findViewById(R.id.layout_download);
 //        layout_download.setOnClickListener(new View.OnClickListener() {

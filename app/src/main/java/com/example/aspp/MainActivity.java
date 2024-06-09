@@ -1,21 +1,11 @@
 package com.example.aspp;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -28,12 +18,12 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.example.aspp.fragments.AddVideoFragment;
 import com.example.aspp.fragments.ShortsFragment;
 import com.example.aspp.fragments.HomeFragment;
 import com.example.aspp.fragments.ProfileFragment;
 import com.example.aspp.databinding.ActivityMainBinding;
 import com.example.aspp.fragments.SubscriptionsFragment;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity {
@@ -91,7 +81,8 @@ public class MainActivity extends AppCompatActivity {
                 currentFragment = new SubscriptionsFragment();
             }
             else if (item.getItemId() == R.id.add_video) {
-                //TODO intent to add video screen (or fragment)
+                switchFragment(new AddVideoFragment());
+                currentFragment = new AddVideoFragment();
             }
             else {
                 switchFragment(new ProfileFragment());
