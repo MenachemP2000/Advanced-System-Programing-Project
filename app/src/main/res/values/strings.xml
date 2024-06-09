@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">TooTube</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="open_nav">1900003</string>
+    <string name="close_nav">1900002</string>
+    <string name="ok">0000000</string>
+    <string name="not_interested">0000001</string>
+    <string name="share">0000002</string>
+    <string name="watch_later">0000003</string>
+    <string name="report">0000004</string>
+    <string name="queue">0000005</string>
+    <string name="playlist">0000006</string>
+    <string name="not_recommend">0000007</string>
+    <string name="download">0000008</string>
+</resources>
