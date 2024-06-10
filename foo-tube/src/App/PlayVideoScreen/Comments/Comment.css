@@ -1,0 +1,27 @@
+.replies.hide {
+    display: none;
+  }
+  
+  .replies.show {
+    display: inherit;
+  }
+
+  #outercomment{
+    display: flex;
+    justify-content: row;
+    align-content: space-between;
+    margin: 0px;
+  }
+  #innercomment{
+
+    width: 100%;
+    margin-top: 0px;
+    border-radius: 4px;
+    padding: 10px;  
+    font-size: 14px;
+    border: 0px;
+  }
+  img{
+    margin: 10px;
+    border-radius: 100%;
+  }

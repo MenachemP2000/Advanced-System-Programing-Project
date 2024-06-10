@@ -1,0 +1,225 @@
+{
+    "videos": [
+      {
+        "id": "1",
+        "title": "twenty one pilots - Chlorine (Official Video)",
+        "description": "This is a description of the video. It contains detailed information about the video content. It might be quite long and detailed, providing insights and background information.",
+        "source": "/Videos/1.mp4",
+        "thumbnail": "/pictures/thumbnails/1.png",
+        "tags": ["Music"],
+        "upload_date": "2024-06-30",
+        "duration": "00:10",
+        "username": "meny",
+        "likeCount": 0,
+        "views": 0,
+        "usersLikes": ["meny"
+        ],
+
+        "comments": [
+          {
+            "id": "c1",
+            "user": "baby",
+            "content": "Great introduction! Really helped me understand the basics.",
+            "date": "2024-01-16",
+            "usersLikes": ["meny"
+            ],
+            
+            "replies": [
+              {
+                "id": "c1r1",
+                "user": "meny",
+                "content": "Thanks, very helpful!",
+                "date": "2024-01-17",
+                "usersLikes": []
+              }
+            ]
+          },
+          {
+            "id": "c2",
+            "user": "baby",
+            "content": "Can you explain more about closures?",
+            "date": "2024-01-18",
+            "usersLikes": [],
+            "replies": []
+          }
+        ]
+      },
+      {
+        "id": "2",
+        "title": "twenty one pilots - Ride (Official Video)",
+        "description": "This is a different description of the video. It contains detailed information about the video content. It might be quite long and detailed, providing insights and background information.",
+        "source": "/Videos/2.mp4",
+        "thumbnail": "/pictures/thumbnails/2.png",
+        "tags": ["Music"],
+        "upload_date": "2024-06-30",
+        "duration": "00:10",
+        "username": "baby",
+        "likeCount": 0,
+        "views": 0,
+        "usersLikes": [],
+        "comments": [
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Houdini by Eminem",
+        "description": "This is a 3 description of the video. It contains detailed information about the video content. It might be quite long and detailed, providing insights and background information.",
+        "source": "/Videos/3.mp4",
+        "thumbnail": "/pictures/thumbnails/3.png",
+        "tags": ["Music"],
+        "upload_date": "2024-06-30",
+        "duration": "00:10",
+        "username": "kobi",
+        "likeCount": 0,
+        "views": 0,
+        "usersLikes": [],
+        "comments": [
+        ]
+      },
+      {
+        "id": "4",
+        "title": "Drake - First Person Shooter ft. J. Cole",
+        "description": "This is a 4 description of the video. It contains detailed information about the video content. It might be quite long and detailed, providing insights and background information.",
+        "source": "/Videos/4.mp4",
+        "thumbnail": "/pictures/thumbnails/4.png",
+        "tags": ["Music"],
+        "upload_date": "2024-06-30",
+        "duration": "00:10",
+        "username": "kobi",
+        "likeCount": 0,
+        "views": 0,
+        "usersLikes": [],
+        "comments": [
+        ]
+      },
+      {
+        "id": "5",
+        "title": "Drake, Kanye West, Lil Wayne, Eminem - Forever (Explicit Version) (Official Music Video)",
+        "description": "This is a 5 description of the video. It contains detailed information about the video content. It might be quite long and detailed, providing insights and background information.",
+        "source": "/Videos/5.mp4",
+        "thumbnail": "/pictures/thumbnails/5.png",
+        "tags": ["Music"],
+        "upload_date": "2024-06-30",
+        "duration": "00:10",
+        "username": "kobi",
+        "likeCount": 0,
+        "views": 0,
+        "usersLikes": [],
+        "comments": [
+        ]
+      },
+      {
+        "id": "6",
+        "title": "Eminem - No Love (Explicit Version) ft. Lil Wayne",
+        "description": "This is a 6 description of the video. It contains detailed information about the video content. It might be quite long and detailed, providing insights and background information.",
+        "source": "/Videos/6.mp4",
+        "thumbnail": "/pictures/thumbnails/6.png",
+        "tags": ["Music"],
+        "upload_date": "2024-06-30",
+        "duration": "00:10",
+        "username": "kobi",
+        "likeCount": 0,
+        "views": 0,
+        "usersLikes": [],
+        "comments": [
+        ]
+      },
+      {
+        "id": "7",
+        "title": "Eminem - Space Bound (Official Video)",
+        "description": "This is a 7 description of the video. It contains detailed information about the video content. It might be quite long and detailed, providing insights and background information.",
+        "source": "/Videos/7.mp4",
+        "thumbnail": "/pictures/thumbnails/7.png",
+        "tags": ["Music"],
+        "upload_date": "2024-06-30",
+        "duration": "00:12",
+        "username": "kobi",
+        "likeCount": 0,
+        "views": 0,
+        "usersLikes": [],
+        "comments": [
+        ]
+      },
+      {
+        "id": "8",
+        "title": "Eminem - Love The Way You Lie ft. Rihanna",
+        "description": "This is a 8 description of the video. It contains detailed information about the video content. It might be quite long and detailed, providing insights and background information.",
+        "source": "/Videos/8.mp4",
+        "thumbnail": "/pictures/thumbnails/8.png",
+        "tags": ["Music"],
+        "upload_date": "2024-06-30",
+        "duration": "00:10",
+        "username": "kobi",
+        "likeCount": 0,
+        "views": 0,
+        "usersLikes": [],
+        "comments": [
+        ]
+      },
+      {
+        "id": "9",
+        "title": "Eminem ft. Rihanna - The Monster (Explicit) [Official Video]",
+        "description": "This is a 9 description of the video. It contains detailed information about the video content. It might be quite long and detailed, providing insights and background information.",
+        "source": "/Videos/9.mp4",
+        "thumbnail": "/pictures/thumbnails/9.png",
+        "tags": ["Music"],
+        "upload_date": "2024-06-30",
+        "duration": "00:10",
+        "username": "kobi",
+        "likeCount": 0,
+        "views": 0,
+        "usersLikes": [],
+        "comments": [
+        ]
+      },
+      {
+        "id": "10",
+        "title": "twenty one pilots: Heathens (from Suicide Squad: The Album) [OFFICIAL VIDEO]",
+        "description": "This is a 10 description of the video. It contains detailed information about the video content. It might be quite long and detailed, providing insights and background information.",
+        "source": "/Videos/10.mp4",
+        "thumbnail": "/pictures/thumbnails/10.png",
+        "tags": ["Music"],
+        "upload_date": "2024-06-30",
+        "duration": "00:11",
+        "username": "kobi",
+        "likeCount": 0,
+        "views": 0,
+        "usersLikes": [],
+        "comments": [
+        ]
+      },
+      {
+        "id": "11",
+        "title": "Imagine Dragons & JID - Enemy (from the series Arcane: League of Legends) | Official Music Video",
+        "description": "This is a 11 description of the video. It contains detailed information about the video content. It might be quite long and detailed, providing insights and background information.",
+        "source": "/Videos/11.mp4",
+        "thumbnail": "/pictures/thumbnails/11.png",
+        "tags": ["Music"],
+        "upload_date": "2024-06-30",
+        "duration": "00:10",
+        "username": "kobi",
+        "likeCount": 0,
+        "views": 0,
+        "usersLikes": [],
+        "comments": [
+        ]
+      },
+      {
+        "id": "12",
+        "title": "Eminem - Venom",
+        "description": "This is a 12 description of the video. It contains detailed information about the video content. It might be quite long and detailed, providing insights and background information.",
+        "source": "/Videos/12.mp4",
+        "thumbnail": "/pictures/thumbnails/12.png",
+        "tags": ["Music"],
+        "upload_date": "2024-06-30",
+        "duration": "00:10",
+        "username": "kobi",
+        "likeCount": 0,
+        "views": 0,
+        "usersLikes": [],
+        "comments": [
+        ]
+      }
+    ]
+  }
+  

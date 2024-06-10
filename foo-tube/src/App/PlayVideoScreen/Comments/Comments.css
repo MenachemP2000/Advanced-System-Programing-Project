@@ -1,0 +1,67 @@
+.comments-container {
+}
+
+.comment-textarea, .reply-textarea, .edit-textarea  {
+  width: 100%;
+  height: auto;
+  min-height: fit-content;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box; /* Ensures padding is included in the total width/height */
+  resize: none;
+  background-color: transparent;
+  color: inherit;
+  overflow: hidden; /* Prevents scrollbar */
+}
+
+.button-container {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end; /* Align buttons to the right */
+}
+
+.btn {
+  margin-right: 10px;
+}
+
+.submit-button {
+  background-color: green;
+  color: white;
+}
+
+.cancel-button {
+  background-color: red;
+  color: white;
+}
+
+.edit-button {
+  background-color: green;
+  color: white;
+}
+
+.delete-button {
+  background-color: red;
+  color: white;
+}
+
+.comment {
+  margin-top: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 10px;
+}
+
+.comment p {
+  font-size: 14px;
+}
+
+.btn-link {
+  background: none;
+  color: blue;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}

@@ -1,0 +1,74 @@
+.PlayVideoScreen {
+  display: flex;
+  margin: 20px;
+}
+
+.videoContainer {
+  flex: 2;
+  margin-right: 20px;
+  width: 100%;
+}
+
+.VideoPlayer {
+  justify-content: flex-start; 
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.videoTitle {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.buttonContainer {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  justify-content: flex-end; 
+}
+
+.btn {
+  margin-right: 10px;
+}
+
+.sidebar {
+  flex: 1;
+}
+
+.likeCounter {
+  margin-left: 10px;
+  font-size: 16px;
+}
+.videoProfile{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.videoProfile.buttonContainer{
+  display: flex;
+  align-items: right;
+  margin-bottom: 20px;
+  justify-content: flex-end; 
+}
+#profilepicandname{
+  display: flex;
+}
+#profilename{
+  padding: 10px;
+}
+
+
+@media (max-width:900px) {
+    .videoContainer{
+      margin-right: 0px;}
+    .sidebarBig {display: none;}
+    .PlayVideoScreen {display:flex;flex-direction:column;}
+        .sidebar {order:2;}
+        .videoContainer {order:1;}
+        .comments {order:3;}
+}
+@media (min-width:900px) {
+  .sidebarSmall {display: none;}
+}

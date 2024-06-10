@@ -1,0 +1,16 @@
+
+#outerreply{
+  display: flex;
+  justify-content: row;
+  align-content: space-between;
+  margin: 0px;
+  }
+  #innerreply{
+
+    width: 100%;
+    margin-top: 0px;
+    border-radius: 4px;
+    padding: 10px;  
+    font-size: 14px;
+    border: 0px;
+  }
