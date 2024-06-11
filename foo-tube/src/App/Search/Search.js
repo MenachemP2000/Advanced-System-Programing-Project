@@ -10,7 +10,7 @@ const Search = ({toggleScreen, videos}) => {
 
   useEffect(() => {
     toggleScreen("Search");
-    const videosWithUsername = videos.filter(video => video.username === key);
+    const videosWithUsername = videos.filter(video => video.username.toLowerCase() === key.toLowerCase());
     const videosWithTitleWord = videos.filter(video => video.title.toLowerCase().includes(key.toLowerCase()));
     const combinedVideos = [...videosWithUsername, ...videosWithTitleWord];
     setSearchVideos(shuffleArray(combinedVideos));

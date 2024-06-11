@@ -76,3 +76,10 @@
   padding: 0;
   flex-direction: row;
 }
+
+@media (max-width:900px) {
+  .RecommendedVideos .video-info h3{
+    width: inherit;
+  }
+
+}
