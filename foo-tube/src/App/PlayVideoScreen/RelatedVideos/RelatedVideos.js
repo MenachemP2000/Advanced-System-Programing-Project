@@ -8,7 +8,7 @@ const RelatedVideos = ({ videos ,id}) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setRelatedVideos(shuffleArray(videos));
+    setRelatedVideos(shuffleArray(videos.filter(v => v.id !== id)));
   }, [id]);
 
   const handleVideoClick = (id) => {

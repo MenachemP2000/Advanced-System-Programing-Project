@@ -23,7 +23,7 @@ const PlayVideoScreen = ({ toggleScreen, onVideoChange, isSignedIn, users, likeV
         setVideo(video);
         setLikeCount(video.likeCount || 0);
         setAuthor(users.find(author => author.username === video.username));
-        setRelatedVideos(videos.filter(v => v.id !== id));
+        setRelatedVideos(videos);
       }
     };
     fetchVideo();
