@@ -206,7 +206,7 @@ const Reply = ({
           </div>
         </>)
         }
-        {(isSignedIn.username == reply.user) && (
+        {!isEditing &&(isSignedIn.username == reply.user) && (
           <div className="button-container">
 
             <button className="btn   " onClick={toggleEdit}>

@@ -14,6 +14,12 @@
   padding: 0 20px;
   z-index: 1000;
 }
+.leftTop{
+  align-items: center;
+}
+.icon{
+  border-radius: 10px;
+}
 
 .app-title {
   margin: 0;

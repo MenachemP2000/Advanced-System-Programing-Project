@@ -72,7 +72,10 @@ const TopBar = ({ toggleMenu, toggleDropDown, isSignedIn, theme }) => {
                 <div className={`bar ${appTheme}`}></div>
                 <div className={`bar ${appTheme}`}></div>
               </div>
-              <h1 className="app-title clickable" onClick={handleClick}>FooTube&trade;</h1>
+              <h1 className="app-title clickable" onClick={handleClick}> 
+              <img  className="icon" src="/favicon.ico" width="30px" highet="30px"></img>
+                  FooTube&trade;
+                  </h1>
             </div>
 
             {isSignedIn && (
@@ -113,7 +116,10 @@ const TopBar = ({ toggleMenu, toggleDropDown, isSignedIn, theme }) => {
               <div className={`bar ${appTheme}`}></div>
               <div className={`bar ${appTheme}`}></div>
             </div>
-            <h1 className="app-title clickable" onClick={handleClick}>FooTube&trade;</h1>
+              <h1 className="app-title clickable" onClick={handleClick}> 
+              <img className='icon' src="/favicon.ico" width="30px" highet="30px"></img>
+                  FooTube&trade;
+                  </h1>
           </div>
           <div className="search">
             <input
