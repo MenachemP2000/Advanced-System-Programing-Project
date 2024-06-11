@@ -40,7 +40,8 @@ public class Utils {
                 String description = json_obj.getString("description");
                 String tags = json_obj.getString("tags");
                 int thumbnailDrawableID = string2drawbleId(context, json_obj.getString("thumbnailID"));
-                Uri videoPathInRaw = Uri.parse("android.resource://com.example.aspp/" + json_obj.getString("videoPathInRaw"));
+                String videoPathInRaw = json_obj.getString("videoPathInRaw");
+
                 Video temp = new Video(publisher_id, duration, title, description, tags, thumbnailDrawableID, videoPathInRaw);
                 result.add(temp);
             }

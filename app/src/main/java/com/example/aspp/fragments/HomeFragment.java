@@ -57,8 +57,8 @@ public class HomeFragment extends Fragment {
 
     RecyclerView surveyListContainer;
     SwipeRefreshLayout swipeRefreshLayout;
-    static HomeRVAdapter adp;
-    static ArrayList<Video> videoArrayList;
+    public static HomeRVAdapter adp;
+    public static ArrayList<Video> videoArrayList;
     Toolbar toolbar;
     MenuItem searchMenuItem, notifMenuItem;
     SearchView searchView;
@@ -265,7 +265,8 @@ public class HomeFragment extends Fragment {
         activity.setSupportActionBar(toolbar);
         activity.getSupportActionBar().setTitle("");
         surveyListContainer = v.findViewById(R.id.ActiveSurveys);
-        videoArrayList = readVideosList(getContext());
+        if (videoArrayList == null)
+            videoArrayList = readVideosList(getContext());
         adp = new HomeRVAdapter(getContext(), videoArrayList);
         surveyListContainer.setAdapter(adp);
         surveyListContainer.setLayoutManager(new LinearLayoutManager(getContext()));
