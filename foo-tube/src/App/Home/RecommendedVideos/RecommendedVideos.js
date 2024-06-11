@@ -8,12 +8,22 @@ const RecommendedVideos = ({ videos, menuOpen, users }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setRelatedVideos(videos);
-  }, []);
+    setRelatedVideos(shuffleArray(videos));
+  }, [videos]);
 
   const handleVideoClick = (id) => {
     navigate(`/video/${id}`);
   };
+
+  const shuffleArray = (array) => {
+    const shuffledArray = [...array];
+    for (let i = shuffledArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+    }
+    return shuffledArray;
+  };
+
 
   return (
     <div className={`RecommendedVideos ${menuOpen ? 'RecommendedVideosOpen' : 'RecommendedVideosClose'}`}>

@@ -5,20 +5,33 @@ import { useNavigate, Link } from 'react-router-dom';
 const TopBar = ({ toggleMenu, toggleDropDown, isSignedIn, theme }) => {
 
   const [appTheme, setTheme] = useState(theme);
+  const [searchInput, setSearchInput] = useState('');
+
+  const handleInputChange = (e) => {
+    setSearchInput(e.target.value);
+  };
+
 
 
   useEffect(() => {
     setTheme(theme);
   }, [theme]);
 
-  const handleSearch = (e) => {
-    const query = e.target.value;
-    console.log('Search query:', query);
-  };
   const navigate = useNavigate()
 
   const handleClick = () => {
     navigate(`/`);
+  };
+  const handleSearch = () => {
+    const query = searchInput;
+    console.log('Search query:', query);
+    navigate(`/search/${query}`);
+  };
+  
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
   };
 
   return (
@@ -33,17 +46,18 @@ const TopBar = ({ toggleMenu, toggleDropDown, isSignedIn, theme }) => {
       </div>
 
       <div className="search">
-        <input
-          type="text"
-          placeholder="Search"
-          className="search-input"
-          onChange={handleSearch}
-        />
-        <button className='btn'>
+      <input
+        type="text"
+        placeholder="Search"
+        className="search-input"
+        value={searchInput}
+        onChange={handleInputChange}
+        onKeyUp ={handleKeyPress}
+      />
+      <button className='btn' onClick={handleSearch}>
         <i class="bi bi-search"></i>
-        </button>
-
-      </div>
+      </button>
+    </div>
 
 
       {isSignedIn && (

@@ -11,6 +11,7 @@ const PlayVideoScreen = ({ toggleScreen, onVideoChange, isSignedIn, users, likeV
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [author, setAuthor] = useState(null);
+  const [relatedVideos, setRelatedVideos] = useState(null);
   const navigate = useNavigate();
 
 
@@ -22,6 +23,7 @@ const PlayVideoScreen = ({ toggleScreen, onVideoChange, isSignedIn, users, likeV
         setVideo(video);
         setLikeCount(video.likeCount || 0);
         setAuthor(users.find(author => author.username === video.username));
+        setRelatedVideos(videos.filter(v => v.id !== id)); 
       }
     };
     fetchVideo();
@@ -132,7 +134,7 @@ const PlayVideoScreen = ({ toggleScreen, onVideoChange, isSignedIn, users, likeV
         <Description views={video.views} description={video.description} username={video.username} isSignedIn={isSignedIn} onSave={handleSaveDescription} />
 
         <div className="sidebarSmall">
-          <RelatedVideos videos={videos} videoData={videoData} />
+          <RelatedVideos videos={relatedVideos} videoData={videoData} />
         </div>
         <Comments
           videoId={video.id}
@@ -146,7 +148,7 @@ const PlayVideoScreen = ({ toggleScreen, onVideoChange, isSignedIn, users, likeV
         />
       </div>
       <div className="sidebarBig">
-        <RelatedVideos videoData={videoData} videos={videos} />
+        <RelatedVideos videoData={videoData} videos={relatedVideos} />
       </div>
     </div>
   );

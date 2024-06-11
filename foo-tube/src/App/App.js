@@ -12,6 +12,7 @@ import './App.css';
 import CreateAccount from './SignIn/CreateAccount';
 import UserData from './SignIn/users.json'
 import videoData from './PlayVideoScreen/MetaData/videos.json'; // Corrected the import path
+import Search from './Search/Search';
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -150,6 +151,7 @@ function App() {
         )}
 
         <Routes>
+           <Route path="/search/:key" element={<Search toggleScreen={toggleScreen}  videos={videos} />} />
           <Route path="/signin" element={<SignIn users={users} setUsers={setUsers} toggleScreen={toggleScreen} isSignedIn={isSignedIn} toggleSignendIn={toggleSignendIn} />} />
           <Route path="/createaccount" element={<CreateAccount setSignedInStatus={setSignedInStatus} users={users} addUser={addUser} isSignedIn={isSignedIn} toggleScreen={toggleScreen} toggleSignendIn={toggleSignendIn} />} />
           <Route path="/" element={<Home toggleScreen={toggleScreen} 
