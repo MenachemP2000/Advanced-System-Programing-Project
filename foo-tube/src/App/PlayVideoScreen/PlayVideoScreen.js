@@ -63,11 +63,13 @@ const PlayVideoScreen = ({ toggleScreen, onVideoChange, isSignedIn, users, likeV
       console.error('Error sharing:', error);
     }
   };
-
   const handleSaveDescription = (newDescription) => {
-    setVideo(prevVideo => ({ ...prevVideo, description: newDescription }));
-    onVideoChange(video);
-  };
+    console.log(newDescription);
+    const updatedVideo = { ...video, description: newDescription };
+    setVideo(updatedVideo);
+    console.log(updatedVideo);
+    onVideoChange(updatedVideo);
+};
 
   const handleCommentsChange = (newComments) => {
     setVideo(prevVideo => {

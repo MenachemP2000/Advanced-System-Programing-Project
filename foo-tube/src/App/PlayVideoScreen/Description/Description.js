@@ -8,7 +8,6 @@ const Description = ({ description, onSave, isSignedIn, username, views }) => {
   const textareaRef = useRef(null);
 
   useEffect(() => {
-    // Update current description when the description prop changes
     setCurrentDescription(description);
   }, [description]);
 
