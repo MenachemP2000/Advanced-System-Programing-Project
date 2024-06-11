@@ -3,13 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import './RelatedVideos.css';
 
 
-const RelatedVideos = ({ videos}) => {
+const RelatedVideos = ({ videos ,id}) => {
   const [relatedVideos, setRelatedVideos] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     setRelatedVideos(shuffleArray(videos));
-  }, [videos]);
+  }, [id]);
 
   const handleVideoClick = (id) => {
     navigate(`/video/${id}`);
