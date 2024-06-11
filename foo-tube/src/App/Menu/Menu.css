@@ -4,7 +4,7 @@
     position: fixed;
     top: 60px; 
     left: 0;
-    width: 250px;
+    width: 220px;
     height: calc(100% - 60px); 
     background-color: inherit;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -23,16 +23,7 @@
     margin: 0;
   }
   
-  .Menu ul li {
-    padding: 15px;
+  .Menu .btn{
+    width: 90%;
+    border-radius: 10px;
   }
-  
-  .Menu ul li a {
-    color: inherit;
-    text-decoration: none;
-  }
-  
-  .Menu ul li a:hover {
-    text-decoration: underline;
-  }
-  

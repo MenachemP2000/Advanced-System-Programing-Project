@@ -6,8 +6,8 @@
     left: 0;
     width: 100%;
     height: 60px;
-    background-color: #333;
-    color: #fff;
+    background-color: inherit;
+    color: inherit;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -18,27 +18,41 @@
   .app-title {
     margin: 0;
     font-size: 1.2rem;
-    margin-left: 20px;
+    align-content: center;
   }
   
   .hamburger-menu {
     cursor: pointer;
-    margin-right: 20px; /* Added margin to create space between button and text */
+    border-radius: 20px;
+    padding: 10px;
+  }
+  .hamburger-menu:hover{
+    background-color: lightgray;
   }
   
   .hamburger-menu .bar {
-    width: 25px;
-    height: 3px;
-    background-color: #fff;
+    width: 17px;
+    height: 1px;
     margin: 4px 0;
   }
   .search{
+    display: flex;
     width: 50%;
+    flex-direction: row;
+    align-items: center;
   }
   .search-input{
+    padding-left: 20px;
     background-color: transparent;
     color: inherit;
     width: 100%;
+    height: 40px;
+    border-radius: 20px;
+    border-color: lightgrey;
+  }
+  .search-input:focus{
+    border-color: grey;
+    outline: none;
 
   }
   
@@ -49,4 +63,10 @@
 }
 .leftTop{
   display: flex;
+}
+.bar.dark{
+  background-color: white;
+}
+.bar.light{
+  background-color: black;
 }

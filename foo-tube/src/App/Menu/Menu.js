@@ -9,14 +9,20 @@ const Menu = ({ isOpen, topBarHeight }) => {
   };
 
   return (
-    <div className={`Menu ${isOpen ? 'open' : ''}`} style={menuStyle}>
-      <ul>
-        <li><Link to="/">Home</Link></li>
-        <li><a href="#trending">Trending</a></li>
-        <li><a href="#subscriptions">Subscriptions</a></li>
-        <li><a href="#library">Library</a></li>
-      </ul>
-    </div>
+
+    <>
+      <div className={`Menu ${isOpen ? 'open' : ''}`} style={menuStyle}>
+        <ul>
+
+          <li>
+            <Link className='btn' to="/">
+              <i class="bi bi-house"></i>
+              <span className="icon-text"> Home</span>
+            </Link>
+          </li>
+        </ul>
+      </div>
+    </>
   );
 }
 

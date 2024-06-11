@@ -72,8 +72,8 @@ const SignIn = ({ toggleScreen, isSignedIn, toggleSignendIn,users}) => {
                         </div>
                         <div className="userNameButtons">
 
-                            <button type="button" className="SignIn btn btn-primary " onClick={handleCreateAccount}>Create account</button>
-                            <button type="submit" className='SignIn btn btn-primary '>Next</button>
+                            <button type="button" className="SignIn btn   " onClick={handleCreateAccount}>Create account</button>
+                            <button type="submit" className='SignIn btn   '>Next</button>
 
                         </div>
                     </form>
@@ -90,7 +90,7 @@ const SignIn = ({ toggleScreen, isSignedIn, toggleSignendIn,users}) => {
                                 required
                             />
                         </div>
-                        <button type="submit" className='SignIn btn btn-primary '>Next</button>
+                        <button type="submit" className='SignIn btn   '>Next</button>
                     </form>
                 )}
             </div>

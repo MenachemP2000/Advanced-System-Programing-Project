@@ -140,19 +140,25 @@ function App() {
   return (
     <Router>
       <div className={`App ${theme}`}>
-        {!(screen == "SignIn" || screen == "CreateAccount") && (
+        {!(screen == "SignIn" || screen == "CreateAccount" ) && (
           <>
-            <TopBar toggleMenu={toggleMenu} toggleDropDown={toggleDropDown} isSignedIn={isSignedIn} />
-            <Menu isOpen={menuOpen} />
+            <TopBar theme={theme} toggleMenu={toggleMenu} toggleDropDown={toggleDropDown} isSignedIn={isSignedIn} />
+            <Menu screen={screen} isOpen={menuOpen}  />
             <DropDown isOpen={dropDownOpen} isSignedIn={isSignedIn} toggleTheme={toggleTheme} toggleSignendIn={toggleSignendIn} />
-            {menuOpen && <div className="Overlay" onClick={toggleMenu}></div>}
+            {(menuOpen && screen != "Home" ) &&(<div className="Overlay" onClick={toggleMenu}></div>) }
           </>
         )}
 
         <Routes>
           <Route path="/signin" element={<SignIn users={users} setUsers={setUsers} toggleScreen={toggleScreen} isSignedIn={isSignedIn} toggleSignendIn={toggleSignendIn} />} />
           <Route path="/createaccount" element={<CreateAccount setSignedInStatus={setSignedInStatus} users={users} addUser={addUser} isSignedIn={isSignedIn} toggleScreen={toggleScreen} toggleSignendIn={toggleSignendIn} />} />
-          <Route path="/" element={<Home toggleScreen={toggleScreen} isSignedIn={isSignedIn} />} /> {/* Define a route for the root URL */}
+          <Route path="/" element={<Home toggleScreen={toggleScreen} 
+            videos={videos}
+            videoData={videoData}
+            isSignedIn={isSignedIn}
+            menuOpen={menuOpen}
+            users ={users}
+            />} />
           <Route path="/video/:id" element={<PlayVideoScreen
             videos={videos}
             videoData={videoData}

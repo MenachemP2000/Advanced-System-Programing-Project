@@ -22,7 +22,7 @@ const Description = ({ description, onSave, isSignedIn, username, views }) => {
 
   const handleEditClick = () => {
     setIsEditing(true);
-    setIsExpanded(true); 
+    setIsExpanded(true);
   };
 
   const handleSaveClick = () => {
@@ -58,14 +58,14 @@ const Description = ({ description, onSave, isSignedIn, username, views }) => {
           ></textarea>
           <div className="button-container">
             <button
-              className="btn btn-primary save-button"
+              className="btn "
               onClick={handleSaveClick}
               aria-label="Save description"
             >
               Save
             </button>
             <button
-              className="btn btn-primary cancel-button"
+              className="btn"
               onClick={handleCancelClick}
               aria-label="Cancel editing"
             >
@@ -76,21 +76,24 @@ const Description = ({ description, onSave, isSignedIn, username, views }) => {
       ) : (
         <div className="description-view">
           <div>{views} views</div>
-          <p>{isExpanded ? currentDescription : currentDescription.substring(0, 100)}</p>
-          {currentDescription.length > 100 && (
-            <button className="btn btn-link" onClick={toggleReadMore}>
-              {isExpanded ? "Show Less" : "Show More"}
+          <p>{isExpanded ? currentDescription : currentDescription.substring(0, 200)}</p>
+          {currentDescription.length > 200 && (
+            <button className="btn " onClick={toggleReadMore}>
+              {isExpanded ? "Show less" : "...more"}
             </button>
           )}
-          { ( username == isSignedIn.username ) && (
+          {(username == isSignedIn.username) && (
             <div className="button-container">
               <button
-                className="btn btn-primary edit-button"
+                className="btn"
                 onClick={handleEditClick}
                 aria-label="Edit description"
               >
-                Edit
-                
+
+                <i class="bi bi-pencil"></i>
+                <span className="icon-text">Edit</span>
+
+
               </button>
             </div>
           )}

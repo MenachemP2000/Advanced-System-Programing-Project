@@ -4,19 +4,25 @@
 .comment-textarea, .reply-textarea, .edit-textarea  {
   width: 100%;
   height: auto;
-  min-height: fit-content;
-  padding: 10px;
+  padding: 5px;
   font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box; /* Ensures padding is included in the total width/height */
+  border: 0px solid #ccc;
+  border-bottom: 4px solid lightgrey;
+  box-sizing: border-box; 
   resize: none;
   background-color: transparent;
   color: inherit;
-  overflow: hidden; /* Prevents scrollbar */
+  overflow: hidden;
+}
+.comment-textarea:focus, .reply-textarea:focus, .edit-textarea:focus{
+  border-bottom: 4px solid gray;
+  transition-duration: 2s;
+  outline: none;
+
 }
 
 .button-container {
+  width: inherit;
   margin-top: 10px;
   display: flex;
   justify-content: flex-end; /* Align buttons to the right */
@@ -64,4 +70,13 @@
   padding: 0;
   font: inherit;
   cursor: pointer;
+}
+
+.newComment{
+  display: flex;
+  align-items: flex-start; /* Align items at the top */
+  gap: 10px; /* Add some space between items */
+}
+.newComment img{
+  flex-shrink: 0;
 }

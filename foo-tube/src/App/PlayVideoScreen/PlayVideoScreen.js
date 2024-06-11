@@ -5,7 +5,7 @@ import RelatedVideos from './RelatedVideos/RelatedVideos';
 import Comments from './Comments/Comments';
 import Description from './Description/Description';
 
-const PlayVideoScreen = ({ toggleScreen,onVideoChange, isSignedIn, users, likeVideo, unlikeVideo, videoData, videos ,likeComment, unlikeComment }) => {
+const PlayVideoScreen = ({ toggleScreen, onVideoChange, isSignedIn, users, likeVideo, unlikeVideo, videoData, videos, likeComment, unlikeComment }) => {
   const { id } = useParams();
   const [video, setVideo] = useState(false);
   const [liked, setLiked] = useState(false);
@@ -76,7 +76,7 @@ const PlayVideoScreen = ({ toggleScreen,onVideoChange, isSignedIn, users, likeVi
       return updatedVideo;
     });
   };
-  
+
 
   if (!video) {
     return <div>Loading...</div>;
@@ -99,21 +99,24 @@ const PlayVideoScreen = ({ toggleScreen,onVideoChange, isSignedIn, users, likeVi
             {isSignedIn && liked && (
               <div>
 
-                <button type="button" className="btn btn-primary bi bi-hand-thumbs-up" onClick={handleUnlike}>
-                  {'Unlike'} {likeCount}
+                <button type="button" className="btn" onClick={handleUnlike}>
+                  <i class="bi bi-hand-thumbs-down"></i>
+                  <span className="icon-text"> {likeCount}</span>
                 </button>
               </div>
             )}
 
             {isSignedIn && !liked && (
               <div>
-                <button type="button" className="btn btn-primary bi bi-hand-thumbs-up" onClick={handleLike}>
-                  {'Like'} {likeCount}
+                <button type="button" className="btn" onClick={handleLike}>
+                  <i class="bi bi-hand-thumbs-up"></i>
+                  <span className="icon-text"> {likeCount}</span>
                 </button>
               </div>
             )}
-            <button type="button" className="btn btn-primary" onClick={handleShare}>
-              Share
+            <button type="button" className="btn  " onClick={handleShare}>
+              <i class="bi bi-share"></i>
+              <span className="icon-text"> Share</span>
             </button>
           </div>
 
@@ -124,7 +127,7 @@ const PlayVideoScreen = ({ toggleScreen,onVideoChange, isSignedIn, users, likeVi
           <RelatedVideos videos={videos} videoData={videoData} />
         </div>
         <Comments
-          videoId = {video.id}
+          videoId={video.id}
           comments={video.comments}
           unlikeComment={unlikeComment}
           likeComment={likeComment}

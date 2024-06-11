@@ -63,3 +63,40 @@ button {
   --yt-button-border-radius: 2px;
 
 }
+
+
+.clickable{
+  cursor: pointer;
+}
+
+.btn{
+  border-radius: 20px;
+  background-color: transparent;
+  color: inherit;
+  border: 0px;
+  margin: 10px;
+  display: flex; /* Use flexbox */
+  align-items: center; 
+}
+
+.btn:hover {
+  background-color: lightgrey;
+  color: inherit;
+}
+.btn:active  {
+  background-color: grey;
+  color: inherit;
+  border: 0px;
+  outline: none;
+}
+input{
+  color: inherit;
+}
+form{
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+.icon-text{
+  margin-left: 20px;
+}

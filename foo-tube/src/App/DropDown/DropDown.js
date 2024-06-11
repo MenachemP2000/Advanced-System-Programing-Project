@@ -14,31 +14,32 @@ const DropDown = ({ isOpen, topBarHeight, toggleTheme, isSignedIn, toggleSignend
   return (
     <div className={`DropDown ${isOpen ? 'open' : ''}`} style={dropDownStyle}>
       <div className="profile">
-        {!isSignedIn && (
-          <div className="button-container">
-            <Link to="/signin" className="btn btn-primary" >Sign In</Link>
-          </div>
-        )}
         {isSignedIn && (
           <>
-          <div >
-            <div className='profile-container'>
-              <img src={isSignedIn.image} height="50px" width="50px" ></img>
-              <div>
-                <div>{isSignedIn.displayname}</div>
-                <div>@{isSignedIn.username}</div>
+            <div className='dropDownList'>
+              <div className='profile-container'>
+                <img src={isSignedIn.image} height="50px" width="50px" ></img>
+                <div>
+                  <div>{isSignedIn.displayname}</div>
+                  <div>@{isSignedIn.username}</div>
+                </div>
               </div>
+
+              <p></p>
+              <button className="dropDownButton" onClick={handleLogOut}>
+                <i class="bi bi-box-arrow-right"></i>
+                <span className="icon-text"> Sign out</span>
+              </button>
+
+              <button className="theme-toggle dropDownButton" onClick={toggleTheme}>
+              <i class="bi bi-moon"></i>
+                <span className="icon-text"> Toggle Theme</span>
+              </button>
+
+
             </div>
-            
-          </div>
-          <p></p>
-          <button className="btn btn-primary" onClick={handleLogOut}>Log Out</button>
-          
           </>
         )}
-      </div>
-      <div className="button-container">
-        <button className="theme-toggle btn btn-primary" onClick={toggleTheme}>Toggle Theme</button>
       </div>
     </div>
   );
