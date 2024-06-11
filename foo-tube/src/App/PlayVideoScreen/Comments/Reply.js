@@ -1,5 +1,6 @@
 // Reply.js
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid'; // Import uuidv4
 import './Reply.css'
 const Reply = ({
@@ -26,6 +27,7 @@ const Reply = ({
   const [usersLikedReply, setUsersLikedReply] = useState([]);
   const [userLikedReply, setUserLikedReply] = useState(false);
   const [totalUserLikes, setTotaluserLikes] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (isEditing && editTextareaRef.current) {
@@ -76,10 +78,16 @@ const Reply = ({
 
 
   const handleLikeReply = () => {
-    const newUsersLikes = [...thisReply.usersLikes, isSignedIn.username];
-    const updatedReply = { ...thisReply, usersLikes: newUsersLikes };
-    setThisReply(updatedReply);
-    handleCommentReplyChange(updatedReply);
+    if (isSignedIn) {
+      const newUsersLikes = [...thisReply.usersLikes, isSignedIn.username];
+      const updatedReply = { ...thisReply, usersLikes: newUsersLikes };
+      setThisReply(updatedReply);
+      handleCommentReplyChange(updatedReply);
+
+    }
+    else {
+      navigate('/signin');
+    }
   };
 
   const handleUnlikeReply = () => {
@@ -163,7 +171,12 @@ const Reply = ({
     setIsEditing(false);
   };
   const showReplyForm = () => {
-    setIsReplyFormVisible(true);
+    if (isSignedIn) {
+      setIsReplyFormVisible(true);
+    }
+    else{
+      navigate('/signin');
+    }
   };
 
   const hideReplyForm = () => {
@@ -186,8 +199,8 @@ const Reply = ({
           <div>
             <p>{isExpanded ? reply.content : reply.content.substring(0, 100)}</p>
             {isLongReply && (
-              <button className="btn btn-link" onClick={toggleReadMore}>
-                {isExpanded ? "Read Less" : "Read More"}
+              <button className="btn" onClick={toggleReadMore}>
+                {isExpanded ? "Show less" : "...more"}
               </button>
             )}
           </div>
@@ -196,14 +209,14 @@ const Reply = ({
         {(isSignedIn.username == reply.user) && (
           <div className="button-container">
 
-            <button className="btn   edit-button" onClick={toggleEdit}>
-                <i class="bi bi-pencil"></i>
-                <span className="icon-text">Edit</span>
-              </button>
-            <button className="btn   delete-button" onClick={() => handleDeleteReply(reply.id)}>
-                <i class="bi bi-trash"></i>
-                <span className="icon-text">Delete</span>
-              </button>
+            <button className="btn   " onClick={toggleEdit}>
+              <i class="bi bi-pencil"></i>
+              <span className="icon-text">Edit</span>
+            </button>
+            <button className="btn  " onClick={() => handleDeleteReply(reply.id)}>
+              <i class="bi bi-trash"></i>
+              <span className="icon-text">Delete</span>
+            </button>
 
           </div>
         )}
@@ -211,7 +224,7 @@ const Reply = ({
           {!isEditing && (
             <>
               <div className='button-container-like-reply'>
-                {(isSignedIn && !userLikedReply) && (
+                {((isSignedIn && !userLikedReply) || !isSignedIn) && (
                   <button
                     className="btn   like-button"
                     onClick={() => handleLikeReply(reply.id)}
@@ -227,15 +240,15 @@ const Reply = ({
                     onClick={() => handleUnlikeReply(reply.id)}
                     aria-label="Unlike reply"
                   >
-                  <i class="bi bi-hand-thumbs-down"></i>
-                  <span className="icon-text"> {totalUserLikes}</span>
+                    <i class="bi bi-hand-thumbs-down"></i>
+                    <span className="icon-text"> {totalUserLikes}</span>
                   </button>
                 )}
-                {isSignedIn && (
+                {
                   <button className="btn" onClick={showReplyForm}>
                     {'Reply'}
                   </button>
-                )}
+                }
 
               </div>
 

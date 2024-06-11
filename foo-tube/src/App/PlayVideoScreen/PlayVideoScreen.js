@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams , useNavigate} from 'react-router-dom';
 import './PlayVideoScreen.css';
 import RelatedVideos from './RelatedVideos/RelatedVideos';
 import Comments from './Comments/Comments';
@@ -11,6 +11,7 @@ const PlayVideoScreen = ({ toggleScreen, onVideoChange, isSignedIn, users, likeV
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [author, setAuthor] = useState(null);
+  const navigate = useNavigate();
 
 
   useEffect(() => {
@@ -41,7 +42,12 @@ const PlayVideoScreen = ({ toggleScreen, onVideoChange, isSignedIn, users, likeV
 
 
   const handleLike = () => {
-    likeVideo(video.id);
+    if (!isSignedIn) {
+      navigate('/signin');
+    }
+    else{
+      likeVideo(video.id);
+    }
   };
   const handleUnlike = () => {
     unlikeVideo(video.id);
@@ -108,7 +114,7 @@ const PlayVideoScreen = ({ toggleScreen, onVideoChange, isSignedIn, users, likeV
               </div>
             )}
 
-            {isSignedIn && !liked && (
+            {((isSignedIn && !liked) || !isSignedIn )&& (
               <div>
                 <button type="button" className="btn" onClick={handleLike}>
                   <i class="bi bi-hand-thumbs-up"></i>

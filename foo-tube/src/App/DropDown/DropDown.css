@@ -42,14 +42,11 @@
     flex-direction: column;
 }
 .dropDownButton{
+    width: inherit;
     padding: 10px;
     background-color: inherit;
     border: 0px;
     color: inherit;
     font-size: larger;
 
-}
-.dropDownButton:hover {
-    background-color: lightgrey;
-    cursor: pointer;
 }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Comments.css';
 import { v4 as uuidv4 } from 'uuid'; // Import uuidv4
 import Comment from './Comment';
@@ -16,6 +17,7 @@ const Comments = ({
   const [commentList, setCommentList] = useState([]);
   const [isCommentFormVisible, setIsCommentFormVisible] = useState(false);
   const commentTextareaRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setCommentList(videos.find(video => video.id === videoId).comments);
@@ -52,7 +54,13 @@ const Comments = ({
   };
 
   const handleTextareaFocus = () => {
-    setIsCommentFormVisible(true);
+    if (isSignedIn) {
+      setIsCommentFormVisible(true);
+
+    }
+    else{
+      navigate('/signin');
+    }
   };
 
   const handleTextareaInput = (e) => {
@@ -111,6 +119,27 @@ const Comments = ({
                   </button>
                 </div>
               )}
+            </form>
+
+
+          </div>
+
+        </>
+      )}
+      {(!isSignedIn) && (
+        <>
+          <div className='newComment'>
+            <div><img src="/pictures/users/notSignedin.jpg" height="50px" width="50px" ></img></div>
+            <form onSubmit={handleAddComment}>
+              <textarea
+                ref={commentTextareaRef}
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                onFocus={handleTextareaFocus}
+                onInput={handleTextareaInput}
+                placeholder="Add your comment..."
+                className="comment-textarea"
+              ></textarea>
             </form>
 
 

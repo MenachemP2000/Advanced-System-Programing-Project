@@ -13,7 +13,6 @@ const TopBar = ({ toggleMenu, toggleDropDown, isSignedIn, theme }) => {
 
   const handleSearch = (e) => {
     const query = e.target.value;
-    // Logic to handle search query
     console.log('Search query:', query);
   };
   const navigate = useNavigate()

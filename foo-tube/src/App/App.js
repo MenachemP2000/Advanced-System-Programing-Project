@@ -1,6 +1,6 @@
 // App.js
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 
 import TopBar from './TopBar/TopBar';
 import Menu from './Menu/Menu';
@@ -144,7 +144,7 @@ function App() {
           <>
             <TopBar theme={theme} toggleMenu={toggleMenu} toggleDropDown={toggleDropDown} isSignedIn={isSignedIn} />
             <Menu screen={screen} isOpen={menuOpen}  />
-            <DropDown isOpen={dropDownOpen} isSignedIn={isSignedIn} toggleTheme={toggleTheme} toggleSignendIn={toggleSignendIn} />
+            <DropDown setIsOpen={setDropDownOpen} isOpen={dropDownOpen} isSignedIn={isSignedIn} toggleTheme={toggleTheme} toggleSignendIn={toggleSignendIn} />
             {(menuOpen && screen != "Home" ) &&(<div className="Overlay" onClick={toggleMenu}></div>) }
           </>
         )}
