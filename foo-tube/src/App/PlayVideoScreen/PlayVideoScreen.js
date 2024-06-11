@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams , useNavigate} from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import './PlayVideoScreen.css';
 import RelatedVideos from './RelatedVideos/RelatedVideos';
 import Comments from './Comments/Comments';
@@ -23,7 +23,7 @@ const PlayVideoScreen = ({ toggleScreen, onVideoChange, isSignedIn, users, likeV
         setVideo(video);
         setLikeCount(video.likeCount || 0);
         setAuthor(users.find(author => author.username === video.username));
-        setRelatedVideos(videos.filter(v => v.id !== id)); 
+        setRelatedVideos(videos.filter(v => v.id !== id));
       }
     };
     fetchVideo();
@@ -47,7 +47,7 @@ const PlayVideoScreen = ({ toggleScreen, onVideoChange, isSignedIn, users, likeV
     if (!isSignedIn) {
       navigate('/signin');
     }
-    else{
+    else {
       likeVideo(video.id);
     }
   };
@@ -77,7 +77,7 @@ const PlayVideoScreen = ({ toggleScreen, onVideoChange, isSignedIn, users, likeV
     setVideo(updatedVideo);
     console.log(updatedVideo);
     onVideoChange(updatedVideo);
-};
+  };
 
   const handleCommentsChange = (newComments) => {
     setVideo(prevVideo => {
@@ -99,7 +99,7 @@ const PlayVideoScreen = ({ toggleScreen, onVideoChange, isSignedIn, users, likeV
         <div className="videoTitle">{video.title}</div>
         <div className="videoProfile">
           <div id="profilepicandname">
-            <img  className='profilePic' src={author.image} height="50px" width="50px" ></img>
+            <img className='profilePic' src={author.image} height="50px" width="50px" ></img>
             <div id="profilename">
               {author.username}
             </div>
@@ -110,13 +110,13 @@ const PlayVideoScreen = ({ toggleScreen, onVideoChange, isSignedIn, users, likeV
               <div>
 
                 <button type="button" className="btn" onClick={handleUnlike}>
-                  <i class="bi bi-hand-thumbs-down"></i>
+                  <i class="bi bi-hand-thumbs-up-fill"></i>
                   <span className="icon-text"> {likeCount}</span>
                 </button>
               </div>
             )}
 
-            {((isSignedIn && !liked) || !isSignedIn )&& (
+            {((isSignedIn && !liked) || !isSignedIn) && (
               <div>
                 <button type="button" className="btn" onClick={handleLike}>
                   <i class="bi bi-hand-thumbs-up"></i>

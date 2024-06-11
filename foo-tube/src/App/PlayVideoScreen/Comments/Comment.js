@@ -307,7 +307,7 @@ const Comment = ({
         <div className='button-container-like-reply'>
           {(isSignedIn && userLikedComment) && (
             <button className="btn  " onClick={handleUnlikeComment}>
-              <i class="bi bi-hand-thumbs-down"></i>
+              <i class="bi bi-hand-thumbs-up-fill"></i>
               <span className="icon-text"> {totalUserLikes}</span>
             </button>
           )}

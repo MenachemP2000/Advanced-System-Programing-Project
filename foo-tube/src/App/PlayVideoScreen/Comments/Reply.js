@@ -240,7 +240,7 @@ const Reply = ({
                     onClick={() => handleUnlikeReply(reply.id)}
                     aria-label="Unlike reply"
                   >
-                    <i class="bi bi-hand-thumbs-down"></i>
+                    <i class="bi bi-hand-thumbs-up-fill"></i>
                     <span className="icon-text"> {totalUserLikes}</span>
                   </button>
                 )}
