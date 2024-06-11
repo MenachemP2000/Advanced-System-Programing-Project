@@ -43,10 +43,16 @@
   flex-direction: row;
   align-items: center;
 }
+.smallTopBar{
+  background-color: inherit;
+}
+.bigTopBar{
+  background-color: inherit;
+}
 
 .search-input {
   padding-left: 20px;
-  background-color: transparent;
+  background-color: inherit;
   color: inherit;
   width: 100%;
   height: 40px;
@@ -77,15 +83,31 @@
 .bar.light {
   background-color: black;
 }
+.smallTopBar{
+  display: none;
+}
+.RightTopSmall{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
 
 @media(max-width:500px) {
+  .bigScreenSearch{
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+  }
 
   .TopBar .icon-text {
     margin-left: 0px;
     display: none;
   }
-
-  .search-input {
+  .smallTopBar{
+    display: flex;
+  }
+  .bigTopBar{
     display: none;
   }
 
@@ -95,9 +117,5 @@
 
   .btn.SignInBtn {
     margin: 0px;
-  }
-  
-  .TopBar{
-    justify-content: space-around;
   }
 }

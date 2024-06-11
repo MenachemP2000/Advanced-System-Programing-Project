@@ -60,26 +60,8 @@
     color: #555;
     padding-left: 0;
   }
-
-
 }
 
-@media (max-width:900px) {
-  .video-info h3 {
-    width: inherit;
-  }
-
-  .RecommendedVideos li {
-    display: flex;
-    flex-direction: row;
-    margin-bottom: 10px;
-    flex: 1 1 0;
-    min-width: 320px;
-    flex-wrap: nowrap;
-
-  }
-
-}
 
 .RecommendedVideosClose .thumbNail {
   min-width: 300px;

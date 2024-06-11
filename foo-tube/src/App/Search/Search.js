@@ -44,7 +44,7 @@ const Search = ({toggleScreen, videos}) => {
         )}
         {searchVideos.map(video => (
           <li className='clickable' key={video.id} onClick={() => handleVideoClick(video.id)}>
-              <img src={video.thumbnail} alt={video.title} />
+              <img className='thumbNail' src={video.thumbnail} alt={video.title} />
               <div className="video-info">
                 <h3>{video.title}</h3>
                 <p>{video.views} views</p>

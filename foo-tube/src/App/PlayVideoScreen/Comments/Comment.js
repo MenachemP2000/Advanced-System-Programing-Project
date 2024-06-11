@@ -238,7 +238,7 @@ const Comment = ({
   return (
     <div id="outercomment">
       {author && (
-        <div><img src={author.image} height="50px" width="50px" ></img></div>
+        <div><img  className='profilePic' src={author.image} height="50px" width="50px" ></img></div>
       )}
 
       <div className="comment" id="innercomment" key={comment.id}>
@@ -327,7 +327,7 @@ const Comment = ({
         {isReplyFormVisible && (
           <>
             <div className='newReply'>
-              <div><img src={isSignedIn.image} height="50px" width="50px" ></img></div>
+              <div><img  className='profilePic' src={isSignedIn.image} height="50px" width="50px" ></img></div>
               <form onSubmit={handleReply}>
                 <textarea
                   value={newReply[comment.id] || ''}

@@ -191,7 +191,7 @@ const Reply = ({
   return (
     <div id="outerreply">
       {author && (
-        <div><img src={author.image} height="50px" width="50px" ></img></div>
+        <div><img  className='profilePic' src={author.image} height="50px" width="50px" ></img></div>
       )}
       <div className="reply" id="innerreply" key={reply.id}>
         {!isEditing && (<>
@@ -255,7 +255,7 @@ const Reply = ({
               {isReplyFormVisible && (
                 <>
                   <div className='newReply'>
-                    <div><img src={isSignedIn.image} height="50px" width="50px" ></img></div>
+                    <div><img  className='profilePic' src={isSignedIn.image} height="50px" width="50px" ></img></div>
                     <form onSubmit={handleReply}>
                       <textarea
                         value={newReply[comment.id] || "@" + reply.user + " "}

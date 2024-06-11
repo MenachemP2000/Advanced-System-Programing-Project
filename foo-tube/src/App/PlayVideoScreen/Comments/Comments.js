@@ -129,7 +129,7 @@ const Comments = ({
       {(!isSignedIn) && (
         <>
           <div className='newComment'>
-            <div><img src="/pictures/users/notSignedin.jpg" height="50px" width="50px" ></img></div>
+            <div><img className='profilePic' src="/pictures/users/notSignedin.jpg" height="50px" width="50px" ></img></div>
             <form onSubmit={handleAddComment}>
               <textarea
                 ref={commentTextareaRef}

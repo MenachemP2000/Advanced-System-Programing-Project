@@ -99,7 +99,7 @@ const PlayVideoScreen = ({ toggleScreen, onVideoChange, isSignedIn, users, likeV
         <div className="videoTitle">{video.title}</div>
         <div className="videoProfile">
           <div id="profilepicandname">
-            <img src={author.image} height="50px" width="50px" ></img>
+            <img  className='profilePic' src={author.image} height="50px" width="50px" ></img>
             <div id="profilename">
               {author.username}
             </div>
