@@ -42,3 +42,11 @@
   justify-content: flex-start; /* Align buttons to the right */
   flex-direction: row;
 }
+
+@media(max-width:500px) {
+   img{
+    width: 30px;
+    height: 30px;
+
+  }
+}

@@ -141,10 +141,7 @@ const Comments = ({
                 className="comment-textarea"
               ></textarea>
             </form>
-
-
           </div>
-
         </>
       )}
       {commentList.map((comment, index) => (

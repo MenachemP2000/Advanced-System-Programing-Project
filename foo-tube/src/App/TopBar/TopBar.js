@@ -56,7 +56,7 @@ const TopBar = ({ toggleMenu, toggleDropDown, isSignedIn, theme }) => {
       {!isSignedIn && (
         <div className="RightTop">
           <div className="drop-down">
-            <Link to="/signin" className="btn" >
+            <Link to="/signin" className="btn SignInBtn" >
             <i class="bi bi-person"></i>
             <span className="icon-text">Sign In</span>
             </Link>
