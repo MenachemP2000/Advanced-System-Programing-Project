@@ -1,5 +1,6 @@
 // Reply.js
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid'; // Import uuidv4
 import './Reply.css'
 const Reply = ({
@@ -26,6 +27,7 @@ const Reply = ({
   const [usersLikedReply, setUsersLikedReply] = useState([]);
   const [userLikedReply, setUserLikedReply] = useState(false);
   const [totalUserLikes, setTotaluserLikes] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (isEditing && editTextareaRef.current) {
@@ -76,10 +78,16 @@ const Reply = ({
 
 
   const handleLikeReply = () => {
-    const newUsersLikes = [...thisReply.usersLikes, isSignedIn.username];
-    const updatedReply = { ...thisReply, usersLikes: newUsersLikes };
-    setThisReply(updatedReply);
-    handleCommentReplyChange(updatedReply);
+    if (isSignedIn) {
+      const newUsersLikes = [...thisReply.usersLikes, isSignedIn.username];
+      const updatedReply = { ...thisReply, usersLikes: newUsersLikes };
+      setThisReply(updatedReply);
+      handleCommentReplyChange(updatedReply);
+
+    }
+    else {
+      navigate('/signin');
+    }
   };
 
   const handleUnlikeReply = () => {
@@ -163,7 +171,12 @@ const Reply = ({
     setIsEditing(false);
   };
   const showReplyForm = () => {
-    setIsReplyFormVisible(true);
+    if (isSignedIn) {
+      setIsReplyFormVisible(true);
+    }
+    else{
+      navigate('/signin');
+    }
   };
 
   const hideReplyForm = () => {
@@ -178,7 +191,7 @@ const Reply = ({
   return (
     <div id="outerreply">
       {author && (
-        <div><img src={author.image} height="50px" width="50px" ></img></div>
+        <div><img  className='profilePic' src={author.image} height="50px" width="50px" ></img></div>
       )}
       <div className="reply" id="innerreply" key={reply.id}>
         {!isEditing && (<>
@@ -186,67 +199,85 @@ const Reply = ({
           <div>
             <p>{isExpanded ? reply.content : reply.content.substring(0, 100)}</p>
             {isLongReply && (
-              <button className="btn btn-link" onClick={toggleReadMore}>
-                {isExpanded ? "Read Less" : "Read More"}
+              <button className="btn" onClick={toggleReadMore}>
+                {isExpanded ? "Show less" : "...more"}
               </button>
             )}
           </div>
         </>)
         }
-        {(isSignedIn.username == reply.user) && (
+        {!isEditing &&(isSignedIn.username == reply.user) && (
           <div className="button-container">
 
-            <button className="btn btn-primary edit-button" onClick={toggleEdit}>Edit</button>
-            <button className="btn btn-primary delete-button" onClick={() => handleDeleteReply(reply.id)}>Delete</button>
+            <button className="btn   " onClick={toggleEdit}>
+              <i class="bi bi-pencil"></i>
+              <span className="icon-text">Edit</span>
+            </button>
+            <button className="btn  " onClick={() => handleDeleteReply(reply.id)}>
+              <i class="bi bi-trash"></i>
+              <span className="icon-text">Delete</span>
+            </button>
 
           </div>
         )}
         <div>
           {!isEditing && (
             <>
-              {isSignedIn && (
-                <button className="btn btn-link" onClick={showReplyForm}>
-                  {'Reply'}
-                </button>
-              )}
-              {(isSignedIn && !userLikedReply) && (
-                <button
-                  className="btn btn-primary like-button"
-                  onClick={() => handleLikeReply(reply.id)}
-                  aria-label="Like reply"
-                >
-                  {totalUserLikes} Like
-                </button>
-              )}
-              {(isSignedIn && userLikedReply) && (
-                <button
-                  className="btn btn-primary unlike-button"
-                  onClick={() => handleUnlikeReply(reply.id)}
-                  aria-label="Unlike reply"
-                >
-                  {totalUserLikes} Unlike
-                </button>
-              )}
+              <div className='button-container-like-reply'>
+                {((isSignedIn && !userLikedReply) || !isSignedIn) && (
+                  <button
+                    className="btn   like-button"
+                    onClick={() => handleLikeReply(reply.id)}
+                    aria-label="Like reply"
+                  >
+                    <i class="bi bi-hand-thumbs-up"></i>
+                    <span className="icon-text"> {totalUserLikes}</span>
+                  </button>
+                )}
+                {(isSignedIn && userLikedReply) && (
+                  <button
+                    className="btn   unlike-button"
+                    onClick={() => handleUnlikeReply(reply.id)}
+                    aria-label="Unlike reply"
+                  >
+                    <i class="bi bi-hand-thumbs-up-fill"></i>
+                    <span className="icon-text"> {totalUserLikes}</span>
+                  </button>
+                )}
+                {
+                  <button className="btn" onClick={showReplyForm}>
+                    {'Reply'}
+                  </button>
+                }
+
+              </div>
+
               {isReplyFormVisible && (
-                <form onSubmit={handleReply}>
-                  <textarea
-                    value={newReply[comment.id] || "@" + reply.user + " "}
-                    onChange={handleReplyContentChange}
-                    className="reply-textarea"
-                  ></textarea>
-                  <div className="button-container">
-                    <button className="btn btn-primary cancel-button" onClick={hideReplyForm}>
-                      {'Cancel'}
-                    </button>
-                    <button
-                      className="btn btn-primary submit-button"
-                      type="submit"
-                      aria-label="Add reply"
-                    >
-                      Reply
-                    </button>
+                <>
+                  <div className='newReply'>
+                    <div><img  className='profilePic' src={isSignedIn.image} height="50px" width="50px" ></img></div>
+                    <form onSubmit={handleReply}>
+                      <textarea
+                        value={newReply[comment.id] || "@" + reply.user + " "}
+                        onChange={handleReplyContentChange}
+                        className="reply-textarea"
+                      ></textarea>
+                      <div className="button-container">
+                        <button className="btn" onClick={hideReplyForm}>
+                          {'Cancel'}
+                        </button>
+                        <button
+                          className="btn"
+                          type="submit"
+                          aria-label="Add reply"
+                        >
+                          Reply
+                        </button>
+                      </div>
+                    </form>
                   </div>
-                </form>
+
+                </>
               )}
 
             </>
@@ -262,7 +293,7 @@ const Reply = ({
               <div className="button-container">
                 <button
                   type="button"
-                  className="btn btn-primary save-button"
+                  className="btn"
                   onClick={handleSaveEdit}
                   aria-label="Save edit"
                 >
@@ -270,7 +301,7 @@ const Reply = ({
                 </button>
                 <button
                   type="button"
-                  className="btn btn-primary cancel-button"
+                  className="btn"
                   onClick={handleCancelEdit}
                   aria-label="Cancel edit"
                 >

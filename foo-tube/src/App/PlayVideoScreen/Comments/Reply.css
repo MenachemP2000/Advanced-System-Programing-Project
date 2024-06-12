@@ -14,3 +14,9 @@
     font-size: 14px;
     border: 0px;
   }
+  @media(max-width:600px) {
+    .button-container .icon-text {
+      margin-left: 0px;
+      display: none;
+    }
+  }

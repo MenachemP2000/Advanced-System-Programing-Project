@@ -1,20 +1,29 @@
-import { React, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { React, useEffect, useState } from 'react';
+import { Form, Link } from 'react-router-dom';
+import RecommendedVideos from './RecommendedVideos/RecommendedVideos';
+
+import './Home.css';
 
 
-const Home = ({toggleScreen}) => {
+const Home = ({toggleScreen, videoData, videos,menuOpen, isSignedIn, users  }) => {
+  const [menuOpenStatus, setMenuOpenStatus] = useState(false);
 
 
   useEffect(() => {
     toggleScreen("Home");
   }, []);
-  return (
-    <div>
-      <h1>Welcome to My Website</h1>
-      <p>This is the home page of my website. You can navigate to other pages using the menu or by typing the URL directly.</p>
-      <p>Feel free to explore!</p>
-      <Link to="/video/1" className="btn btn-primary" >Video</Link>
 
+  useEffect(() => {
+    setMenuOpenStatus(menuOpen);
+    console.log("changed");
+  }, [menuOpen]);
+
+  return (
+    
+    <div>
+      <div className={`${menuOpen ? 'opend' : 'closed'}`}>
+          <RecommendedVideos videos={videos} videoData={videoData} menuOpen={menuOpen} users={users} />
+      </div>
     </div>
   );
 };

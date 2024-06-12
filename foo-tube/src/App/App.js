@@ -1,6 +1,6 @@
 // App.js
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 
 import TopBar from './TopBar/TopBar';
 import Menu from './Menu/Menu';
@@ -12,6 +12,7 @@ import './App.css';
 import CreateAccount from './SignIn/CreateAccount';
 import UserData from './SignIn/users.json'
 import videoData from './PlayVideoScreen/MetaData/videos.json'; // Corrected the import path
+import Search from './Search/Search';
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -101,6 +102,10 @@ function App() {
     });
   };
 
+  const handleVideoDelete = (oldVideo) => {
+    setVideos(prevVideos => prevVideos.filter(video => video.id !== oldVideo.id));
+  };
+
 
 
   const addUser = (user) => {
@@ -140,19 +145,26 @@ function App() {
   return (
     <Router>
       <div className={`App ${theme}`}>
-        {!(screen == "SignIn" || screen == "CreateAccount") && (
+        {!(screen == "SignIn" || screen == "CreateAccount" ) && (
           <>
-            <TopBar toggleMenu={toggleMenu} toggleDropDown={toggleDropDown} isSignedIn={isSignedIn} />
-            <Menu isOpen={menuOpen} />
-            <DropDown isOpen={dropDownOpen} isSignedIn={isSignedIn} toggleTheme={toggleTheme} toggleSignendIn={toggleSignendIn} />
-            {menuOpen && <div className="Overlay" onClick={toggleMenu}></div>}
+            <TopBar theme={theme} toggleMenu={toggleMenu} toggleDropDown={toggleDropDown} isSignedIn={isSignedIn} />
+            <Menu screen={screen} isOpen={menuOpen}  />
+            <DropDown setIsOpen={setDropDownOpen} isOpen={dropDownOpen} isSignedIn={isSignedIn} toggleTheme={toggleTheme} toggleSignendIn={toggleSignendIn} />
+            {(menuOpen && screen != "Home" ) &&(<div className="Overlay" onClick={toggleMenu}></div>) }
           </>
         )}
 
         <Routes>
+           <Route path="/search/:key" element={<Search users={users} toggleScreen={toggleScreen}  videos={videos} />} />
           <Route path="/signin" element={<SignIn users={users} setUsers={setUsers} toggleScreen={toggleScreen} isSignedIn={isSignedIn} toggleSignendIn={toggleSignendIn} />} />
           <Route path="/createaccount" element={<CreateAccount setSignedInStatus={setSignedInStatus} users={users} addUser={addUser} isSignedIn={isSignedIn} toggleScreen={toggleScreen} toggleSignendIn={toggleSignendIn} />} />
-          <Route path="/" element={<Home toggleScreen={toggleScreen} isSignedIn={isSignedIn} />} /> {/* Define a route for the root URL */}
+          <Route path="/" element={<Home toggleScreen={toggleScreen} 
+            videos={videos}
+            videoData={videoData}
+            isSignedIn={isSignedIn}
+            menuOpen={menuOpen}
+            users ={users}
+            />} />
           <Route path="/video/:id" element={<PlayVideoScreen
             videos={videos}
             videoData={videoData}
@@ -164,6 +176,7 @@ function App() {
             unlikeComment={unlikeComment}
             likeComment={likeComment}
             onVideoChange={handleVideoChange}
+            onVideoDelete={handleVideoDelete}
           />} />
         </Routes>
       </div>

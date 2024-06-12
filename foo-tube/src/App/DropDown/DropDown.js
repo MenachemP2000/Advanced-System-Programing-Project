@@ -1,44 +1,65 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import './DropDown.css';
 
-const DropDown = ({ isOpen, topBarHeight, toggleTheme, isSignedIn, toggleSignendIn }) => {
+const DropDown = ({ isOpen, topBarHeight, toggleTheme, isSignedIn, toggleSignendIn, setIsOpen }) => {
+  const navigate = useNavigate();
+  const dropdownRef = useRef(null);
 
   const dropDownStyle = {
     bottom: topBarHeight + 'px',
   };
+
   const handleLogOut = () => {
     toggleSignendIn(false);
+    navigate('/');
   };
 
+  const handleClickOutside = (event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setIsOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
+
   return (
-    <div className={`DropDown ${isOpen ? 'open' : ''}`} style={dropDownStyle}>
+    <div ref={dropdownRef} className={`DropDown ${isOpen ? 'open' : ''}`} style={dropDownStyle}>
       <div className="profile">
-        {!isSignedIn && (
-          <div className="button-container">
-            <Link to="/signin" className="btn btn-primary" >Sign In</Link>
-          </div>
-        )}
         {isSignedIn && (
           <>
-          <div >
-            <div className='profile-container'>
-              <img src={isSignedIn.image} height="50px" width="50px" ></img>
-              <div>
-                <div>{isSignedIn.displayname}</div>
-                <div>@{isSignedIn.username}</div>
+            <div className='dropDownList'>
+              <div className='profile-container'>
+                <img src={isSignedIn.image} height="50px" width="50px" alt="Profile" />
+                <div>
+                  <div>{isSignedIn.displayname}</div>
+                  <div>@{isSignedIn.username}</div>
+                </div>
               </div>
+
+              <p></p>
+              <button className="dropDownButton btn" onClick={handleLogOut}>
+                <i className="bi bi-box-arrow-right"></i>
+                <span className="icon-text"> Sign out</span>
+              </button>
+
+              <button className="theme-toggle btn dropDownButton" onClick={toggleTheme}>
+                <i className="bi bi-moon"></i>
+                <span className="icon-text"> Toggle Theme</span>
+              </button>
             </div>
-            
-          </div>
-          <p></p>
-          <button className="btn btn-primary" onClick={handleLogOut}>Log Out</button>
-          
           </>
         )}
-      </div>
-      <div className="button-container">
-        <button className="theme-toggle btn btn-primary" onClick={toggleTheme}>Toggle Theme</button>
       </div>
     </div>
   );

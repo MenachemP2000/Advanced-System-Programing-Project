@@ -7,6 +7,8 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     display: none;
+    border-radius: 10px;
+    
 }
 
 .DropDown.open {
@@ -34,4 +36,16 @@
 .profile-container{
     display: flex;
     flex-direction: row;
+}
+.dropDownList{
+    display: flex;
+    flex-direction: column;
+}
+.dropDownButton{
+    width: inherit;
+    padding: 10px;
+    background-color: inherit;
+    border: 0px;
+    color: inherit;
+    font-size: larger;
 }
