@@ -16,7 +16,7 @@ and install react-router-dom using the following command:
 npm install react-router-dom
 
 then, copy the files that are on "foo-tube" folder to the new react project.
-then start the web app using npm start.
+then start the web app the following command: npm start.
 
 
 
