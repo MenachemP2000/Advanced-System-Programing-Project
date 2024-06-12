@@ -51,9 +51,13 @@
 
 
 @media (max-width:900px) {
-  .video-info h3 {
-    width: inherit;
+  .RelatedVideos .video-info h3 {
+    width: 100%;
   }
+
+}
+
+@media (max-width:480px) {
 
   .RelatedVideos li {
     display: flex;
