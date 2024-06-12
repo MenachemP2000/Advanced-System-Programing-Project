@@ -51,7 +51,7 @@
 
 .search {
   display: flex;
-  width: inherit;
+  width: 50%;
   flex-direction: row;
   align-items: center;
   flex-shrink: 1;
@@ -141,6 +141,8 @@
   .drop-down{
     min-width: 110px;
     flex-shrink: 0;
+    display: flex;
+    justify-content: flex-end;
   }
   .RightTop{
     min-width: 110px;
