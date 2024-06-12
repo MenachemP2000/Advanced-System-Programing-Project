@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './RelatedVideos.css';
 
 
-const RelatedVideos = ({ videos ,id}) => {
+const RelatedVideos = ({ videos, id,users }) => {
   const [relatedVideos, setRelatedVideos] = useState([]);
   const navigate = useNavigate();
 
@@ -14,7 +14,7 @@ const RelatedVideos = ({ videos ,id}) => {
   const handleVideoClick = (id) => {
     navigate(`/video/${id}`);
   };
-  
+
   const shuffleArray = (array) => {
     const shuffledArray = [...array];
     for (let i = shuffledArray.length - 1; i > 0; i--) {
@@ -29,12 +29,12 @@ const RelatedVideos = ({ videos ,id}) => {
       <ul>
         {relatedVideos.map(video => (
           <li className='clickable' key={video.id} onClick={() => handleVideoClick(video.id)}>
-              <img src={video.thumbnail} alt={video.title} />
-              <div className="video-info">
-                <h3>{video.title}</h3>
-                <p>{video.username}</p>
-                <p>{video.views} views</p>
-              </div>
+            <img className="thumbNail" src={video.thumbnail} alt={video.title} />
+            <div className="video-info">
+              <h3>{video.title}</h3>
+              <p>{video.username}</p>
+              <p>{video.views} views</p>
+            </div>
           </li>
         ))}
       </ul>

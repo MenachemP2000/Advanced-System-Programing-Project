@@ -151,7 +151,7 @@ function App() {
         )}
 
         <Routes>
-           <Route path="/search/:key" element={<Search toggleScreen={toggleScreen}  videos={videos} />} />
+           <Route path="/search/:key" element={<Search users={users} toggleScreen={toggleScreen}  videos={videos} />} />
           <Route path="/signin" element={<SignIn users={users} setUsers={setUsers} toggleScreen={toggleScreen} isSignedIn={isSignedIn} toggleSignendIn={toggleSignendIn} />} />
           <Route path="/createaccount" element={<CreateAccount setSignedInStatus={setSignedInStatus} users={users} addUser={addUser} isSignedIn={isSignedIn} toggleScreen={toggleScreen} toggleSignendIn={toggleSignendIn} />} />
           <Route path="/" element={<Home toggleScreen={toggleScreen} 

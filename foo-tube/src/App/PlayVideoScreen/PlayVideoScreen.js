@@ -134,7 +134,7 @@ const PlayVideoScreen = ({ toggleScreen, onVideoChange, isSignedIn, users, likeV
         <Description views={video.views} description={video.description} username={video.username} isSignedIn={isSignedIn} onSave={handleSaveDescription} />
 
         <div className="sidebarSmall">
-          <RelatedVideos id={id} videos={relatedVideos} videoData={videoData} />
+          <RelatedVideos users={users} id={id} videos={relatedVideos} videoData={videoData} />
         </div>
         <Comments
           videoId={video.id}
@@ -148,7 +148,7 @@ const PlayVideoScreen = ({ toggleScreen, onVideoChange, isSignedIn, users, likeV
         />
       </div>
       <div className="sidebarBig">
-        <RelatedVideos id={id} videoData={videoData} videos={relatedVideos} />
+        <RelatedVideos users={users} id={id} videoData={videoData} videos={relatedVideos} />
       </div>
     </div>
   );

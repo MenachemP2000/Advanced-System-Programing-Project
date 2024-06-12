@@ -16,15 +16,21 @@
 }
 .leftTop{
   align-items: center;
+  min-width: 210px;
 }
 .icon{
   border-radius: 10px;
+  flex-shrink: 0;
 }
 
 .app-title {
   margin: 0;
   font-size: 1.2rem;
-  align-content: center;
+  align-contet: center;
+  flex-direction: row;
+  display: flex;
+  align-items: center;
+  min-width: 170px;
 }
 
 .hamburger-menu {
@@ -45,9 +51,10 @@
 
 .search {
   display: flex;
-  width: 50%;
+  width: inherit;
   flex-direction: row;
   align-items: center;
+  flex-shrink: 1;
 }
 .smallTopBar{
   background-color: inherit;
@@ -99,7 +106,7 @@
 }
 
 
-@media(max-width:500px) {
+@media(max-width:656px) {
   .bigScreenSearch{
     display: flex;
     flex-direction: row;
@@ -123,5 +130,19 @@
 
   .btn.SignInBtn {
     margin: 0px;
+    flex-shrink: 0;
+  }
+}
+@media (min-width:656px) {
+  .btn.SignInBtn {
+    margin: 0px;
+    min-width: 110px;
+  }
+  .drop-down{
+    min-width: 110px;
+    flex-shrink: 0;
+  }
+  .RightTop{
+    min-width: 110px;
   }
 }
