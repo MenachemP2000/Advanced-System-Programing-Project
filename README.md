@@ -19,4 +19,5 @@ then, copy the files that are on "foo-tube" folder to the new react project.
 then start the web app the following command: npm start.
 
 
-
+android part:
+in order to run the application you will need to open the project in android studio and run the program through the IDE
