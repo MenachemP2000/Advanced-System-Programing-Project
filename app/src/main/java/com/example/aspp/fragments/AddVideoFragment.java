@@ -5,62 +5,44 @@ import static android.app.Activity.RESULT_OK;
 import static com.example.aspp.Utils.getPath;
 
 import android.app.Dialog;
-import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
-import androidx.camera.core.Camera;
-import androidx.camera.core.CameraSelector;
-import androidx.camera.core.Preview;
-import androidx.camera.video.MediaStoreOutputOptions;
-import androidx.camera.video.Quality;
-import androidx.camera.video.QualitySelector;
-import androidx.camera.video.Recorder;
-import androidx.camera.video.Recording;
-import androidx.camera.video.VideoCapture;
-import androidx.camera.lifecycle.ProcessCameraProvider;
-import androidx.camera.video.VideoRecordEvent;
-import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
-import android.os.Environment;
-import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.ImageButton;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.example.aspp.MainActivity;
 import com.example.aspp.R;
-import com.example.aspp.VideoDetailsActivity;
 import com.example.aspp.objects.Video;
-import com.google.common.util.concurrent.ListenableFuture;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -68,16 +50,15 @@ import java.util.concurrent.Executors;
  * create an instance of this fragment.
  */
 public class AddVideoFragment extends Fragment {
-
-    ExecutorService service;
-    Recording recording = null;
-    VideoCapture<Recorder> videoCapture = null;
-    ImageButton capture, toggleFlash, flipCamera;
-    PreviewView previewView;
-    int cameraFacing = CameraSelector.LENS_FACING_BACK;
+    Button createVideo, cancel;
+    EditText videoTitle, videoDescription, videoTags;
+    ImageView videoThumbnail;
+    Uri uri;
+    boolean photoWasSelected = false;
+    String videoPath;
     private final ActivityResultLauncher<String> activityResultLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), result -> {
         if (ActivityCompat.checkSelfPermission(getContext(), android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-            startCamera(cameraFacing);
+            showBottomDialog(getContext());
         }
     });   // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 
@@ -125,135 +106,69 @@ public class AddVideoFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_add_video, container, false);
 
-        previewView = view.findViewById(R.id.viewFinder);
-        capture = view.findViewById(R.id.capture);
-        toggleFlash = view.findViewById(R.id.toggleFlash);
-        flipCamera = view.findViewById(R.id.flipCamera);
-
-        showBottomDialog(getContext());
-
-        capture.setOnClickListener(v -> {
-            if (ActivityCompat.checkSelfPermission(getContext(), android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                activityResultLauncher.launch(android.Manifest.permission.CAMERA);
-            } else if (ActivityCompat.checkSelfPermission(getContext(), android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-                activityResultLauncher.launch(android.Manifest.permission.RECORD_AUDIO);
-            } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P && ActivityCompat.checkSelfPermission(getContext(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                activityResultLauncher.launch(android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            } else {
-                captureVideo();
-            }
-        });
         if (ActivityCompat.checkSelfPermission(getContext(), android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             activityResultLauncher.launch(android.Manifest.permission.CAMERA);
         } else {
-            startCamera(cameraFacing);
+            showBottomDialog(getContext());
         }
-        flipCamera.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (cameraFacing == CameraSelector.LENS_FACING_BACK) {
-                    cameraFacing = CameraSelector.LENS_FACING_FRONT;
-                } else {
-                    cameraFacing = CameraSelector.LENS_FACING_BACK;
-                }
-                startCamera(cameraFacing);
+
+        videoThumbnail = view.findViewById(R.id.thumbnail);
+        videoThumbnail.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            intent.setType("image/*");
+            startActivityForResult(intent, 100);
+        });
+        videoTitle = view.findViewById(R.id.title);
+        videoDescription = view.findViewById(R.id.description);
+        videoTags = view.findViewById(R.id.tags);
+        createVideo = view.findViewById(R.id.create);
+        createVideo.setOnClickListener(v -> {
+            String title = videoTitle.getText().toString();
+            String description = videoDescription.getText().toString();
+            String tags = videoTags.getText().toString();
+            boolean isValid = true;
+            if (title.isEmpty()) {
+                isValid = false;
+                videoTitle.setError("Title is required");
             }
+            if (description.isEmpty()) {
+                isValid = false;
+                videoDescription.setError("Description is required");
+            }
+            if (tags.isEmpty()) {
+                isValid = false;
+                videoTags.setError("Tags are required");
+            }
+
+            if (!photoWasSelected) {
+                isValid = false;
+                Toast.makeText(getContext(), "Thumbnail image is require, click on the lens icon", Toast.LENGTH_LONG).show();
+            }
+            if (!isValid) {
+                return;
+            }
+            Video newVideo = new Video(123243, "demi user", 0.0,title,
+                    description, tags, uri, videoPath);
+            HomeFragment.videoArrayList.add(newVideo);
+            HomeFragment.adp.notifyDataSetChanged();
+            startActivity(new Intent(getContext(), MainActivity.class));
+        });
+        cancel = view.findViewById(R.id.cancel);
+        cancel.setOnClickListener(v -> {
+            startActivity(new Intent(getContext(), MainActivity.class));
         });
 
-        service = Executors.newSingleThreadExecutor();
-
+        SharedPreferences sp = getContext().getSharedPreferences("MODE", Context.MODE_PRIVATE);
+        boolean nightMode = sp.getBoolean("night", false);
+        if (nightMode) {
+            createVideo.setBackgroundTintList(getContext().getColorStateList(R.color.colorOnSurface_night));
+            cancel.setBackgroundTintList(getContext().getColorStateList(R.color.colorOnSurface_night));
+        }
+        else {
+            createVideo.setBackgroundTintList(getContext().getColorStateList(R.color.colorOnSurface_day));
+            cancel.setBackgroundTintList(getContext().getColorStateList(R.color.colorOnSurface_day));
+        }
         return view;
-    }
-
-    public void captureVideo() {
-        capture.setImageResource(R.drawable.stop_record);
-        Recording recording1 = recording;
-        if (recording1 != null) {
-            recording1.stop();
-            recording = null;
-            return;
-        }
-        String name = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.getDefault()).format(System.currentTimeMillis());
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, name);
-        contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4");
-        contentValues.put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/CameraX-Video");
-
-        MediaStoreOutputOptions options = new MediaStoreOutputOptions.Builder(getContext().getContentResolver(), MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
-                .setContentValues(contentValues).build();
-        String path = "Movies/CameraX-Video/" + name + ".mp4";
-        Path videoPath = Paths.get(path);
-
-        if (ActivityCompat.checkSelfPermission(getContext(), android.Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        recording = videoCapture.getOutput().prepareRecording(getContext(), options).withAudioEnabled().start(ContextCompat.getMainExecutor(getContext()), videoRecordEvent -> {
-            if (videoRecordEvent instanceof VideoRecordEvent.Start) {
-                capture.setEnabled(true);
-            } else if (videoRecordEvent instanceof VideoRecordEvent.Finalize) {
-                if (!((VideoRecordEvent.Finalize) videoRecordEvent).hasError()) {
-                    String msg = "Video capture succeeded: " + ((VideoRecordEvent.Finalize) videoRecordEvent).getOutputResults().getOutputUri();
-                    Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(getContext(), VideoDetailsActivity.class);
-                    intent.putExtra("videoPath", path);
-                    startActivity(intent);
-                } else {
-                    recording.close();
-                    recording = null;
-                    String msg = "Error: " + ((VideoRecordEvent.Finalize) videoRecordEvent).getError();
-                    Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
-                }
-                capture.setImageResource(R.drawable.record);
-            }
-        });
-    }
-
-    public void startCamera(int cameraFacing) {
-        ListenableFuture<ProcessCameraProvider> processCameraProvider = ProcessCameraProvider.getInstance(getContext());
-
-        processCameraProvider.addListener(() -> {
-            try {
-                ProcessCameraProvider cameraProvider = processCameraProvider.get();
-                Preview preview = new Preview.Builder().build();
-                preview.setSurfaceProvider(previewView.getSurfaceProvider());
-
-                Recorder recorder = new Recorder.Builder()
-                        .setQualitySelector(QualitySelector.from(Quality.HIGHEST))
-                        .build();
-                videoCapture = VideoCapture.withOutput(recorder);
-
-                cameraProvider.unbindAll();
-
-                CameraSelector cameraSelector = new CameraSelector.Builder()
-                        .requireLensFacing(cameraFacing).build();
-
-                Camera camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, videoCapture);
-
-                toggleFlash.setOnClickListener(view -> toggleFlash(camera));
-            } catch (ExecutionException | InterruptedException e) {
-                e.printStackTrace();
-            }
-        }, ContextCompat.getMainExecutor(getContext()));
-    }
-
-    private void toggleFlash(Camera camera) {
-        if (camera.getCameraInfo().hasFlashUnit()) {
-            if (camera.getCameraInfo().getTorchState().getValue() == 0) {
-                camera.getCameraControl().enableTorch(true);
-                toggleFlash.setImageResource(R.drawable.flash_off);
-            } else {
-                camera.getCameraControl().enableTorch(false);
-                toggleFlash.setImageResource(R.drawable.flash_on);
-            }
-        } else {
-            getActivity().runOnUiThread(() -> Toast.makeText(getContext(), "Flash is not available currently", Toast.LENGTH_SHORT).show());
-        }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        service.shutdown();
     }
 
     public void showBottomDialog(Context context) {
@@ -268,7 +183,8 @@ public class AddVideoFragment extends Fragment {
             public void onClick(View v) {
 
                 dialog.dismiss();
-
+                Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                startActivityForResult(intent, 1);
             }
         });
 
@@ -279,13 +195,24 @@ public class AddVideoFragment extends Fragment {
             public void onClick(View v) {
 
                 dialog.dismiss();
-                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                intent.setType("video/*");
-                startActivityForResult(intent, 1);
+                Intent videoIntent = new Intent(Intent.ACTION_PICK);
+                videoIntent.setType("video/*");
+                startActivityForResult(Intent.createChooser(videoIntent,"Select Video"),2);
 
             }
         });
 
+        LinearLayout layout_return = dialog.findViewById(R.id.layout_return);
+        layout_return.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                dialog.dismiss();
+                startActivity(new Intent(getContext(), MainActivity.class));
+            }
+        });
+
+        dialog.setCancelable(false);
         dialog.show();
         dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -294,15 +221,27 @@ public class AddVideoFragment extends Fragment {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK){
-            if (requestCode == 1){
-                Uri uri = data.getData();
-                String videopath = getPath(getContext(), uri);
-                Intent intent = new Intent(getContext(), VideoDetailsActivity.class);
-                intent.putExtra("videoPath", videopath);
-                startActivity(intent);
+            if (requestCode == 2 || requestCode == 1) {
+                videoPath = data.toURI().split(";")[0];
+                Log.i("DATA", data.toURI().split(";")[0] + "  ");
+            }
+            if (requestCode == 100) {
+                uri = data.getData();
+                Bitmap bitmap = null;
+                Bitmap decoded = null;
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 10, out);
+                    decoded = BitmapFactory.decodeStream(new ByteArrayInputStream(out.toByteArray()));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                videoThumbnail.setImageBitmap(decoded);
+                photoWasSelected = true;
             }
         }
     }

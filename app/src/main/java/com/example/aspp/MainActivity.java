@@ -31,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
     ActivityMainBinding binding;
     DrawerLayout drawerLayout;
     NavigationView navigationView;
-    Menu test;
     boolean nightMode;
     SharedPreferences sp;
     private Fragment currentFragment;
@@ -136,4 +135,9 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finishAffinity();
+    }
 }
