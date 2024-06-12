@@ -80,7 +80,6 @@ button {
   border: 0px;
   margin: 10px;
   display: flex;
-  /* Use flexbox */
   align-items: center;
 }
 

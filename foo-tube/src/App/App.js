@@ -102,6 +102,10 @@ function App() {
     });
   };
 
+  const handleVideoDelete = (oldVideo) => {
+    setVideos(prevVideos => prevVideos.filter(video => video.id !== oldVideo.id));
+  };
+
 
 
   const addUser = (user) => {
@@ -172,6 +176,7 @@ function App() {
             unlikeComment={unlikeComment}
             likeComment={likeComment}
             onVideoChange={handleVideoChange}
+            onVideoDelete={handleVideoDelete}
           />} />
         </Routes>
       </div>

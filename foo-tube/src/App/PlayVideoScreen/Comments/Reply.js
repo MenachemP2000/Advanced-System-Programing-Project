@@ -263,11 +263,11 @@ const Reply = ({
                         className="reply-textarea"
                       ></textarea>
                       <div className="button-container">
-                        <button className="btn   cancel-button" onClick={hideReplyForm}>
+                        <button className="btn" onClick={hideReplyForm}>
                           {'Cancel'}
                         </button>
                         <button
-                          className="btn   submit-button"
+                          className="btn"
                           type="submit"
                           aria-label="Add reply"
                         >
@@ -293,7 +293,7 @@ const Reply = ({
               <div className="button-container">
                 <button
                   type="button"
-                  className="btn   save-button"
+                  className="btn"
                   onClick={handleSaveEdit}
                   aria-label="Save edit"
                 >
@@ -301,7 +301,7 @@ const Reply = ({
                 </button>
                 <button
                   type="button"
-                  className="btn   cancel-button"
+                  className="btn"
                   onClick={handleCancelEdit}
                   aria-label="Cancel edit"
                 >
