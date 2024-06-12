@@ -1,10 +1,13 @@
 package com.example.aspp;
 
+import static com.example.aspp.Utils.generateId;
+import static com.example.aspp.Utils.loadComments;
 import static com.example.aspp.fragments.HomeFragment.adp;
 import static com.example.aspp.fragments.HomeFragment.videoArrayList;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -18,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
@@ -33,6 +37,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.aspp.adapters.CommentsRVAdapter;
 import com.example.aspp.adapters.HomeRVAdapter;
 import com.example.aspp.fragments.HomeFragment;
 import com.example.aspp.objects.Comment;
@@ -42,6 +47,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class VideoPlayerActivity extends AppCompatActivity {
+    private static final int CURRENT_USER = 123123123;
     TextView title, views, time, more, publisher, subscribers, comments, comment;
     RecyclerView related_videos;
     ImageView c_profile, profilePic;
@@ -51,6 +57,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
     HomeRVAdapter related;
     ArrayList<Video> relatedVideoArrayList;
     Video currentVideo;
+
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +72,8 @@ public class VideoPlayerActivity extends AppCompatActivity {
         Intent intent = getIntent();
         currentVideo = HomeFragment.videoArrayList.get(intent.getIntExtra("pos",0));
         currentVideo.addView();
+        loadComments(currentVideo.getId());
+        currentVideo = HomeFragment.videoArrayList.get(intent.getIntExtra("pos",0));
         ArrayList<Comment> commentSection = currentVideo.getComments();
         String vid = currentVideo.getVideoPath();
 
@@ -94,10 +103,22 @@ public class VideoPlayerActivity extends AppCompatActivity {
         publisher.setText(currentVideo.getPublisher());
         subscribers = findViewById(R.id.subscribers);
         comments = findViewById(R.id.comments);
-//        comments.setText(commentSection.size());
         comment = findViewById(R.id.comment);
-//        comments.setText(commentSection.get(0).getInfo);
-
+        comments.setText(commentSection.size() + " ");
+        try {
+            comment.setText(commentSection.get(0).getText());
+        }
+        catch (Exception e) {
+            Log.d("Exception", e.getMessage());
+            comment.setText("No comments are available right now");
+        }
+        LinearLayout layout_commentSection = findViewById(R.id.comment_section);
+        layout_commentSection.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showCommentsDialog(VideoPlayerActivity.this, currentVideo.getComments(), currentVideo);
+            }
+        });
         c_profile = findViewById(R.id.c_profile);
         profilePic = findViewById(R.id.profilePic);
         subscribe = findViewById(R.id.subscribe);
@@ -151,6 +172,53 @@ public class VideoPlayerActivity extends AppCompatActivity {
         related = new HomeRVAdapter(this, videoArrayList);
         related_videos.setAdapter(related);
         related_videos.setLayoutManager(new LinearLayoutManager(this));
+    }
+    public static void showCommentsDialog(Context context, ArrayList<Comment> c, Video vid) {
+
+        final Dialog dialog = new Dialog(context);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.comment_section_bottom_sheet_layout);
+
+        RecyclerView comments = dialog.findViewById(R.id.comment_section);
+        CommentsRVAdapter Cadp = new CommentsRVAdapter(context, c);
+        comments.setAdapter(Cadp);
+        comments.setLayoutManager(new LinearLayoutManager(dialog.getContext()));
+        ImageView profilePic = dialog.findViewById(R.id.profilePic);
+        EditText comment = dialog.findViewById(R.id.comment);
+        Button send = dialog.findViewById(R.id.send);
+        send.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (comment.getText().toString().isEmpty()) {
+                    comment.setError("Please enter a comment");
+                } else {
+                    c.add(new Comment(CURRENT_USER,comment.getText().toString(), vid.getId(), generateId()));
+                    comment.setText("");
+                    Cadp.notifyDataSetChanged();
+                }
+            }
+        });
+        ImageView layout_cancel = dialog.findViewById(R.id.cancelButton);
+        layout_cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                dialog.dismiss();
+            }
+        });
+
+        dialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialogInterface) {
+
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+        dialog.getWindow().setGravity(Gravity.BOTTOM);
     }
     public void showBottomDialog(Context context) {
 

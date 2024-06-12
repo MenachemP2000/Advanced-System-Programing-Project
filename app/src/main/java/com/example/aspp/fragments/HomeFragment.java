@@ -1,5 +1,6 @@
 package com.example.aspp.fragments;
 
+import static com.example.aspp.Utils.readCommentsList;
 import static com.example.aspp.Utils.readVideosList;
 
 import android.app.Dialog;
@@ -42,6 +43,7 @@ import android.widget.Toast;
 
 import com.example.aspp.R;
 import com.example.aspp.adapters.HomeRVAdapter;
+import com.example.aspp.objects.Comment;
 import com.example.aspp.objects.Video;
 
 import java.util.ArrayList;
@@ -59,6 +61,7 @@ public class HomeFragment extends Fragment {
     SwipeRefreshLayout swipeRefreshLayout;
     public static HomeRVAdapter adp;
     public static ArrayList<Video> videoArrayList;
+    public static ArrayList<Comment> commentArrayList;
     Toolbar toolbar;
     MenuItem searchMenuItem, notifMenuItem;
     SearchView searchView;
@@ -174,6 +177,8 @@ public class HomeFragment extends Fragment {
                     updatedSet.add(v);
                 else if (v.getDescription().contains(query.trim()))
                     updatedSet.add(v);
+                else if (v.getTags().contains(query.trim()))
+                    updatedSet.add(v);
             }
         }
 
@@ -234,6 +239,7 @@ public class HomeFragment extends Fragment {
         SharedPreferences sp = getContext().getSharedPreferences("MODE", Context.MODE_PRIVATE);
         nightMode = sp.getBoolean("night", false);
 
+        commentArrayList = readCommentsList(getContext());
         drawerLayout = getActivity().findViewById(R.id.drawer_layout);
         Toolbar activtytoolbar = getActivity().findViewById(R.id.toolbar);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(getActivity(), drawerLayout, activtytoolbar, R.string.open_nav,

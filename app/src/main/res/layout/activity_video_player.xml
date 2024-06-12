@@ -159,6 +159,7 @@
     </HorizontalScrollView>
 
     <LinearLayout
+        android:id="@+id/comment_section"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/top_profile_back"
@@ -168,6 +169,7 @@
         android:orientation="vertical">
 
         <LinearLayout
+            android:layout_marginTop="5dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal">
@@ -187,6 +189,8 @@
         </LinearLayout>
 
         <LinearLayout
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal">

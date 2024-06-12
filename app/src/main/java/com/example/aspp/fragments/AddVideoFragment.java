@@ -147,7 +147,7 @@ public class AddVideoFragment extends Fragment {
             if (!isValid) {
                 return;
             }
-            Video newVideo = new Video("demi user", 0.0,title,
+            Video newVideo = new Video(123243, "demi user", 0.0,title,
                     description, tags, uri, videoPath);
             HomeFragment.videoArrayList.add(newVideo);
             HomeFragment.adp.notifyDataSetChanged();

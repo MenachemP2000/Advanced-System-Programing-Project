@@ -22,11 +22,12 @@ import java.util.Map;
 public class Video {
 //    private double duration;
     private String publisher, title, description, videoPath, tags;
-    private int likes, dislikes, views, thumbnailDrawableId;
+    private int likes, dislikes, views, thumbnailDrawableId, id;
     private ArrayList<Comment> comments;
     private Date dateOfPublish;
     private Uri videoPathInRaw, thumbnailUri;
-    public Video(String publisher, double duration, String title, String description, String tags, int thumbnailDrawableId, Uri videoPathInRaw) {
+    public Video(int id, String publisher, double duration, String title, String description, String tags, int thumbnailDrawableId, Uri videoPathInRaw) {
+        this.id = id;
         this.publisher = publisher;
 //        this.duration = duration;
         this.title = title;
@@ -43,8 +44,9 @@ public class Video {
         this.dateOfPublish = Calendar.getInstance().getTime();
     }
 
-    public Video(String publisher, double duration, String title, String description, String tags, int thumbnailDrawableId, String videoPath) {
+    public Video(int id, String publisher, double duration, String title, String description, String tags, int thumbnailDrawableId, String videoPath) {
 //        this.duration = duration;
+        this.id = id;
         this.publisher = publisher;
         this.title = title;
         this.description = description;
@@ -60,8 +62,9 @@ public class Video {
         this.dateOfPublish = Calendar.getInstance().getTime();
     }
 
-    public Video(String publisher, double duration, String title, String description, String tags, Uri thumbnailUri, String videoPath) {
+    public Video(int id,String publisher, double duration, String title, String description, String tags, Uri thumbnailUri, String videoPath) {
 //        this.duration = duration;
+        this.id = id;
         this.publisher = publisher;
         this.title = title;
         this.description = description;
@@ -141,5 +144,8 @@ public class Video {
 
     public void addView() {
         this.views++;
+    }
+    public int getId() {
+        return id;
     }
 }

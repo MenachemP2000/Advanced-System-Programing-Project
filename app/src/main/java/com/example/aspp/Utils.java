@@ -8,6 +8,8 @@ import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 
+import com.example.aspp.fragments.HomeFragment;
+import com.example.aspp.objects.Comment;
 import com.example.aspp.objects.Video;
 
 import org.json.JSONArray;
@@ -20,7 +22,64 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 public class Utils {
+    public static ArrayList<Comment> readCommentsList(Context context) {
+        BufferedReader jsonReader = new BufferedReader(new InputStreamReader(
+                context.getResources().openRawResource(R.raw.comment_list)));
+        StringBuilder jsonBuilder = new StringBuilder();
+        ArrayList<Comment> result = new ArrayList<>();
+        try {
+            for (String line = null; (line = jsonReader.readLine()) != null;) {
+                jsonBuilder.append(line).append("\n");
+            }
+            JSONArray videoData = new JSONArray(jsonBuilder.substring(
+                    jsonBuilder.indexOf("["),jsonBuilder.indexOf("]")+1).toString());
+            for (int i = 0; i < videoData.length(); i++) {
+                JSONObject json_obj = videoData.getJSONObject(i);
+                int publisher_id = json_obj.getInt("publisher");
+                int id = json_obj.getInt("id");
+                String text = json_obj.getString("text");
+                int video = json_obj.getInt("video");
 
+                Comment temp = new Comment(publisher_id, text, video, id);
+                result.add(temp);
+            }
+        } catch (JSONException | IOException e) {
+            throw new RuntimeException(e);
+        }
+        return result;
+    }
+
+    public static int getVideoById(int id) {
+        for (int i = 0; i < HomeFragment.videoArrayList.size(); i++) {
+            if (HomeFragment.videoArrayList.get(i).getId() == id) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    public static void loadComments(int id) {
+        int pos = getVideoById(id);
+        for (int i = 0; i < HomeFragment.commentArrayList.size(); i++) {
+            if (HomeFragment.commentArrayList.get(i).getVideoId() == id) {
+                int finalI = i;
+                final boolean[] load = {true};
+                HomeFragment.videoArrayList.get(pos).getComments().forEach(comment -> {
+                    if (comment.getId() == HomeFragment.commentArrayList.get(finalI).getId()){
+                        load[0] = false;
+                    }
+                });
+                if (load[0])
+                    HomeFragment.videoArrayList.get(pos).getComments().add(HomeFragment.commentArrayList.get(finalI));
+            }
+        }
+    }
+    public static int generateId() {
+        int id = 0;
+        for (int i = 0; i < 50; i++) {
+            id += (int) (Math.random() * 10);
+        }
+        return id;
+    }
     public static ArrayList<Video> readVideosList(Context context) {
         BufferedReader jsonReader = new BufferedReader(new InputStreamReader(
                 context.getResources().openRawResource(R.raw.video_list)));
@@ -40,9 +99,10 @@ public class Utils {
                 String description = json_obj.getString("description");
                 String tags = json_obj.getString("tags");
                 int thumbnailDrawableID = string2drawbleId(context, json_obj.getString("thumbnailID"));
+                int id = json_obj.getInt("id");
                 String videoPathInRaw = json_obj.getString("videoPathInRaw");
 
-                Video temp = new Video(publisher_id, duration, title, description, tags, thumbnailDrawableID, videoPathInRaw);
+                Video temp = new Video(id, publisher_id, duration, title, description, tags, thumbnailDrawableID, videoPathInRaw);
                 result.add(temp);
             }
         } catch (JSONException | IOException e) {
