@@ -38,10 +38,12 @@ const PlayVideoScreen = ({ onVideoDelete, toggleScreen, onVideoChange, isSignedI
 
   useEffect(() => {
     setLikeCount(video.likeCount);
-    if (isSignedIn && video && video.usersLikes.find(user => user._id === isSignedIn._id)) {
+    if (isSignedIn && video && video.usersLikes.find(user => user === isSignedIn._id)) {
       setLiked(true);
     }
     else {
+      console.log(isSignedIn._id)
+      console.log(video.usersLikes);
       setLiked(false)
     }
   }, [video, video.usersLikes]);
