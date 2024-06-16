@@ -5,7 +5,7 @@ import RelatedVideos from './RelatedVideos/RelatedVideos';
 import Comments from './Comments/Comments';
 import Description from './Description/Description';
 
-const PlayVideoScreen = ({ onVideoDelete, toggleScreen, onVideoChange, isSignedIn, users, likeVideo, unlikeVideo, videos, likeComment, unlikeComment }) => {
+const PlayVideoScreen = ({ onVideoDelete, toggleScreen,addVideoView, onVideoChange, isSignedIn, users, likeVideo, unlikeVideo, videos, likeComment, unlikeComment }) => {
   const { id } = useParams();
   const [video, setVideo] = useState(false);
   const [liked, setLiked] = useState(false);
@@ -34,7 +34,11 @@ const PlayVideoScreen = ({ onVideoDelete, toggleScreen, onVideoChange, isSignedI
       }
     };
     fetchVideo();
-  }, [id, toggleScreen, users]);
+  }, [id, toggleScreen]);
+
+  useEffect(()=>{
+    addVideoView(id);
+  },[id]);
 
   useEffect(() => {
     setLikeCount(video.likeCount);
@@ -42,8 +46,6 @@ const PlayVideoScreen = ({ onVideoDelete, toggleScreen, onVideoChange, isSignedI
       setLiked(true);
     }
     else {
-      console.log(isSignedIn._id)
-      console.log(video.usersLikes);
       setLiked(false)
     }
   }, [video, video.usersLikes]);

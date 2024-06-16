@@ -1,92 +1,29 @@
 
 const express = require('express');
 const router = express.Router();
-const Video = require('../models/Video');
-
-
+const commentRoutes = require('./commentRoutes')
+const replyRoutes = require('./replyRoutes')
+const videoController = require('../controllers/videoController');
 
 // Create a new video
-router.post('/videos', async (req, res) => {
-  try {
-    const newVideo = new Video(req.body);
-    await newVideo.save();
-    res.status(201).send(newVideo);
-  } catch (error) {
-    res.status(400).send(error);
-  }
-});
+router.post('', videoController.createVideo);
 
 // Get all videos
-router.get('/videos', async (req, res) => {
-  try {
-    const videos = await Video.find();
-    res.send(videos);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
+router.get('', videoController.getAllVideos);
 
+// Get a specific video by ID
+router.get('/:id', videoController.getVideoById);
 
-// need to Get 20 certain videos !to modify!
-router.get('', async (req, res) => {
-  try {
-    const videos = await Video.find();
-    res.send(videos);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
+// Update a video by ID (PUT)
+router.put('/:id', videoController.updateVideo);
 
-// Get a video by ID
-router.get('/:id', async (req, res) => {
-  try {
-    const video = await Video.findById(req.params.id);
-    if (!video) {
-      return res.status(404).send();
-    }
-    res.send(video);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
+// Update a video by ID (PATCH)
+router.patch('/:id', videoController.partialUpdateVideo);
 
-// Update a video (PUT)
-router.put('/:id', async (req, res) => {
-  try {
-    const video = await Video.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-    if (!video) {
-      return res.status(404).send();
-    }
-    res.send(video);
-  } catch (error) {
-    res.status(400).send(error);
-  }
-});
+// Delete a video by ID
+router.delete('/:id', videoController.deleteVideo);
 
-// Update a video
-router.patch('/:id', async (req, res) => {
-  try {
-    const video = await Video.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-    if (!video) {
-      return res.status(404).send();
-    }
-    res.send(video);
-  } catch (error) {
-    res.status(400).send(error);
-  }
-});
-
-// Delete a video
-router.delete('/:id', async (req, res) => {
-  try {
-    const video = await Video.findByIdAndDelete(req.params.id);
-    if (!video) {
-      return res.status(404).send();
-    }
-    res.send(video);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
+router.use('', commentRoutes);
+router.use('', replyRoutes);
 
 module.exports = router;

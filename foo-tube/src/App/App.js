@@ -96,6 +96,22 @@ function App() {
   };
 
 
+  const addVideoView = async (videoId) => {
+    try {
+      const videoToUpdate = videos.find(video => video._id === videoId);
+      if (!videoToUpdate) {
+        throw new Error('Video not found');
+      }
+      const updatedVideo = {
+        ...videoToUpdate,
+          views: videoToUpdate.views + 1
+      };
+      await updateVideo(updatedVideo);
+    } catch (error) {
+      console.error('Error viewing video:', error);
+    }
+  };
+
   const likeVideo = async (videoId) => {
     try {
       const videoToUpdate = videos.find(video => video._id === videoId);
@@ -185,11 +201,25 @@ function App() {
     deleteVideo(oldVideo._id);
   };
 
-
-
-  const addUser = (user) => {
-    setUsers((prevUsers) => [...prevUsers, user]);
+  const addUser = async (newUser) => {
+    try {
+      const response = await fetch('http://localhost:4000/api/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newUser),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to add new user');
+      }
+      const newUserFromServer = await response.json();
+      setUsers(prevUsers => [...prevUsers, newUserFromServer]);
+    } catch (error) {
+      console.error('Error adding new user:', error);
+    }
   };
+  
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -243,6 +273,7 @@ function App() {
             users={users}
           />} />
           <Route path="/video/:id" element={<PlayVideoScreen
+            addVideoView={addVideoView}
             videos={videos}
             unlikeVideo={unlikeVideo}
             likeVideo={likeVideo}

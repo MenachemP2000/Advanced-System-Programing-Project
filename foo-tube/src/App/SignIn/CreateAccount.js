@@ -73,7 +73,7 @@ const CreateAccount = ({ addUser, toggleSignendIn, toggleScreen, isSignedIn, use
         addUser(newUser);
 
         toggleSignendIn(username);
-        toggleScreen("SignIN");
+        toggleScreen("SignIn");
         navigate("/signin");
     };
 
