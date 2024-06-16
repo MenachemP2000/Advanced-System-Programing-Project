@@ -42,7 +42,7 @@ const Comment = ({
 
   useEffect(() => {
     const fetchComment = () => {
-      const currentComment = commentList.find(c => c.id === key);
+      const currentComment = commentList.find(c => c._id === key);
       if (currentComment) {
         setThisComment(currentComment);
         setUsersLikedComment(currentComment.usersLikes);
@@ -126,7 +126,7 @@ const Comment = ({
 
   const hideReplyForm = () => {
     if (isReplyFormVisible) {
-      handleReplyChange({ target: { value: '' } }, comment.id);
+      handleReplyChange({ target: { value: '' } }, comment._id);
     }
     setIsReplyFormVisible(!isReplyFormVisible);
   };
@@ -158,7 +158,7 @@ const Comment = ({
   };
 
   const handleReplyContentChange = (e) => {
-    handleReplyChange(e, comment.id);
+    handleReplyChange(e, comment._id);
     e.target.style.height = 'auto';
     e.target.style.height = e.target.scrollHeight + 'px';
   };
@@ -171,7 +171,7 @@ const Comment = ({
 
   const handleCommentReplyChange = (newReply) => {
     setCurrentCommentReplies(prevReplies => {
-      const replyIndex = prevReplies.findIndex(reply => reply.id === newReply.id);
+      const replyIndex = prevReplies.findIndex(reply => reply._id === newReply._id);
       let updatedReplies;
       if (replyIndex !== -1) {
         updatedReplies = prevReplies.map((reply, index) => index === replyIndex ? newReply : reply);
@@ -195,7 +195,6 @@ const Comment = ({
     const replyContent = newReply[commentId];
     if (replyContent && replyContent.trim() !== '') {
       const newReplyObject = {
-        id: uuidv4(),
         user: isSignedIn.username,
         content: replyContent,
         usersLikes: []
@@ -212,7 +211,7 @@ const Comment = ({
   };
 
   const handleDeleteReply = (replyId) => {
-    const updatedReplies = thisComment.replies.filter(reply => reply.id !== replyId);
+    const updatedReplies = thisComment.replies.filter(reply => reply._id !== replyId);
     const updatedComment = {
       ...thisComment,
       replies: updatedReplies
@@ -222,7 +221,7 @@ const Comment = ({
   };
   const handleReply = (e) => {
     e.preventDefault();
-    handleAddReply(e, comment.id);
+    handleAddReply(e, comment._id);
     hideReplyForm();
   };
 
@@ -231,7 +230,7 @@ const Comment = ({
   };
 
   const handleSendAddReply = (replyId) => {
-    handleAddReply(replyId, comment.id);
+    handleAddReply(replyId, comment._id);
   };
   const isLongComment = comment.content.length > 100;
 
@@ -241,7 +240,7 @@ const Comment = ({
         <div><img  className='profilePic' src={author.image} height="50px" width="50px" ></img></div>
       )}
 
-      <div className="comment" id="innercomment" key={comment.id}>
+      <div className="comment" id="innercomment" key={comment._id}>
         <div>@{comment.user}</div>
         {isEditing ? (
           <div>
@@ -295,7 +294,7 @@ const Comment = ({
               <button
                 type="button"
                 className="btn "
-                onClick={() => handleDeleteComment(comment.id)}
+                onClick={() => handleDeleteComment(comment._id)}
                 aria-label="Delete comment"
               >
                 <i class="bi bi-trash"></i>
@@ -330,7 +329,7 @@ const Comment = ({
               <div><img  className='profilePic' src={isSignedIn.image} height="50px" width="50px" ></img></div>
               <form onSubmit={handleReply}>
                 <textarea
-                  value={newReply[comment.id] || ''}
+                  value={newReply[comment._id] || ''}
                   onChange={handleReplyContentChange}
                   placeholder="Reply to this comment..."
                   className="reply-textarea"
@@ -363,7 +362,7 @@ const Comment = ({
           {currentCommentReplies.map(reply => (
             <Reply
               reply={reply}
-              key={reply.id}
+              key={reply._id}
               handleAddReply={handleSendAddReply}
               handleDeleteReply={handleSendDeleteReply}
               handleReplyChange={handleReplyChange}

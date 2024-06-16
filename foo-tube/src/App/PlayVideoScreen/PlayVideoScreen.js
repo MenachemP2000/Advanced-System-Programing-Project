@@ -5,7 +5,7 @@ import RelatedVideos from './RelatedVideos/RelatedVideos';
 import Comments from './Comments/Comments';
 import Description from './Description/Description';
 
-const PlayVideoScreen = ({ onVideoDelete, toggleScreen, onVideoChange, isSignedIn, users, likeVideo, unlikeVideo, videoData, videos, likeComment, unlikeComment }) => {
+const PlayVideoScreen = ({ onVideoDelete, toggleScreen, onVideoChange, isSignedIn, users, likeVideo, unlikeVideo, videos, likeComment, unlikeComment }) => {
   const { id } = useParams();
   const [video, setVideo] = useState(false);
   const [liked, setLiked] = useState(false);
@@ -22,7 +22,7 @@ const PlayVideoScreen = ({ onVideoDelete, toggleScreen, onVideoChange, isSignedI
   useEffect(() => {
     toggleScreen("PlayVideoScreen");
     const fetchVideo = () => {
-      const video = videos.find(v => v.id === id);
+      const video = videos.find(v => v._id === id);
       if (video) {
         setVideo(video);
         setLikeCount(video.likeCount || 0);
@@ -38,16 +38,14 @@ const PlayVideoScreen = ({ onVideoDelete, toggleScreen, onVideoChange, isSignedI
 
   useEffect(() => {
     setLikeCount(video.likeCount);
+    if (isSignedIn && video && video.usersLikes.find(user => user._id === isSignedIn._id)) {
+      setLiked(true);
+    }
+    else {
+      setLiked(false)
+    }
   }, [video, video.usersLikes]);
 
-  useEffect(() => {
-    if (video.usersLikes && video.usersLikes.length > 0 && video.usersLikes.find(user => user === isSignedIn)) {
-      setLiked(true);
-    } else {
-
-      setLiked(false);
-    }
-  }, [isSignedIn, video.usersLikes]);
 
 
   const handleLike = () => {
@@ -55,11 +53,11 @@ const PlayVideoScreen = ({ onVideoDelete, toggleScreen, onVideoChange, isSignedI
       navigate('/signin');
     }
     else {
-      likeVideo(video.id);
+      likeVideo(video._id);
     }
   };
   const handleUnlike = () => {
-    unlikeVideo(video.id);
+    unlikeVideo(video._id);
   };
 
   const handleShare = async () => {
@@ -227,10 +225,10 @@ const PlayVideoScreen = ({ onVideoDelete, toggleScreen, onVideoChange, isSignedI
         <Description views={video.views} description={video.description} username={video.username} isSignedIn={isSignedIn} onSave={handleSaveDescription} />
 
         <div className="sidebarSmall">
-          <RelatedVideos users={users} id={id} videos={relatedVideos} videoData={videoData} />
+          <RelatedVideos users={users} id={id} videos={relatedVideos} />
         </div>
         <Comments
-          videoId={video.id}
+          videoId={video._id}
           comments={video.comments}
           unlikeComment={unlikeComment}
           likeComment={likeComment}
@@ -241,7 +239,7 @@ const PlayVideoScreen = ({ onVideoDelete, toggleScreen, onVideoChange, isSignedI
         />
       </div>
       <div className="sidebarBig">
-        <RelatedVideos users={users} id={id} videoData={videoData} videos={relatedVideos} />
+        <RelatedVideos users={users} id={id} videos={relatedVideos} />
       </div>
     </div>
   );

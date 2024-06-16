@@ -5,7 +5,7 @@ import RecommendedVideos from './RecommendedVideos/RecommendedVideos';
 import './Home.css';
 
 
-const Home = ({toggleScreen, videoData, videos,menuOpen, isSignedIn, users  }) => {
+const Home = ({toggleScreen, videos,menuOpen, isSignedIn, users  }) => {
   const [menuOpenStatus, setMenuOpenStatus] = useState(false);
 
 
@@ -22,7 +22,7 @@ const Home = ({toggleScreen, videoData, videos,menuOpen, isSignedIn, users  }) =
     
     <div>
       <div className={`${menuOpen ? 'opend' : 'closed'}`}>
-          <RecommendedVideos videos={videos} videoData={videoData} menuOpen={menuOpen} users={users} />
+          <RecommendedVideos videos={videos}  menuOpen={menuOpen} users={users} />
       </div>
     </div>
   );

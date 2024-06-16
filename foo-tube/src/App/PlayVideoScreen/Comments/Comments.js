@@ -20,7 +20,7 @@ const Comments = ({
   const navigate = useNavigate();
 
   useEffect(() => {
-    setCommentList(videos.find(video => video.id === videoId).comments);
+    setCommentList(videos.find(video => video._id === videoId).comments);
   }, [videos, videoId]);
 
   useEffect(() => {
@@ -31,7 +31,7 @@ const Comments = ({
   }, [newComment]);
 
   const handleDeleteComment = (commentId) => {
-    const updatedComments = commentList.filter(comment => comment.id !== commentId);
+    const updatedComments = commentList.filter(comment => comment._id !== commentId);
     setCommentList(updatedComments);
     onCommentsChange(updatedComments);
   };
@@ -41,7 +41,7 @@ const Comments = ({
     e.preventDefault();
     if (newComment.trim() !== '') {
       let updatedComments;
-      updatedComments = [...commentList, { id: uuidv4(), content: newComment, replies: [], usersLikes: [], user: author, date: Date.now() }];
+      updatedComments = [...commentList, {  content: newComment, replies: [], usersLikes: [], user: author, date: Date.now() }];
       setNewComment('');
       setIsCommentFormVisible(false);
       onCommentsChange(updatedComments);
@@ -70,7 +70,7 @@ const Comments = ({
 
   const handleCommentChange = (newComment) => {
     setCommentList(prevComments => {
-      const commentIndex = prevComments.findIndex(comment => comment.id === newComment.id);
+      const commentIndex = prevComments.findIndex(comment => comment._id === newComment._id);
 
       let updatedComments;
       if (commentIndex !== -1) {
@@ -150,7 +150,7 @@ const Comments = ({
           unlikeComment={unlikeComment}
           users={users}
           isSignedIn={isSignedIn}
-          key={comment.id}
+          key={comment._id}
           comment={comment}
           index={index}
           handleDeleteComment={handleDeleteComment}

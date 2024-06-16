@@ -29,7 +29,7 @@ const RecommendedVideos = ({ videos, menuOpen, users }) => {
     <div className={`RecommendedVideos ${menuOpen ? 'RecommendedVideosOpen' : 'RecommendedVideosClose'}`}>
       <ul>
         {relatedVideos.map(video => (
-          <li className='clickable' key={video.id} onClick={() => handleVideoClick(video.id)}>
+          <li className='clickable' key={video._id} onClick={() => handleVideoClick(video._id)}>
             <img className='thumbNail' src={video.thumbnail} alt={video.title} />
             <div className='videoDetails'>
               <img src={users.find(author => author.username === video.username).image} height="35px" width="35px" ></img>

@@ -39,7 +39,7 @@ const Reply = ({
 
   useEffect(() => {
     const fetchReply = () => {
-      const currentReply = comment.replies.find(r => r.id === key);
+      const currentReply = comment.replies.find(r => r._id === key);
       if (currentReply) {
         setThisReply(currentReply);
         setUsersLikedReply(currentReply.usersLikes);
@@ -109,7 +109,7 @@ const Reply = ({
 
   const handleAddReply = (e, commentId) => {
     e.preventDefault();
-    const commentIndex = commentList.findIndex(comment => comment.id === commentId);
+    const commentIndex = commentList.findIndex(comment => comment._id === commentId);
     if (commentIndex !== -1) {
       const updatedComments = [...commentList];
       const replyContent = newReply[commentId];
@@ -130,7 +130,7 @@ const Reply = ({
 
   const handleReply = (e) => {
     e.preventDefault();
-    handleAddReply(e, comment.id);
+    handleAddReply(e, comment._id);
     hideReplyForm();
   };
 
@@ -150,7 +150,7 @@ const Reply = ({
   };
 
   const handleReplyContentChange = (e) => {
-    handleReplyChange(e, comment.id);
+    handleReplyChange(e, comment._id);
     e.target.style.height = 'auto';
     e.target.style.height = e.target.scrollHeight + 'px';
   };
@@ -181,7 +181,7 @@ const Reply = ({
 
   const hideReplyForm = () => {
     if (isReplyFormVisible) {
-      handleReplyChange({ target: { value: '' } }, comment.id);
+      handleReplyChange({ target: { value: '' } }, comment._id);
     }
     setIsReplyFormVisible(!isReplyFormVisible);
   };
@@ -193,7 +193,7 @@ const Reply = ({
       {author && (
         <div><img  className='profilePic' src={author.image} height="50px" width="50px" ></img></div>
       )}
-      <div className="reply" id="innerreply" key={reply.id}>
+      <div className="reply" id="innerreply" key={reply._id}>
         {!isEditing && (<>
           <div>@{reply.user}</div>
           <div>
@@ -213,7 +213,7 @@ const Reply = ({
               <i class="bi bi-pencil"></i>
               <span className="icon-text">Edit</span>
             </button>
-            <button className="btn  " onClick={() => handleDeleteReply(reply.id)}>
+            <button className="btn  " onClick={() => handleDeleteReply(reply._id)}>
               <i class="bi bi-trash"></i>
               <span className="icon-text">Delete</span>
             </button>
@@ -227,7 +227,7 @@ const Reply = ({
                 {((isSignedIn && !userLikedReply) || !isSignedIn) && (
                   <button
                     className="btn   like-button"
-                    onClick={() => handleLikeReply(reply.id)}
+                    onClick={() => handleLikeReply(reply._id)}
                     aria-label="Like reply"
                   >
                     <i class="bi bi-hand-thumbs-up"></i>
@@ -237,7 +237,7 @@ const Reply = ({
                 {(isSignedIn && userLikedReply) && (
                   <button
                     className="btn   unlike-button"
-                    onClick={() => handleUnlikeReply(reply.id)}
+                    onClick={() => handleUnlikeReply(reply._id)}
                     aria-label="Unlike reply"
                   >
                     <i class="bi bi-hand-thumbs-up-fill"></i>
@@ -258,7 +258,7 @@ const Reply = ({
                     <div><img  className='profilePic' src={isSignedIn.image} height="50px" width="50px" ></img></div>
                     <form onSubmit={handleReply}>
                       <textarea
-                        value={newReply[comment.id] || "@" + reply.user + " "}
+                        value={newReply[comment._id] || "@" + reply.user + " "}
                         onChange={handleReplyContentChange}
                         className="reply-textarea"
                       ></textarea>

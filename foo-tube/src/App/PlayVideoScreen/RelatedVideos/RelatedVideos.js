@@ -8,7 +8,7 @@ const RelatedVideos = ({ videos, id,users }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setRelatedVideos(shuffleArray(videos.filter(v => v.id !== id)));
+    setRelatedVideos(shuffleArray(videos.filter(v => v._id !== id)));
   }, [id]);
 
   const handleVideoClick = (id) => {
@@ -28,7 +28,7 @@ const RelatedVideos = ({ videos, id,users }) => {
     <div className="RelatedVideos">
       <ul>
         {relatedVideos.map(video => (
-          <li className='clickable' key={video.id} onClick={() => handleVideoClick(video.id)}>
+          <li className='clickable' key={video._id} onClick={() => handleVideoClick(video._id)}>
             <img className="thumbNail" src={video.thumbnail} alt={video.title} />
             <div className="video-info">
               <h3>{video.title}</h3>
