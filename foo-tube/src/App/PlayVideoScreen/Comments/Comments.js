@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Comments.css';
-import { v4 as uuidv4 } from 'uuid'; // Import uuidv4
 import Comment from './Comment';
 
 const Comments = ({

@@ -8,7 +8,9 @@ router.get('/:videoId/comments', commentController.getComments);
 
 router.get('/:videoId/comments/:commentId', commentController.getComment);
 
-router.patch('/:videoId/comments/:commentId', commentController.updateComment);
+router.put('/:videoId/comments/:commentId', commentController.updateComment);
+
+router.patch('/:videoId/comments/:commentId', commentController.partialUpdateComment);
 
 router.delete('/:videoId/comments/:commentId', commentController.deleteComment);
 

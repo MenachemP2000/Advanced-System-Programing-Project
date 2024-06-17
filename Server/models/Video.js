@@ -1,19 +1,6 @@
 const mongoose = require('mongoose');
 
-const replySchema = new mongoose.Schema({
-  user: { type: String, required: true },
-  content: { type: String, required: true },
-  date: { type: Date, required: true },
-  usersLikes: { type: [String], default: [] }
-});
-
-const commentSchema = new mongoose.Schema({
-  user: { type: String, required: true },
-  content: { type: String, required: true },
-  date: { type: Date, required: true },
-  usersLikes: { type: [String], default: [] },
-  replies: { type: [replySchema], default: [] }
-});
+const Comment = require('./Comment');
 
 const videoSchema = new mongoose.Schema({
   title: { type: String, required: true },
@@ -27,7 +14,7 @@ const videoSchema = new mongoose.Schema({
   likeCount: { type: Number, default: 0 },
   views: { type: Number, default: 0 },
   usersLikes: { type: [String], default: [] },
-  comments: { type: [commentSchema], default: [] }
+  comments: { type: [Comment.schema], default: [] }
 });
 
 module.exports = mongoose.model('Video', videoSchema);

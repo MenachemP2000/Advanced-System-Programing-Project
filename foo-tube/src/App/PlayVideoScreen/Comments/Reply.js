@@ -48,10 +48,8 @@ const Reply = ({
       }
       if (usersLikedReply && usersLikedReply.length > 0 && usersLikedReply.find(user => user === isSignedIn.username)) {
         setUserLikedReply(true);
-        console.log(true);
       } else {
         setUserLikedReply(false);
-        console.log(false);
       }
     };
     fetchReply();

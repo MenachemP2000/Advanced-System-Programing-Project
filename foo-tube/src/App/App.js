@@ -33,173 +33,10 @@ function App() {
       .then(response => response.json())
       .then(data => setVideos(data))
       .catch(error => console.error('Error fetching videos:', error));
-  }, []); // Empty dependency array ensures this runs only once
-
-  const updateVideo = async (updatedVideo) => {
-    try {
-      const response = await fetch(`http://localhost:4000/api/videos/${updatedVideo._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedVideo),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to update video');
-      }
-      const updatedVideoFromServer = await response.json();
-      setVideos(prevVideos => prevVideos.map(video =>
-        video._id === updatedVideoFromServer._id ? updatedVideoFromServer : video
-      ));
-    } catch (error) {
-      console.error('Error updating video:', error);
-    }
-    console.log(videos);
-  };
-
-  // Function to add a new video to the server
-  const addVideo = async (newVideo) => {
-    try {
-      const response = await fetch('http://localhost:4000/api/videos', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newVideo),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to add new video');
-      }
-      const newVideoFromServer = await response.json();
-      setVideos(prevVideos => [...prevVideos, newVideoFromServer]);
-    } catch (error) {
-      console.error('Error adding new video:', error);
-    }
-  };
-  const deleteVideo = async (videoId) => {
-    try {
-      const response = await fetch(`http://localhost:4000/api/videos/${videoId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete video');
-      }
-
-      setVideos(prevVideos => prevVideos.filter(video => video._id !== videoId));
-    } catch (error) {
-      console.error('Error deleting video:', error);
-    }
-  };
-
-
-  const addVideoView = async (videoId) => {
-    try {
-      const videoToUpdate = videos.find(video => video._id === videoId);
-      if (!videoToUpdate) {
-        throw new Error('Video not found');
-      }
-      const updatedVideo = {
-        ...videoToUpdate,
-          views: videoToUpdate.views + 1
-      };
-      await updateVideo(updatedVideo);
-    } catch (error) {
-      console.error('Error viewing video:', error);
-    }
-  };
-
-  const likeVideo = async (videoId) => {
-    try {
-      const videoToUpdate = videos.find(video => video._id === videoId);
-      if (!videoToUpdate) {
-        throw new Error('Video not found');
-      }
-      const updatedVideo = {
-        ...videoToUpdate,
-        likeCount: videoToUpdate.likeCount + 1,
-        usersLikes: [...videoToUpdate.usersLikes, isSignedIn]
-      };
-      await updateVideo(updatedVideo);
-    } catch (error) {
-      console.error('Error liking video:', error);
-    }
-  };
-
-  const unlikeVideo = async (videoId) => {
-    try {
-      const videoToUpdate = videos.find(video => video._id === videoId);
-      if (!videoToUpdate) {
-        throw new Error('Video not found');
-      }
-      const updatedVideo = {
-        ...videoToUpdate,
-        likeCount: Math.max(videoToUpdate.likeCount - 1, 0),
-        usersLikes: videoToUpdate.usersLikes.filter(user => user !== isSignedIn._id)
-      };
-      await updateVideo(updatedVideo);
-    } catch (error) {
-      console.error('Error unliking video:', error);
-    }
-  };
-
-  const likeComment = async (videoId, commentId) => {
-    try {
-      const videoToUpdate = videos.find(video => video._id === videoId);
-      if (!videoToUpdate) {
-        throw new Error('Video not found');
-      }
-      const updatedComments = videoToUpdate.comments.map(comment => {
-        if (comment.id === commentId) {
-          const newUsersLikes = [...comment.usersLikes, isSignedIn];
-          return { ...comment, usersLikes: newUsersLikes };
-        }
-        return comment;
-      });
-      const updatedVideo = {
-        ...videoToUpdate,
-        comments: updatedComments
-      };
-      await updateVideo(updatedVideo);
-    } catch (error) {
-      console.error('Error liking comment:', error);
-    }
-  };
-
-  const unlikeComment = async (videoId, commentId) => {
-    try {
-      const videoToUpdate = videos.find(video => video._id === videoId);
-      if (!videoToUpdate) {
-        throw new Error('Video not found');
-      }
-      const updatedComments = videoToUpdate.comments.map(comment => {
-        if (comment.id === commentId) {
-          const newUsersLikes = comment.usersLikes.filter(user => user !== isSignedIn);
-          return { ...comment, usersLikes: newUsersLikes };
-        }
-        return comment;
-      });
-      const updatedVideo = {
-        ...videoToUpdate,
-        comments: updatedComments
-      };
-      await updateVideo(updatedVideo);
-    } catch (error) {
-      console.error('Error liking comment:', error);
-    }
-  };
-
-
-  const handleVideoChange = (newVideo) => {
-    updateVideo(newVideo);
-  };
-
-  const handleVideoDelete = (oldVideo) => {
-    deleteVideo(oldVideo._id);
-  };
+  }, []);
+  useEffect(() => {
+    document.body.className = theme;
+  }, [theme]);
 
   const addUser = async (newUser) => {
     try {
@@ -219,7 +56,6 @@ function App() {
       console.error('Error adding new user:', error);
     }
   };
-  
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -232,10 +68,6 @@ function App() {
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
   };
-
-  useEffect(() => {
-    document.body.className = theme;
-  }, [theme]);
 
   const toggleSignendIn = (username) => {
     if (username) {
@@ -273,17 +105,11 @@ function App() {
             users={users}
           />} />
           <Route path="/video/:id" element={<PlayVideoScreen
-            addVideoView={addVideoView}
-            videos={videos}
-            unlikeVideo={unlikeVideo}
-            likeVideo={likeVideo}
+            appVideos={videos}
             users={users}
             toggleScreen={toggleScreen}
             isSignedIn={isSignedIn}
-            unlikeComment={unlikeComment}
-            likeComment={likeComment}
-            onVideoChange={handleVideoChange}
-            onVideoDelete={handleVideoDelete}
+            setAppVideos={setVideos}
           />} />
         </Routes>
       </div>

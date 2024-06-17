@@ -5,11 +5,10 @@ import RelatedVideos from './RelatedVideos/RelatedVideos';
 import Comments from './Comments/Comments';
 import Description from './Description/Description';
 
-const PlayVideoScreen = ({ onVideoDelete, toggleScreen,addVideoView, onVideoChange, isSignedIn, users, likeVideo, unlikeVideo, videos, likeComment, unlikeComment }) => {
+const PlayVideoScreen = ({ setAppVideos, toggleScreen, isSignedIn, users, appVideos }) => {
   const { id } = useParams();
   const [video, setVideo] = useState(false);
   const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(0);
   const [author, setAuthor] = useState(null);
   const [relatedVideos, setRelatedVideos] = useState(null);
   const [currentTitle, setCurrentTitle] = useState(null);
@@ -17,15 +16,15 @@ const PlayVideoScreen = ({ onVideoDelete, toggleScreen,addVideoView, onVideoChan
   const navigate = useNavigate();
   const textareaRef = useRef(null);
   const [newTitle, setNewTitle] = useState(false);
-
+  const [videos, setVideos] = useState(appVideos);
 
   useEffect(() => {
     toggleScreen("PlayVideoScreen");
+    setVideos(appVideos);
     const fetchVideo = () => {
       const video = videos.find(v => v._id === id);
       if (video) {
         setVideo(video);
-        setLikeCount(video.likeCount || 0);
         setAuthor(users.find(author => author.username === video.username));
         setRelatedVideos(videos);
         setCurrentTitle(video.title);
@@ -36,12 +35,15 @@ const PlayVideoScreen = ({ onVideoDelete, toggleScreen,addVideoView, onVideoChan
     fetchVideo();
   }, [id, toggleScreen]);
 
-  useEffect(()=>{
+  useEffect(() => {
     addVideoView(id);
-  },[id]);
+  }, [id]);
 
   useEffect(() => {
-    setLikeCount(video.likeCount);
+    setAppVideos(videos);
+  }, [videos]);
+
+  useEffect(() => {
     if (isSignedIn && video && video.usersLikes.find(user => user === isSignedIn._id)) {
       setLiked(true);
     }
@@ -49,8 +51,191 @@ const PlayVideoScreen = ({ onVideoDelete, toggleScreen,addVideoView, onVideoChan
       setLiked(false)
     }
   }, [video, video.usersLikes]);
+  
+  const getVideo = async (videoId) => {
+  try {
+    const response = await fetch(`http://localhost:4000/api/videos/${videoId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch video');
+    }
+    const videoFromServer = await response.json();
+    setVideo(videoFromServer);
+  } catch (error) {
+    console.error('Error fetching video:', error);
+  }
+};
 
 
+  const addVideo = async (newVideo) => {
+    try {
+      const response = await fetch('http://localhost:4000/api/videos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newVideo),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to add new video');
+      }
+      const newVideoFromServer = await response.json();
+      setVideos(prevVideos => [...prevVideos, newVideoFromServer]);
+    } catch (error) {
+      console.error('Error adding new video:', error);
+    }
+  };
+  const updateVideo = async (updatedVideo) => {
+    try {
+      const updatedVideoFromServer = await sendUpdateRequest(updatedVideo, 'PUT');
+      setVideos(prevVideos =>
+        prevVideos.map(video =>
+          video._id === updatedVideoFromServer._id ? updatedVideoFromServer : video
+        )
+      );
+    } catch (error) {
+      console.error('Error updating video:', error);
+    }
+  };
+  const partialUpdateVideo = async (updatedVideo) => {
+    try {
+      const originalVideo = videos.find(video => video._id === updatedVideo._id);
+      if (!originalVideo) {
+        throw new Error('Video not found in the local state');
+      }
+      // Prepare an object to store updated fields
+      const updatedFields = Object.keys(updatedVideo).reduce((fields, key) => {
+        if (updatedVideo[key] !== originalVideo[key]) {
+          fields[key] = updatedVideo[key];
+        }
+        return fields;
+      }, {});
+      updatedFields._id = originalVideo._id;
+
+      // Update the video with the updated fields
+      const updatedVideoFromServer = await sendUpdateRequest(updatedFields, 'PATCH');
+
+      // Update local state with the updated video from server
+      setVideos(prevVideos =>
+        prevVideos.map(video =>
+          video._id === updatedVideoFromServer._id ? updatedVideoFromServer : video
+        )
+      );
+    } catch (error) {
+      console.error('Error updating video:', error);
+    }
+  };
+  const sendUpdateRequest = async (updatedVideo, method) => {
+    const url = `http://localhost:4000/api/videos/${updatedVideo._id}`;
+    let bodyData = {};
+
+    if (method === 'PATCH') {
+      // Construct bodyData with only the updated fields
+      const fieldsToUpdate = ['title', 'description', 'source', 'thumbnail', 'tags', 'upload_date', 'duration', 'username', 'likeCount', 'views', 'usersLikes', 'comments'];
+      bodyData = {};
+      fieldsToUpdate.forEach(field => {
+        if (updatedVideo.hasOwnProperty(field)) {
+          bodyData[field] = updatedVideo[field];
+        }
+      });
+    } else if (method === 'PUT') {
+      // For PUT, send the entire updatedVideo object
+      bodyData = updatedVideo;
+    }
+
+    const options = {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(bodyData),
+    };
+
+    try {
+      const response = await fetch(url, options);
+      if (!response.ok) {
+        throw new Error('Failed to update video');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error updating video:', error);
+      throw error; // Rethrow the error for handling in the calling function
+    }
+  };
+  const deleteVideo = async (video) => {
+    const videoId = video._id;
+    try {
+      const response = await fetch(`http://localhost:4000/api/videos/${videoId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete video');
+      }
+
+      setVideos(prevVideos => prevVideos.filter(video => video._id !== videoId));
+    } catch (error) {
+      console.error('Error deleting video:', error);
+    }
+  };
+  const addVideoView = async (videoId) => {
+    try {
+      const videoToUpdate = videos.find(video => video._id === videoId);
+      if (!videoToUpdate) {
+        throw new Error('Video not found');
+      }
+      const updatedVideo = {
+        ...videoToUpdate,
+        views: videoToUpdate.views + 1
+      };
+      await partialUpdateVideo(updatedVideo);
+    } catch (error) {
+      console.error('Error viewing video:', error);
+    }
+  };
+
+  const likeVideo = async () => {
+    try {
+      const updatedVideo = {
+        _id: id,
+        likeCount: video.likeCount + 1,
+        usersLikes: [...video.usersLikes, isSignedIn]
+      };
+      await partialUpdateVideo(updatedVideo);
+    } catch (error) {
+      console.error('Error liking video:', error);
+    }
+  };
+  const unlikeVideo = async () => {
+    try {
+      const updatedVideo = {
+        _id: id,
+        likeCount: Math.max(video.likeCount - 1, 0),
+        usersLikes: video.usersLikes.filter(user => user !== isSignedIn._id)
+      };
+      await partialUpdateVideo(updatedVideo);
+    } catch (error) {
+      console.error('Error unliking video:', error);
+    }
+  };
+  const handleSaveDescription = async (newDescription) => {
+    try {
+      const updatedVideo = {
+        _id: id,
+        description: newDescription
+      };
+      await partialUpdateVideo(updatedVideo);
+    } catch (error) {
+      console.error('Error saving Description:', error);
+    }
+  };
 
   const handleLike = () => {
     if (!isSignedIn) {
@@ -62,6 +247,39 @@ const PlayVideoScreen = ({ onVideoDelete, toggleScreen,addVideoView, onVideoChan
   };
   const handleUnlike = () => {
     unlikeVideo(video._id);
+  };
+  const handleSaveClick = async () => {
+    if (newTitle === "") {
+      handleCancelClick()
+    }
+    else {
+      setCurrentTitle(newTitle);
+      setIsEditing(false);
+
+      try {
+        const updatedVideo = {
+          _id: id,
+          title: newTitle
+        };
+        await partialUpdateVideo(updatedVideo);
+      } catch (error) {
+        console.error('Error saving Title:', error);
+      }
+    }
+  };
+
+  const handleDeleteClick = () => {
+    setIsEditing(false);
+    deleteVideo(video);
+    navigate('/');
+  };
+  const handleEditClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleCancelClick = () => {
+    setNewTitle(currentTitle);
+    setIsEditing(false);
   };
 
   const handleShare = async () => {
@@ -80,49 +298,60 @@ const PlayVideoScreen = ({ onVideoDelete, toggleScreen,addVideoView, onVideoChan
       console.error('Error sharing:', error);
     }
   };
-  const handleSaveDescription = (newDescription) => {
-    const updatedVideo = { ...video, description: newDescription };
-    setVideo(updatedVideo);
-    onVideoChange(updatedVideo);
+
+  const likeComment = async (videoId, commentId) => {
+    try {
+      const videoToUpdate = videos.find(video => video._id === videoId);
+      if (!videoToUpdate) {
+        throw new Error('Video not found');
+      }
+      const updatedComments = videoToUpdate.comments.map(comment => {
+        if (comment.id === commentId) {
+          const newUsersLikes = [...comment.usersLikes, isSignedIn];
+          return { ...comment, usersLikes: newUsersLikes };
+        }
+        return comment;
+      });
+      const updatedVideo = {
+        ...videoToUpdate,
+        comments: updatedComments
+      };
+      await updateVideo(updatedVideo);
+    } catch (error) {
+      console.error('Error liking comment:', error);
+    }
+  };
+
+  const unlikeComment = async (videoId, commentId) => {
+    try {
+      const videoToUpdate = videos.find(video => video._id === videoId);
+      if (!videoToUpdate) {
+        throw new Error('Video not found');
+      }
+      const updatedComments = videoToUpdate.comments.map(comment => {
+        if (comment.id === commentId) {
+          const newUsersLikes = comment.usersLikes.filter(user => user !== isSignedIn);
+          return { ...comment, usersLikes: newUsersLikes };
+        }
+        return comment;
+      });
+      const updatedVideo = {
+        ...videoToUpdate,
+        comments: updatedComments
+      };
+      await updateVideo(updatedVideo);
+    } catch (error) {
+      console.error('Error liking comment:', error);
+    }
   };
 
   const handleCommentsChange = (newComments) => {
     setVideo(prevVideo => {
       const updatedVideo = { ...prevVideo, comments: newComments };
-      onVideoChange(updatedVideo);
+      updateVideo(updatedVideo);
       return updatedVideo;
     });
   };
-
-  const handleEditClick = () => {
-    setIsEditing(true);
-  };
-
-  const handleSaveClick = () => {
-    if (newTitle === "") {
-      handleCancelClick()
-
-    }
-    else {
-      setCurrentTitle(newTitle);
-      const updatedVideo = { ...video, title: newTitle };
-      setVideo(updatedVideo);
-      onVideoChange(updatedVideo);
-      setIsEditing(false);
-    }
-  };
-
-  const handleCancelClick = () => {
-    setNewTitle(currentTitle);
-    setIsEditing(false);
-  };
-
-  const handleDeleteClick = () => {
-    setIsEditing(false);
-    onVideoDelete(video);
-    navigate('/');
-  };
-
 
   const handleTextareaChange = () => {
     setNewTitle(textareaRef.current.value);
@@ -154,7 +383,7 @@ const PlayVideoScreen = ({ onVideoDelete, toggleScreen,addVideoView, onVideoChan
 
                     <button type="button" className="btn" onClick={handleUnlike}>
                       <i class="bi bi-hand-thumbs-up-fill"></i>
-                      <span className="icon-text"> {likeCount}</span>
+                      <span className="icon-text"> {video.likeCount}</span>
                     </button>
                   </div>
                 )}
@@ -163,7 +392,7 @@ const PlayVideoScreen = ({ onVideoDelete, toggleScreen,addVideoView, onVideoChan
                   <div>
                     <button type="button" className="btn" onClick={handleLike}>
                       <i class="bi bi-hand-thumbs-up"></i>
-                      <span className="icon-text"> {likeCount}</span>
+                      <span className="icon-text"> {video.likeCount}</span>
                     </button>
                   </div>
                 )}
