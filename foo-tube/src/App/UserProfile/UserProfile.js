@@ -10,7 +10,7 @@ const Search = ({ toggleScreen }) => {
   const { key } = useParams();
 
   useEffect(() => {
-    toggleScreen("Search");
+    toggleScreen("UserProfile");
     fetchVideos();
   }, [key]);
 

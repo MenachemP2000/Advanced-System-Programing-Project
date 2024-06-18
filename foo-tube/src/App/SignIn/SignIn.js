@@ -1,18 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import './SignIn.css';
 import { useNavigate } from 'react-router-dom';
+import './SignIn.css';
 
 
 
-const SignIn = ({ toggleScreen, isSignedIn, toggleSignendIn,users}) => {
+const SignIn = ({ toggleScreen, isSignedIn, toggleSignendIn }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [errorUserName, setErrorUserName] = useState(false);
     const [errorPassword, setErrorPassword] = useState(false);
     const [userNameGood, toggleUserNameGood] = useState(false);
+    const [user, setUser] = useState(false)
     const navigate = useNavigate();
-
-
+    const getUserByUserName = async (username) => {
+        try {
+            const response = await fetch(`http://localhost:4000/api/users/username/${username}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            if (!response.ok) {
+                throw new Error('Failed to fetch user');
+            }
+            const userFromServer = await response.json();
+            setUser(userFromServer);
+            return userFromServer;
+        } catch (error) {
+            console.error('Error fetching user:', error);
+        }
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -21,8 +38,7 @@ const SignIn = ({ toggleScreen, isSignedIn, toggleSignendIn,users}) => {
             navigate("/");
         }
         else {
-            const user = users.find(user => user.username === username && user.password === password);
-            if (user) {
+            if (user.password === password) {
                 toggleSignendIn(user.username);
                 toggleScreen("Home")
                 navigate("/"); // Navigate to the home page
@@ -31,22 +47,25 @@ const SignIn = ({ toggleScreen, isSignedIn, toggleSignendIn,users}) => {
             }
         }
     };
-    
+
     const handleCreateAccount = () => {
         toggleScreen("CreateAccount")
         navigate("/createaccount");
-        
-    };
-    
 
-    const handleUserName = (e) => {
+    };
+
+    const handleUserName = async (e) => {
         e.preventDefault();
-        const user = users.find(user => user.username === username);
-        if (user) {
-            toggleUserNameGood(true);
-            setErrorUserName(false);
-        } else {
-            setErrorUserName(true);
+        try {
+            const userSigningIn = (await getUserByUserName(username));
+            if (userSigningIn) {
+                toggleUserNameGood(true);
+                setErrorUserName(false);
+            } else {
+                setErrorUserName(true);
+            }
+        } catch (error) {
+            console.error('Error fetching user:', error);
         }
     };
 

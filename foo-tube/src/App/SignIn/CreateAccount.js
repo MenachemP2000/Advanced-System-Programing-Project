@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './CreateAccount.css';
 import { useNavigate } from 'react-router-dom';
 
-const CreateAccount = ({ addUser, toggleSignendIn, toggleScreen, isSignedIn, users }) => {
+const CreateAccount = ({ toggleSignendIn, toggleScreen, isSignedIn }) => {
     const [displayname, setDisplayname] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -33,49 +33,37 @@ const CreateAccount = ({ addUser, toggleSignendIn, toggleScreen, isSignedIn, use
     };
 
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        const displaynameWords = displayname.trim().split(/\s+/);
-        if (displaynameWords.length < 2) {
-            setError('Must input first and last name');
-            return;
+        // Construct the payload
+        const payload = { username, displayname, password, passwordAgain, image };
+        try {
+            // Send the registration data to the server
+            const response = await fetch('http://localhost:4000/api/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                // If the server responds with an error, set the error message
+                setError(result.message);
+                return;
+            }
+
+            // If registration is successful, proceed with login or other actions
+            toggleSignendIn(username);
+            navigate("/");
+        } catch (error) {
+            setError('An error occurred. Please try again.');
+            console.error('Error:', error);
         }
-        const user = users.find(user => user.username === username);
-        if (user) {
-            setError('Username already taken');
-            return;
-        }
-
-        if (username === '' || password === '' || !image) {
-            setError('All fields are required');
-            return;
-        }
-
-        if (password !== passwordAgain) {
-            setError('Password fields do not match!');
-            return;
-        }
-
-        if (password.length < 8) {
-            setError('Password must be at least 8 characters');
-            return;
-        }
-
-        const hasLetter = /[a-zA-Z]/.test(password);
-        const hasNumber = /[0-9]/.test(password);
-
-        if (!hasLetter || !hasNumber) {
-            setError('Password must contain both letters and numbers');
-            return;
-        }
-        const newUser = {username, displayname, password, image };
-
-        addUser(newUser);
-
-        toggleSignendIn(username);
-        toggleScreen("SignIn");
-        navigate("/signin");
     };
+
 
     return (
         <div className="container">
@@ -138,7 +126,7 @@ const CreateAccount = ({ addUser, toggleSignendIn, toggleScreen, isSignedIn, use
                     </div>
                     {error && <div className="error-message">{error}</div>}
                     <button type="submit" className="create-account">Create Account</button>
-                    
+
                 </form>
             </div>
         </div>

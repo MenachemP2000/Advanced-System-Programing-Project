@@ -19,60 +19,10 @@ function App() {
   const [theme, setTheme] = useState('light');
   const [screen, setScreen] = useState(false);
   const [isSignedIn, setSignedInStatus] = useState(false);
-  const [users, setUsers] = useState([]);
-  const [videos, setVideos] = useState([]);
-
-  useEffect(() => {
-    getUsers();
-    getVideos();
-  }, []);
-
-  const getUsers = async () => {
-    try {
-      // Fetch users data
-      const usersResponse = await fetch('http://localhost:4000/api/users');
-      const usersData = await usersResponse.json();
-      setUsers(usersData);
-    } catch (error) {
-      console.error('Error fetching users:', error);
-    }
-  };
-  
-  const getVideos = async () => {
-    try {
-      // Fetch videos data
-      const videosResponse = await fetch('http://localhost:4000/api/videos');
-      const videosData = await videosResponse.json();
-      setVideos(videosData);
-    } catch (error) {
-      console.error('Error fetching videos:', error);
-    }
-  };
-
-
 
   useEffect(() => {
     document.body.className = theme;
   }, [theme]);
-
-  const addUser = async (newUser) => {
-    try {
-      const response = await fetch('http://localhost:4000/api/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newUser),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to add new user');
-      }
-      const newUserFromServer = await response.json();
-      setUsers(prevUsers => [...prevUsers, newUserFromServer]);
-    } catch (error) {
-      console.error('Error adding new user:', error);
-    }
-  };
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -86,9 +36,31 @@ function App() {
     setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
   };
 
-  const toggleSignendIn = (username) => {
+  const getUserByUserName = async (username) => {
+    try {
+      const response = await fetch(`http://localhost:4000/api/users/username/${username}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch user');
+      }
+      const userFromServer = await response.json();
+      setSignedInStatus(userFromServer);
+    } catch (error) {
+      console.error('Error fetching user:', error);
+    }
+  };
+  const toggleSignendIn = async (username) => {
+
     if (username) {
-      setSignedInStatus(users.find(user => user.username === username));
+      try {
+        await getUserByUserName(username);
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      }
     }
     else {
       setSignedInStatus(false);
@@ -113,21 +85,25 @@ function App() {
 
         <Routes>
           <Route path="/search/:key" element={<Search toggleScreen={toggleScreen} />} />
-          <Route path="/user/:key" element={<UserProfile users={users} toggleScreen={toggleScreen} videos={videos} />} />
-          <Route path="/signin" element={<SignIn users={users} setUsers={setUsers} toggleScreen={toggleScreen} isSignedIn={isSignedIn} toggleSignendIn={toggleSignendIn} />} />
-          <Route path="/createaccount" element={<CreateAccount setSignedInStatus={setSignedInStatus} users={users} addUser={addUser} isSignedIn={isSignedIn} toggleScreen={toggleScreen} toggleSignendIn={toggleSignendIn} />} />
-          <Route path="/" element={<Home toggleScreen={toggleScreen}
-            videos={videos}
-            isSignedIn={isSignedIn}
-            menuOpen={menuOpen}
-            users={users}
-          />} />
-          <Route path="/video/:id" element={<PlayVideoScreen
-            appVideos={videos}
-            users={users}
+          <Route path="/user/:key" element={<UserProfile toggleScreen={toggleScreen} />} />
+          <Route path="/signin" element={<SignIn
             toggleScreen={toggleScreen}
             isSignedIn={isSignedIn}
-            setAppVideos={setVideos}
+            toggleSignendIn={toggleSignendIn}
+          />} />
+          <Route path="/createaccount" element={<CreateAccount
+            isSignedIn={isSignedIn}
+            toggleScreen={toggleScreen}
+            toggleSignendIn={toggleSignendIn}
+          />} />
+          <Route path="/" element={<Home
+            toggleScreen={toggleScreen}
+            isSignedIn={isSignedIn}
+            menuOpen={menuOpen}
+          />} />
+          <Route path="/video/:id" element={<PlayVideoScreen
+            toggleScreen={toggleScreen}
+            isSignedIn={isSignedIn}
           />} />
         </Routes>
       </div>

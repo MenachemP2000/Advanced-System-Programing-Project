@@ -1,16 +1,50 @@
 const User = require('../models/User');
 const Video = require('../models/Video');
 
-// Create a new user
 exports.createUser = async (req, res) => {
     try {
-        const newUser = new User(req.body);
-        await newUser.save();
-        res.status(201).send(newUser);
+      const { username, displayname, password, passwordAgain, image } = req.body;
+  
+      // Basic validation
+      if (!username || !displayname || !password || !passwordAgain || !image) {
+        return res.status(400).json({ message: 'All fields are required' });
+      }
+  
+      const displaynameWords = displayname.trim().split(/\s+/);
+      if (displaynameWords.length < 2) {
+        return res.status(400).json({ message: 'Must input first and last name' });
+      }
+  
+      if (password !== passwordAgain) {
+        return res.status(400).json({ message: 'Password fields do not match' });
+      }
+  
+      if (password.length < 8) {
+        return res.status(400).json({ message: 'Password must be at least 8 characters' });
+      }
+  
+      const hasLetter = /[a-zA-Z]/.test(password);
+      const hasNumber = /[0-9]/.test(password);
+  
+      if (!hasLetter || !hasNumber) {
+        return res.status(400).json({ message: 'Password must contain both letters and numbers' });
+      }
+  
+      // Check if the username is already taken
+      const existingUser = await User.findOne({ username: username });
+      if (existingUser) {
+        return res.status(400).json({ message: 'Username already taken' });
+      }
+  
+      // Create and save the new user
+      const newUser = new User(req.body);
+      await newUser.save();
+      res.status(201).send(newUser);
     } catch (error) {
-        res.status(400).send(error);
+      res.status(400).send({ message: 'An error occurred', error });
     }
-};
+  };
+  
 
 // Get all users
 exports.getAllUsers = async (req, res) => {
@@ -37,7 +71,7 @@ exports.getUser = async (req, res) => {
 // Get user by name
 exports.getUserByUserName = async (req, res) => {
     try {
-        const user = await User.findOne({ username: req.params.username }); 
+        const user = await User.findOne({ username: req.params.username });
         if (!user) {
             return res.status(404).send({ message: 'User not found' });
         }

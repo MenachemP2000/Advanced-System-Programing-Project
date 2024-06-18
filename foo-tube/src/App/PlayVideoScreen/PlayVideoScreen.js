@@ -5,7 +5,7 @@ import RelatedVideos from './RelatedVideos/RelatedVideos';
 import Comments from './Comments/Comments';
 import Description from './Description/Description';
 
-const PlayVideoScreen = ({ setAppVideos, toggleScreen, isSignedIn, appVideos }) => {
+const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
   const { id } = useParams();
   const [video, setVideo] = useState(false);
   const [liked, setLiked] = useState(false);
@@ -16,12 +16,12 @@ const PlayVideoScreen = ({ setAppVideos, toggleScreen, isSignedIn, appVideos }) 
   const navigate = useNavigate();
   const textareaRef = useRef(null);
   const [newTitle, setNewTitle] = useState(false);
-  const [videos, setVideos] = useState(appVideos);
+  const [videos, setVideos] = useState([]);
 
   useEffect(() => {
     toggleScreen("PlayVideoScreen");
-    setVideos(appVideos);
     const fetchVideo = async () => {
+      getVideos();
       await getVideo(id);
     };
     fetchVideo();
@@ -41,9 +41,6 @@ const PlayVideoScreen = ({ setAppVideos, toggleScreen, isSignedIn, appVideos }) 
     addVideoView(id);
   }, [id]);
 
-  useEffect(() => {
-    setAppVideos(videos);
-  }, [videos]);
 
   useEffect(() => {
     if (isSignedIn && video && video.usersLikes.find(user => user === isSignedIn._id)) {
@@ -53,6 +50,19 @@ const PlayVideoScreen = ({ setAppVideos, toggleScreen, isSignedIn, appVideos }) 
       setLiked(false)
     }
   }, [video, video.usersLikes]);
+
+
+  const getVideos = async () => {
+    try {
+      // Fetch videos data
+      const videosResponse = await fetch('http://localhost:4000/api/videos');
+      const videosData = await videosResponse.json();
+      setVideos(videosData);
+    } catch (error) {
+      console.error('Error fetching videos:', error);
+    }
+  };
+
 
   const getVideo = async (videoId) => {
     try {
@@ -152,6 +162,7 @@ const PlayVideoScreen = ({ setAppVideos, toggleScreen, isSignedIn, appVideos }) 
 
       // Update the video with the updated fields
       const updatedVideoFromServer = await sendUpdateRequest(updatedFields, 'PATCH');
+      setVideo(updatedVideoFromServer);
 
       // Update local state with the updated video from server
       setVideos(prevVideos =>
