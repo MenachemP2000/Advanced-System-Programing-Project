@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './RelatedVideos.css';
+import RelatedBox from './RelatedBox/RelatedBox'
 
 
 const RelatedVideos = ({ videos, id }) => {
@@ -28,14 +29,10 @@ const RelatedVideos = ({ videos, id }) => {
     <div className="RelatedVideos">
       <ul>
         {relatedVideos.map(video => (
-          <li className='clickable' key={video._id} onClick={() => handleVideoClick(video._id)}>
-            <img className="thumbNail" src={video.thumbnail} alt={video.title} />
-            <div className="video-info">
-              <h3>{video.title}</h3>
-              <p>{video.username}</p>
-              <p>{video.views} views</p>
-            </div>
-          </li>
+          <RelatedBox
+            video={video}
+          />
+
         ))}
       </ul>
     </div>

@@ -32,7 +32,7 @@ const Reply = ({
     }
     getAuthorByUserName(reply.user);
   }, [isEditing, editedContent]);
-  
+
 
   useEffect(() => {
     const fetchReply = () => {
@@ -70,7 +70,7 @@ const Reply = ({
       setUserLikedReply(false);
     }
   }, [isSignedIn, usersLikedReply]);
-  
+
   const getAuthorByUserName = async (username) => {
     try {
       const response = await fetch(`http://localhost:4000/api/users/username/${username}`, {
@@ -118,7 +118,7 @@ const Reply = ({
     setThisReply(updatedReply);
     handleCommentReplyChange(updatedReply);
   };
-  
+
   const handleAddReply = async (e, commentId) => {
     e.preventDefault();
     const replyContent = newReply[commentId];
@@ -191,7 +191,7 @@ const Reply = ({
     if (isSignedIn) {
       setIsReplyFormVisible(true);
     }
-    else{
+    else {
       navigate('/signin');
     }
   };
@@ -205,14 +205,18 @@ const Reply = ({
 
   const isLongReply = reply.content.length > 100;
 
+  const handleProfileClick = (username) => {
+    navigate(`/user/${username}`);
+  };
+
   return (
     <div id="outerreply">
       {author && (
-        <div><img  className='profilePic' src={author.image} height="50px" width="50px" ></img></div>
+        <div className='clickable' onClick={() => handleProfileClick(reply.user)}><img className='profilePic' src={author.image} height="50px" width="50px" ></img></div>
       )}
       <div className="reply" id="innerreply" key={reply._id}>
         {!isEditing && (<>
-          <div>@{reply.user}</div>
+          <div className='clickable' onClick={() => handleProfileClick(reply.user)}>@{reply.user}</div>
           <div>
             <p>{isExpanded ? reply.content : reply.content.substring(0, 100)}</p>
             {isLongReply && (
@@ -223,7 +227,7 @@ const Reply = ({
           </div>
         </>)
         }
-        {!isEditing &&(isSignedIn.username == reply.user) && (
+        {!isEditing && (isSignedIn.username == reply.user) && (
           <div className="button-container">
 
             <button className="btn   " onClick={toggleEdit}>
@@ -272,7 +276,7 @@ const Reply = ({
               {isReplyFormVisible && (
                 <>
                   <div className='newReply'>
-                    <div><img  className='profilePic' src={isSignedIn.image} height="50px" width="50px" ></img></div>
+                    <div><img className='profilePic' src={isSignedIn.image} height="50px" width="50px" ></img></div>
                     <form onSubmit={handleReply}>
                       <textarea
                         value={newReply[comment._id] || "@" + reply.user + " "}

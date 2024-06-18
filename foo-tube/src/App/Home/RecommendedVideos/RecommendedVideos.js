@@ -1,19 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import './RecommendedVideos.css';
+import RecommendedBox from './RecommendedBox/RecomendedBox';
 
 
-const RecommendedVideos = ({ videos, menuOpen, users }) => {
+const RecommendedVideos = ({ videos, menuOpen}) => {
   const [relatedVideos, setRelatedVideos] = useState([]);
-  const navigate = useNavigate();
-
   useEffect(() => {
     setRelatedVideos(shuffleArray(videos));
   }, [videos]);
-
-  const handleVideoClick = (id) => {
-    navigate(`/video/${id}`);
-  };
 
   const shuffleArray = (array) => {
     const shuffledArray = [...array];
@@ -23,23 +17,14 @@ const RecommendedVideos = ({ videos, menuOpen, users }) => {
     }
     return shuffledArray;
   };
-
-
+  
   return (
     <div className={`RecommendedVideos ${menuOpen ? 'RecommendedVideosOpen' : 'RecommendedVideosClose'}`}>
       <ul>
         {relatedVideos.map(video => (
-          <li className='clickable' key={video._id} onClick={() => handleVideoClick(video._id)}>
-            <img className='thumbNail' src={video.thumbnail} alt={video.title} />
-            <div className='videoDetails'>
-              <img src={users.find(author => author.username === video.username).image} height="35px" width="35px" ></img>
-              <div className="video-info">
-                <h3>{video.title}</h3>
-                <p>{video.username}</p>
-                <p>{video.views} views</p>
-              </div>
-            </div>
-          </li>
+          <RecommendedBox
+            video={video}
+          />
         ))}
       </ul>
     </div>

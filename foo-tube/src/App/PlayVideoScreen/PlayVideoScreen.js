@@ -341,6 +341,10 @@ const PlayVideoScreen = ({ setAppVideos, toggleScreen, isSignedIn, appVideos }) 
     setNewTitle(textareaRef.current.value);
   };
 
+  const handleProfileClick = (username) => {
+    navigate(`/user/${username}`);
+  };
+
   while (!(video && author)) {
     if (!video) {
       getVideo(id);
@@ -361,7 +365,7 @@ const PlayVideoScreen = ({ setAppVideos, toggleScreen, isSignedIn, appVideos }) 
             <div className="videoTitle">{currentTitle}</div>
 
             <div className="videoProfile">
-              <div id="profilepicandname">
+              <div className='clickable' onClick={() => handleProfileClick(author.username)} id="profilepicandname">
                 <img className='profilePic' src={author.image} height="50px" width="50px" ></img>
                 <div id="profilename">
                   {author.username}
@@ -444,7 +448,7 @@ const PlayVideoScreen = ({ setAppVideos, toggleScreen, isSignedIn, appVideos }) 
 
         <Description views={video.views} description={video.description} username={video.username} isSignedIn={isSignedIn} onSave={handleSaveDescription} />
         <div className="sidebarSmall">
-          <RelatedVideos  id={id} videos={relatedVideos} />
+          <RelatedVideos id={id} videos={relatedVideos} />
         </div>
         <Comments
           videoId={video._id}

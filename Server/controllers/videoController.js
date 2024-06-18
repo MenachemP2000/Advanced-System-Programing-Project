@@ -11,15 +11,46 @@ exports.createVideo = async (req, res) => {
   }
 };
 
-// Get all videos
 exports.getAllVideos = async (req, res) => {
   try {
-    const videos = await Video.find();
+    // Extract query parameters from the request
+    const { title, category, username, uploadDate } = req.query;
+    
+    // Initialize an array to hold individual query conditions
+    let queryConditions = [];
+    
+    if (title) {
+      queryConditions.push({ title: { $regex: title, $options: 'i' } }); // Case-insensitive regex search
+    }
+    
+    if (category) {
+      queryConditions.push({ category: category });
+    }
+    
+    if (username) {
+      queryConditions.push({ username: username });
+    }
+    
+    if (uploadDate) {
+      // Assuming uploadDate is in ISO format (YYYY-MM-DD)
+      const startDate = new Date(uploadDate);
+      const endDate = new Date(uploadDate);
+      endDate.setDate(endDate.getDate() + 1);
+      queryConditions.push({ uploadDate: { $gte: startDate, $lt: endDate } });
+    }
+    
+    // Build the final query using $or operator if there are conditions
+    let query = queryConditions.length > 0 ? { $or: queryConditions } : {};
+    
+    // Fetch videos from the database based on the query
+    const videos = await Video.find(query);
     res.send(videos);
   } catch (error) {
     res.status(500).send(error);
   }
 };
+
+
 
 // Get a specific video by ID
 exports.getVideoById = async (req, res) => {
@@ -33,6 +64,7 @@ exports.getVideoById = async (req, res) => {
     res.status(500).send(error);
   }
 };
+
 
 // Update a video by ID (PUT)
 exports.updateVideo = async (req, res) => {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import './Search.css';
-import VideoBox from './VideoBox/VideoBox';
+import './UserProfile.css';
+import UserBox from './UserBox/UserBox'
 
 
 const Search = ({ toggleScreen }) => {
@@ -48,7 +48,7 @@ const Search = ({ toggleScreen }) => {
   }
 
   return (
-    <div className="searchVideos">
+    <div className="userVideos">
       <ul>
         {searchVideos.length == 0 && (
           <div>
@@ -57,7 +57,7 @@ const Search = ({ toggleScreen }) => {
           </div>
         )}
         {searchVideos.map(video => (
-          <VideoBox
+          <UserBox
             video={video}
           />
         ))}

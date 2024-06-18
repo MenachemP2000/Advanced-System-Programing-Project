@@ -63,6 +63,7 @@ exports.updateUser = async (req, res) => {
         res.status(400).send(error);
     }
 };
+
 // Update a user
 exports.partialUpdateUser = async (req, res) => {
     try {

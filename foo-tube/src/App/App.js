@@ -11,6 +11,7 @@ import SignIn from './SignIn/SignIn';
 import './App.css';
 import CreateAccount from './SignIn/CreateAccount';
 import Search from './Search/Search';
+import UserProfile from './UserProfile/UserProfile';
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -36,6 +37,7 @@ function App() {
       console.error('Error fetching users:', error);
     }
   };
+  
   const getVideos = async () => {
     try {
       // Fetch videos data
@@ -96,7 +98,7 @@ function App() {
   const toggleScreen = (screen) => {
     setScreen(screen);
   };
-  
+
   return (
     <Router>
       <div className={`App ${theme}`}>
@@ -110,7 +112,8 @@ function App() {
         )}
 
         <Routes>
-          <Route path="/search/:key" element={<Search users={users} toggleScreen={toggleScreen} videos={videos} />} />
+          <Route path="/search/:key" element={<Search toggleScreen={toggleScreen} />} />
+          <Route path="/user/:key" element={<UserProfile users={users} toggleScreen={toggleScreen} videos={videos} />} />
           <Route path="/signin" element={<SignIn users={users} setUsers={setUsers} toggleScreen={toggleScreen} isSignedIn={isSignedIn} toggleSignendIn={toggleSignendIn} />} />
           <Route path="/createaccount" element={<CreateAccount setSignedInStatus={setSignedInStatus} users={users} addUser={addUser} isSignedIn={isSignedIn} toggleScreen={toggleScreen} toggleSignendIn={toggleSignendIn} />} />
           <Route path="/" element={<Home toggleScreen={toggleScreen}

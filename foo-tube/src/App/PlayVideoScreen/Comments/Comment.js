@@ -42,7 +42,7 @@ const Comment = ({
       await getComment();
     };
     fetchComment();
-    getAuthorByUserName( comment.user);
+    getAuthorByUserName(comment.user);
   }, [comment]);
 
   useEffect(() => {
@@ -383,19 +383,23 @@ const Comment = ({
     handleDeleteReply(replyId);
   };
 
-  const handleSendAddReply = (replyId) => {
-    handleAddReply(replyId, comment._id);
-  };
   const isLongComment = comment.content.length > 100;
+
+
+  const handleProfileClick = (username) => {
+    navigate(`/user/${username}`);
+  };
 
   return (
     <div id="outercomment">
       {author && (
-        <div><img className='profilePic' src={author.image} height="50px" width="50px" ></img></div>
-      )}
+        <div className='clickable' onClick={() => handleProfileClick(comment.user)} >
+          <img className='profilePic' src={author.image} height="50px" width="50px" ></img></div>
+      )
+      }
 
       <div className="comment" id="innercomment" key={comment._id}>
-        <div>@{comment.user}</div>
+        <div className='clickable' onClick={() => handleProfileClick(comment.user)} >@{comment.user}</div>
         {isEditing ? (
           <div>
             <textarea
@@ -527,7 +531,7 @@ const Comment = ({
           ))}
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 
