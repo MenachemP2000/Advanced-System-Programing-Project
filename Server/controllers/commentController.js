@@ -3,7 +3,7 @@ const Video = require('../models/Video');
 // Create a comment
 exports.createComment = async (req, res) => {
   const { videoId } = req.params;
-  const { user, content, date } = req.body;
+  const { user, content, date,usersLikes,replies } = req.body;
   try {
     const video = await Video.findById(videoId);
     if (!video) {
@@ -14,12 +14,14 @@ exports.createComment = async (req, res) => {
       user,
       content,
       date,
+      usersLikes,
+      replies,
     };
 
     video.comments.push(newComment);
     await video.save();
 
-    res.status(201).send(newComment);
+    res.status(201).send(video.comments[video.comments.length - 1]);
   } catch (error) {
     res.status(400).send(error.message);
   }
@@ -132,8 +134,10 @@ exports.deleteComment = async (req, res) => {
     if (!video) {
       return res.status(404).send('Video not found');
     }
+    
+    const comment = video.comments.id(commentId);
 
-    video.comments.id(commentId).remove();
+    video.comments.remove(comment);
     await video.save();
 
     res.send('Comment deleted successfully');

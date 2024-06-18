@@ -5,7 +5,7 @@ import RelatedVideos from './RelatedVideos/RelatedVideos';
 import Comments from './Comments/Comments';
 import Description from './Description/Description';
 
-const PlayVideoScreen = ({ setAppVideos, toggleScreen, isSignedIn, users, appVideos }) => {
+const PlayVideoScreen = ({ setAppVideos, toggleScreen, isSignedIn, appVideos }) => {
   const { id } = useParams();
   const [video, setVideo] = useState(false);
   const [liked, setLiked] = useState(false);
@@ -21,19 +21,21 @@ const PlayVideoScreen = ({ setAppVideos, toggleScreen, isSignedIn, users, appVid
   useEffect(() => {
     toggleScreen("PlayVideoScreen");
     setVideos(appVideos);
-    const fetchVideo = () => {
-      const video = videos.find(v => v._id === id);
-      if (video) {
-        setVideo(video);
-        setAuthor(users.find(author => author.username === video.username));
-        setRelatedVideos(videos);
-        setCurrentTitle(video.title);
-        setIsEditing(false);
-        setNewTitle(video.title);
-      }
+    const fetchVideo = async () => {
+      await getVideo(id);
     };
     fetchVideo();
   }, [id, toggleScreen]);
+
+  useEffect(() => {
+    if (video) {
+      getAuthorByUserName(video.username);
+      setRelatedVideos(videos);
+      setCurrentTitle(video.title);
+      setIsEditing(false);
+      setNewTitle(video.title);
+    }
+  }, [video]);
 
   useEffect(() => {
     addVideoView(id);
@@ -51,26 +53,58 @@ const PlayVideoScreen = ({ setAppVideos, toggleScreen, isSignedIn, users, appVid
       setLiked(false)
     }
   }, [video, video.usersLikes]);
-  
+
   const getVideo = async (videoId) => {
-  try {
-    const response = await fetch(`http://localhost:4000/api/videos/${videoId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    if (!response.ok) {
-      throw new Error('Failed to fetch video');
+    try {
+      const response = await fetch(`http://localhost:4000/api/videos/${videoId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch video');
+      }
+      const videoFromServer = await response.json();
+      setVideo(videoFromServer);
+    } catch (error) {
+      console.error('Error fetching video:', error);
     }
-    const videoFromServer = await response.json();
-    setVideo(videoFromServer);
-  } catch (error) {
-    console.error('Error fetching video:', error);
-  }
-};
-
-
+  };
+  const getVideoWithoutChangingState = async (videoId) => {
+    try {
+      const response = await fetch(`http://localhost:4000/api/videos/${videoId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch video');
+      }
+      const videoFromServer = await response.json();
+      return videoFromServer;
+    } catch (error) {
+      console.error('Error fetching video:', error);
+    }
+  };
+  const getAuthorByUserName = async (username) => {
+    try {
+      const response = await fetch(`http://localhost:4000/api/users/username/${username}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch user');
+      }
+      const userFromServer = await response.json();
+      setAuthor(userFromServer);
+    } catch (error) {
+      console.error('Error fetching user:', error);
+    }
+  };
   const addVideo = async (newVideo) => {
     try {
       const response = await fetch('http://localhost:4000/api/videos', {
@@ -103,7 +137,7 @@ const PlayVideoScreen = ({ setAppVideos, toggleScreen, isSignedIn, users, appVid
   };
   const partialUpdateVideo = async (updatedVideo) => {
     try {
-      const originalVideo = videos.find(video => video._id === updatedVideo._id);
+      const originalVideo = await getVideoWithoutChangingState(updatedVideo._id);
       if (!originalVideo) {
         throw new Error('Video not found in the local state');
       }
@@ -187,12 +221,12 @@ const PlayVideoScreen = ({ setAppVideos, toggleScreen, isSignedIn, users, appVid
   };
   const addVideoView = async (videoId) => {
     try {
-      const videoToUpdate = videos.find(video => video._id === videoId);
+      const videoToUpdate = await getVideoWithoutChangingState(videoId);
       if (!videoToUpdate) {
         throw new Error('Video not found');
       }
       const updatedVideo = {
-        ...videoToUpdate,
+        _id: id,
         views: videoToUpdate.views + 1
       };
       await partialUpdateVideo(updatedVideo);
@@ -299,65 +333,22 @@ const PlayVideoScreen = ({ setAppVideos, toggleScreen, isSignedIn, users, appVid
     }
   };
 
-  const likeComment = async (videoId, commentId) => {
-    try {
-      const videoToUpdate = videos.find(video => video._id === videoId);
-      if (!videoToUpdate) {
-        throw new Error('Video not found');
-      }
-      const updatedComments = videoToUpdate.comments.map(comment => {
-        if (comment.id === commentId) {
-          const newUsersLikes = [...comment.usersLikes, isSignedIn];
-          return { ...comment, usersLikes: newUsersLikes };
-        }
-        return comment;
-      });
-      const updatedVideo = {
-        ...videoToUpdate,
-        comments: updatedComments
-      };
-      await updateVideo(updatedVideo);
-    } catch (error) {
-      console.error('Error liking comment:', error);
-    }
-  };
-
-  const unlikeComment = async (videoId, commentId) => {
-    try {
-      const videoToUpdate = videos.find(video => video._id === videoId);
-      if (!videoToUpdate) {
-        throw new Error('Video not found');
-      }
-      const updatedComments = videoToUpdate.comments.map(comment => {
-        if (comment.id === commentId) {
-          const newUsersLikes = comment.usersLikes.filter(user => user !== isSignedIn);
-          return { ...comment, usersLikes: newUsersLikes };
-        }
-        return comment;
-      });
-      const updatedVideo = {
-        ...videoToUpdate,
-        comments: updatedComments
-      };
-      await updateVideo(updatedVideo);
-    } catch (error) {
-      console.error('Error liking comment:', error);
-    }
-  };
-
-  const handleCommentsChange = (newComments) => {
-    setVideo(prevVideo => {
-      const updatedVideo = { ...prevVideo, comments: newComments };
-      updateVideo(updatedVideo);
-      return updatedVideo;
-    });
+  const handleCommentsChangeOnly = (newComments) => {
+    setVideo({ ...video, comments: newComments })
   };
 
   const handleTextareaChange = () => {
     setNewTitle(textareaRef.current.value);
   };
 
-  if (!video) {
+  while (!(video && author)) {
+    if (!video) {
+      getVideo(id);
+    }
+    else if (!author) {
+      getAuthorByUserName(video.username);
+    }
+
     return <div>Loading...</div>;
   }
 
@@ -401,7 +392,7 @@ const PlayVideoScreen = ({ setAppVideos, toggleScreen, isSignedIn, users, appVid
                   <span id="shareVideo" className="icon-text"> Share</span>
                 </button>
 
-                {((isSignedIn === author)) && (
+                {((isSignedIn.username === video.username)) && (
                   <>
                     <button type="button" className="btn" onClick={handleEditClick}>
                       <i class="bi bi-pencil"></i>
@@ -451,28 +442,18 @@ const PlayVideoScreen = ({ setAppVideos, toggleScreen, isSignedIn, users, appVid
           </>
         )}
 
-
-
-
-
         <Description views={video.views} description={video.description} username={video.username} isSignedIn={isSignedIn} onSave={handleSaveDescription} />
-
         <div className="sidebarSmall">
-          <RelatedVideos users={users} id={id} videos={relatedVideos} />
+          <RelatedVideos  id={id} videos={relatedVideos} />
         </div>
         <Comments
           videoId={video._id}
-          comments={video.comments}
-          unlikeComment={unlikeComment}
-          likeComment={likeComment}
-          users={users}
           isSignedIn={isSignedIn}
-          onCommentsChange={handleCommentsChange}
-          videos={videos}
+          onCommentsChangeOnly={handleCommentsChangeOnly}
         />
       </div>
       <div className="sidebarBig">
-        <RelatedVideos users={users} id={id} videos={relatedVideos} />
+        <RelatedVideos id={id} videos={relatedVideos} />
       </div>
     </div>
   );

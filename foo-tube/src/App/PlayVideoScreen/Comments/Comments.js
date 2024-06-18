@@ -4,13 +4,9 @@ import './Comments.css';
 import Comment from './Comment';
 
 const Comments = ({
-  onCommentsChange,
   isSignedIn,
-  users,
-  likeComment,
-  unlikeComment,
   videoId,
-  videos
+  onCommentsChangeOnly,
 }) => {
   const [newComment, setNewComment] = useState('');
   const [commentList, setCommentList] = useState([]);
@@ -18,9 +14,13 @@ const Comments = ({
   const commentTextareaRef = useRef(null);
   const navigate = useNavigate();
 
+
   useEffect(() => {
-    setCommentList(videos.find(video => video._id === videoId).comments);
-  }, [videos, videoId]);
+  }, [commentList]);
+
+  useEffect(() => {
+    getVideoComments(videoId);
+  }, [videoId]);
 
   useEffect(() => {
     if (commentTextareaRef.current) {
@@ -28,24 +28,63 @@ const Comments = ({
       commentTextareaRef.current.style.height = commentTextareaRef.current.scrollHeight + 'px';
     }
   }, [newComment]);
+  
+  const getVideoComments= async (videoId) => {
+    try {
+      const response = await fetch(`http://localhost:4000/api/videos/${videoId}/comments`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch video comments');
+      }
+      const videoCommentsFromServer = await response.json();
+      setCommentList(videoCommentsFromServer);
+    } catch (error) {
+      console.error('Error fetching video comments:', error);
+    }
+  };
+
+  const addComment = async (comment) => {
+    try {
+      const response = await fetch(`http://localhost:4000/api/videos/${videoId}/comments`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(comment),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to add new comment');
+      }
+      const newCommentFromServer = await response.json();
+      setCommentList(prevComments => [...prevComments, newCommentFromServer]);
+    } catch (error) {
+      console.error('Error adding new comment:', error);
+    }
+  };
+  const handleAddComment = async (e) => {
+    e.preventDefault();
+    let author = isSignedIn.username;
+    const commentToAdd = { content: newComment, replies: [], usersLikes: [], user: author, date: Date.now() }
+
+    try {
+      await addComment(commentToAdd);
+    } catch (error) {
+      console.error('Error Adding comment:', error);
+    }
+    setIsCommentFormVisible(false);
+    setNewComment('');
+  };
 
   const handleDeleteComment = (commentId) => {
     const updatedComments = commentList.filter(comment => comment._id !== commentId);
     setCommentList(updatedComments);
-    onCommentsChange(updatedComments);
+    onCommentsChangeOnly(updatedComments);
   };
 
-  const handleAddComment = (e) => {
-    let author = isSignedIn.username
-    e.preventDefault();
-    if (newComment.trim() !== '') {
-      let updatedComments;
-      updatedComments = [...commentList, {  content: newComment, replies: [], usersLikes: [], user: author, date: Date.now() }];
-      setNewComment('');
-      setIsCommentFormVisible(false);
-      onCommentsChange(updatedComments);
-    }
-  };
 
   const handleCancelEdit = () => {
     setNewComment('');
@@ -57,7 +96,7 @@ const Comments = ({
       setIsCommentFormVisible(true);
 
     }
-    else{
+    else {
       navigate('/signin');
     }
   };
@@ -77,11 +116,11 @@ const Comments = ({
       } else {
         updatedComments = [...prevComments, newComment];
       }
-      console.log(updatedComments);
-      onCommentsChange(updatedComments);
+      onCommentsChangeOnly(updatedComments);
       return updatedComments;
     });
   };
+
   return (
     <div className="comments-container">
       <h2>{commentList.length} Comments</h2>
@@ -143,22 +182,14 @@ const Comments = ({
           </div>
         </>
       )}
-      {commentList.map((comment, index) => (
+      {commentList.map((comment) => (
         <Comment
-          likeComment={likeComment}
-          unlikeComment={unlikeComment}
-          users={users}
           isSignedIn={isSignedIn}
           key={comment._id}
           comment={comment}
-          index={index}
           handleDeleteComment={handleDeleteComment}
-          commentList={commentList}
           onCommentChange={handleCommentChange}
-          setCommentList={setCommentList}
           videoId={videoId}
-          videos={videos}
-          onCommentsChange={onCommentsChange}
         />
       ))}
     </div>

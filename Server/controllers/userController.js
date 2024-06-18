@@ -34,6 +34,21 @@ exports.getUser = async (req, res) => {
         res.status(500).send(error);
     }
 };
+// Get user by name
+exports.getUserByUserName = async (req, res) => {
+    try {
+        const user = await User.findOne({ username: req.params.username }); 
+        if (!user) {
+            return res.status(404).send({ message: 'User not found' });
+        }
+        res.send(user);
+    } catch (error) {
+        res.status(500).send({ error: 'Internal Server Error' });
+    }
+};
+
+
+
 
 
 // Update a user (PUT)

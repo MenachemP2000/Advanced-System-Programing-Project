@@ -22,18 +22,33 @@ function App() {
   const [videos, setVideos] = useState([]);
 
   useEffect(() => {
-    // Fetch users data from server
-    fetch('http://localhost:4000/api/users')
-      .then(response => response.json())
-      .then(data => setUsers(data))
-      .catch(error => console.error('Error fetching users:', error));
-
-    // Fetch videos data from server
-    fetch('http://localhost:4000/api/videos')
-      .then(response => response.json())
-      .then(data => setVideos(data))
-      .catch(error => console.error('Error fetching videos:', error));
+    getUsers();
+    getVideos();
   }, []);
+
+  const getUsers = async () => {
+    try {
+      // Fetch users data
+      const usersResponse = await fetch('http://localhost:4000/api/users');
+      const usersData = await usersResponse.json();
+      setUsers(usersData);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
+  const getVideos = async () => {
+    try {
+      // Fetch videos data
+      const videosResponse = await fetch('http://localhost:4000/api/videos');
+      const videosData = await videosResponse.json();
+      setVideos(videosData);
+    } catch (error) {
+      console.error('Error fetching videos:', error);
+    }
+  };
+
+
+
   useEffect(() => {
     document.body.className = theme;
   }, [theme]);
@@ -81,7 +96,7 @@ function App() {
   const toggleScreen = (screen) => {
     setScreen(screen);
   };
-
+  
   return (
     <Router>
       <div className={`App ${theme}`}>

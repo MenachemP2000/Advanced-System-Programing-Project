@@ -3,7 +3,7 @@ const Video = require('../models/Video');
 // Create a reply
 exports.createReply = async (req, res) => {
     const { videoId, commentId } = req.params;
-    const { user, content, date } = req.body;
+    const { user, content, date, usersLikes } = req.body;
     try {
         const video = await Video.findById(videoId);
         if (!video) {
@@ -18,6 +18,7 @@ exports.createReply = async (req, res) => {
             user,
             content,
             date,
+            usersLikes,
         };
 
         video.comments.comment.push(newReply);

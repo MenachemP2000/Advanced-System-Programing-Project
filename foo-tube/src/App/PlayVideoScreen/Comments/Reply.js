@@ -1,19 +1,15 @@
 // Reply.js
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid'; // Import uuidv4
 import './Reply.css'
 const Reply = ({
   key,
   reply,
   handleDeleteReply,
   comment,
-  commentList,
-  onCommentsChange,
-  setCommentList,
   isSignedIn,
-  users,
-  handleCommentReplyChange
+  handleCommentReplyChange,
+  partialUpdateComment
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -34,8 +30,9 @@ const Reply = ({
       editTextareaRef.current.style.height = 'auto';
       editTextareaRef.current.style.height = editTextareaRef.current.scrollHeight + 'px';
     }
-    setAuthor(users.find(author => author.username === reply.user));
+    getAuthorByUserName(reply.user);
   }, [isEditing, editedContent]);
+  
 
   useEffect(() => {
     const fetchReply = () => {
@@ -44,7 +41,7 @@ const Reply = ({
         setThisReply(currentReply);
         setUsersLikedReply(currentReply.usersLikes);
         setTotaluserLikes(usersLikedReply.length || 0);
-        setAuthor(users.find(author => author.username === currentReply.username));
+        getAuthorByUserName(currentReply.user);
       }
       if (usersLikedReply && usersLikedReply.length > 0 && usersLikedReply.find(user => user === isSignedIn.username)) {
         setUserLikedReply(true);
@@ -53,7 +50,7 @@ const Reply = ({
       }
     };
     fetchReply();
-  }, [key, users]);
+  }, [key]);
 
   useEffect(() => {
     setUsersLikedReply(thisReply.usersLikes);
@@ -73,6 +70,24 @@ const Reply = ({
       setUserLikedReply(false);
     }
   }, [isSignedIn, usersLikedReply]);
+  
+  const getAuthorByUserName = async (username) => {
+    try {
+      const response = await fetch(`http://localhost:4000/api/users/username/${username}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch user');
+      }
+      const userFromServer = await response.json();
+      setAuthor(userFromServer);
+    } catch (error) {
+      console.error('Error fetching user:', error);
+    }
+  };
 
 
   const handleLikeReply = () => {
@@ -103,25 +118,29 @@ const Reply = ({
     setThisReply(updatedReply);
     handleCommentReplyChange(updatedReply);
   };
-
-
-  const handleAddReply = (e, commentId) => {
+  
+  const handleAddReply = async (e, commentId) => {
     e.preventDefault();
-    const commentIndex = commentList.findIndex(comment => comment._id === commentId);
-    if (commentIndex !== -1) {
-      const updatedComments = [...commentList];
-      const replyContent = newReply[commentId];
-      if (replyContent && replyContent.trim() !== '') {
-        const newReply = {
-          id: uuidv4(),
+    const replyContent = newReply[commentId];
+
+    if (replyContent && replyContent.trim() !== '') {
+      try {
+        const newReplyObject = {
           user: isSignedIn.username,
           content: replyContent,
-          usersLikes: []
-        }
-        updatedComments[commentIndex].replies.push(newReply);
-        setCommentList(updatedComments);
-        onCommentsChange(updatedComments);
+          date: Date.now(),
+          usersLikes: [],
+
+        };
+        const updatedReplies = [...comment.replies, newReplyObject];
+        const updatedComment = {
+          _id: comment._id,
+          replies: updatedReplies
+        };
         setNewReply(prevState => ({ ...prevState, [commentId]: '' }));
+        await partialUpdateComment(updatedComment);
+      } catch (error) {
+        console.error('Error adding reply:', error);
       }
     }
   };

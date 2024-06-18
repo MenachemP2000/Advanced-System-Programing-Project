@@ -13,6 +13,9 @@ router.get('', userController.getAllUsers);
 // Get a user by ID
 router.get('/:id', userController.getUser);
 
+// Get a user by username
+router.get('/username/:username', userController.getUserByUserName);
+
 // Update a user (PUT)
 router.put('/:id', userController.updateUser);
 

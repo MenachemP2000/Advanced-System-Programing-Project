@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './RelatedVideos.css';
 
 
-const RelatedVideos = ({ videos, id,users }) => {
+const RelatedVideos = ({ videos, id }) => {
   const [relatedVideos, setRelatedVideos] = useState([]);
   const navigate = useNavigate();
 
