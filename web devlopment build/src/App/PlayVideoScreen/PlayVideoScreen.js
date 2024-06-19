@@ -11,18 +11,15 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
   const [video, setVideo] = useState(false);
   const [liked, setLiked] = useState(false);
   const [author, setAuthor] = useState(null);
-  const [relatedVideos, setRelatedVideos] = useState(null);
   const [currentTitle, setCurrentTitle] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const navigate = useNavigate();
   const textareaRef = useRef(null);
   const [newTitle, setNewTitle] = useState(false);
-  const [videos, setVideos] = useState([]);
 
   useEffect(() => {
     toggleScreen("PlayVideoScreen");
     const fetchVideo = async () => {
-      getVideos();
       await getVideo(id);
     };
     fetchVideo();
@@ -31,7 +28,6 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
   useEffect(() => {
     if (video) {
       getAuthorByUserName(video.username);
-      setRelatedVideos(videos);
       setCurrentTitle(video.title);
       setIsEditing(false);
       setNewTitle(video.title);
@@ -51,18 +47,6 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
       setLiked(false)
     }
   }, [video, video.usersLikes]);
-
-
-  const getVideos = async () => {
-    try {
-      // Fetch videos data
-      const videosResponse = await fetch(`${config.apiBaseUrl}/api/videos`);
-      const videosData = await videosResponse.json();
-      setVideos(videosData);
-    } catch (error) {
-      console.error('Error fetching videos:', error);
-    }
-  };
 
 
   const getVideo = async (videoId) => {
@@ -129,7 +113,6 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
         throw new Error('Failed to add new video');
       }
       const newVideoFromServer = await response.json();
-      setVideos(prevVideos => [...prevVideos, newVideoFromServer]);
     } catch (error) {
       console.error('Error adding new video:', error);
     }
@@ -137,11 +120,6 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
   const updateVideo = async (updatedVideo) => {
     try {
       const updatedVideoFromServer = await sendUpdateRequest(updatedVideo, 'PUT');
-      setVideos(prevVideos =>
-        prevVideos.map(video =>
-          video._id === updatedVideoFromServer._id ? updatedVideoFromServer : video
-        )
-      );
     } catch (error) {
       console.error('Error updating video:', error);
     }
@@ -164,13 +142,6 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
       // Update the video with the updated fields
       const updatedVideoFromServer = await sendUpdateRequest(updatedFields, 'PATCH');
       setVideo(updatedVideoFromServer);
-
-      // Update local state with the updated video from server
-      setVideos(prevVideos =>
-        prevVideos.map(video =>
-          video._id === updatedVideoFromServer._id ? updatedVideoFromServer : video
-        )
-      );
     } catch (error) {
       console.error('Error updating video:', error);
     }
@@ -225,8 +196,6 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
       if (!response.ok) {
         throw new Error('Failed to delete video');
       }
-
-      setVideos(prevVideos => prevVideos.filter(video => video._id !== videoId));
     } catch (error) {
       console.error('Error deleting video:', error);
     }
@@ -460,7 +429,7 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
 
         <Description views={video.views} description={video.description} username={video.username} isSignedIn={isSignedIn} onSave={handleSaveDescription} />
         <div className="sidebarSmall">
-          <RelatedVideos id={id} videos={relatedVideos} />
+          <RelatedVideos id={id} />
         </div>
         <Comments
           videoId={video._id}
@@ -469,7 +438,7 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
         />
       </div>
       <div className="sidebarBig">
-        <RelatedVideos id={id} videos={relatedVideos} />
+        <RelatedVideos id={id}  />
       </div>
     </div>
   );

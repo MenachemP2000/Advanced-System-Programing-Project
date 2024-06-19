@@ -11,6 +11,9 @@ router.post('', videoController.createVideo);
 // Get all videos
 router.get('', videoController.getAllVideos);
 
+// Get all videos
+router.get('/:id/related', videoController.getRelatedVideos);
+
 // Get a specific video by ID
 router.get('/:id', videoController.getVideoById);
 
