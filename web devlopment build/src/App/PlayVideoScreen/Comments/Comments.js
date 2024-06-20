@@ -105,7 +105,7 @@ const Comments = ({
         throw new Error('Failed to add new comment');
       }
       const newCommentFromServer = await response.json();
-      setCommentList(prevComments => [...prevComments, newCommentFromServer]);
+      setCommentList(prevComments => [newCommentFromServer,...prevComments]);
       setCount(count + 1);
     } catch (error) {
       console.error('Error adding new comment:', error);

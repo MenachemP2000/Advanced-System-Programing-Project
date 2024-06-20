@@ -36,7 +36,7 @@ exports.getComments = async (req, res) => {
     if (!video) {
       return res.status(404).json({ message: 'Video not found' });
     }
-    const sortedComments = video.comments.sort((a, b) => b.createdAt - a.createdAt);
+    const sortedComments = video.comments.sort((a, b) => b.date - a.date);
     const limit = parseInt(req.query.limit) || sortedComments.length;
     const page = parseInt(req.query.page) || 1;
     const skip = (page - 1) * limit;
