@@ -49,7 +49,7 @@ const TopBar = ({ toggleMenu, toggleDropDown, isSignedIn, theme }) => {
         {searchOpen && (
           <div className="TopBar leftTop bigScreenSearch">
             <button className='btn' onClick={handleCollapseSearch}>
-              <i class="bi bi-arrow-return-left"></i>
+              <i className="bi bi-arrow-return-left"></i>
             </button>
             <input
               type="text"
@@ -60,7 +60,7 @@ const TopBar = ({ toggleMenu, toggleDropDown, isSignedIn, theme }) => {
               onKeyUp={handleKeyPress}
             />
             <button className='btn' onClick={handleSearch}>
-              <i class="bi bi-search"></i>
+              <i className="bi bi-search"></i>
             </button>
           </div>
         )}
@@ -82,7 +82,7 @@ const TopBar = ({ toggleMenu, toggleDropDown, isSignedIn, theme }) => {
               <div className="RightTopSmall">
                 <div className="smallScreenSearch">
                   <button className='btn' onClick={handleExpandSearch}>
-                    <i class="bi bi-search"></i>
+                    <i className="bi bi-search"></i>
                   </button>
                 </div>
                 <div className="drop-down">
@@ -94,12 +94,12 @@ const TopBar = ({ toggleMenu, toggleDropDown, isSignedIn, theme }) => {
               <div className="RightTopSmall">
                 <div className="smallScreenSearch">
                   <button className='btn' onClick={handleExpandSearch}>
-                    <i class="bi bi-search"></i>
+                    <i className="bi bi-search"></i>
                   </button>
                 </div>
                 <div className="drop-down">
                   <Link to="/signin" className="btn SignInBtn" >
-                    <i class="bi bi-person"></i>
+                    <i className="bi bi-person"></i>
                     <span className="icon-text">Sign In</span>
                   </Link>
                 </div>
@@ -131,7 +131,7 @@ const TopBar = ({ toggleMenu, toggleDropDown, isSignedIn, theme }) => {
               onKeyUp={handleKeyPress}
             />
             <button className='btn' onClick={handleSearch}>
-              <i class="bi bi-search"></i>
+              <i className="bi bi-search"></i>
             </button>
           </div>
 
@@ -147,7 +147,7 @@ const TopBar = ({ toggleMenu, toggleDropDown, isSignedIn, theme }) => {
             <div className="RightTop">
               <div className="drop-down">
                 <Link to="/signin" className="btn SignInBtn" >
-                  <i class="bi bi-person"></i>
+                  <i className="bi bi-person"></i>
                   <span className="icon-text">Sign In</span>
                 </Link>
               </div>

@@ -21,8 +21,9 @@ const RecommendedVideos = ({ videos, menuOpen}) => {
   return (
     <div className={`RecommendedVideos ${menuOpen ? 'RecommendedVideosOpen' : 'RecommendedVideosClose'}`}>
       <ul>
-        {relatedVideos.map(video => (
+        {relatedVideos.map((video, index) => (
           <RecommendedBox
+            key={index}
             video={video}
           />
         ))}

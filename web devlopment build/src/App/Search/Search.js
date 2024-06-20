@@ -13,6 +13,7 @@ const Search = ({ toggleScreen }) => {
   useEffect(() => {
     toggleScreen("Search");
     fetchVideos();
+    window.scrollTo(0, 0);
   }, [key]);
 
   const fetchVideos = async () => {
@@ -57,8 +58,9 @@ const Search = ({ toggleScreen }) => {
             <h3>No Results Found</h3>
           </div>
         )}
-        {searchVideos.map(video => (
+        {searchVideos.map((video, index) => (
           <VideoBox
+            key={index}
             video={video}
           />
         ))}

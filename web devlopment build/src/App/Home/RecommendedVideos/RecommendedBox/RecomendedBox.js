@@ -45,7 +45,7 @@ const RecommendedBox = ({ video }) => {
         <li className='clickable' key={video._id} onClick={() => handleVideoClick(video._id)}>
             <img className='thumbNail' src={video.thumbnail} alt={video.title} />
             <div className='videoDetails'>
-                <img onClick={(event) => {
+                <img id="authorRecomended" onClick={(event) => {
                     event.stopPropagation();
                     handleProfileClick(video.username);
                 }} src={author.image} height="35px" width="35px" ></img>

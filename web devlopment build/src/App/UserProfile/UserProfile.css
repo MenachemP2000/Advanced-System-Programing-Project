@@ -8,27 +8,27 @@
   }
   
   .userVideos ul {
-    width: 90%;
+    width: inherit;
     display: flex;
     flex-direction: column;
     list-style: none;
-    padding: 0;
+    padding-right: 20px;
+    padding-left: 20px;
+    margin-bottom: 10px;
     margin: 0;
   }
   
   .userVideos {
-    width: inherit;
     display: flex;
     justify-content: center;
   }
   
   
-  .userVideos li {
-    display: flex;
-    flex-direction: row;
-    margin-bottom: 10px;
-  }
+  .userVideos .video-info {
+    padding-top: 20px;
+    overflow: hidden;
   
+  }
   .userVideos .video-info h3 {
     width: inherit;
     margin: 0;
@@ -53,11 +53,6 @@
   
   }
   
-  .userVideos .video-info {
-    padding-top: 20px;
-    overflow: hidden;
-  
-  }
   
   .profileUserVideos {
     display: flex;
@@ -101,7 +96,6 @@
     }
   
     .userVideos .video-info {
-      margin: 10px;
       padding: 0px;
   
     }

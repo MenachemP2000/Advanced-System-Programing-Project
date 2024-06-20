@@ -35,6 +35,7 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
   }, [video]);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     addVideoView(id);
   }, [id]);
 
@@ -124,6 +125,7 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
       console.error('Error updating video:', error);
     }
   };
+  
   const partialUpdateVideo = async (updatedVideo) => {
     try {
       const originalVideo = await getVideoWithoutChangingState(updatedVideo._id);
@@ -314,10 +316,6 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
     }
   };
 
-  const handleCommentsChangeOnly = (newComments) => {
-    setVideo({ ...video, comments: newComments })
-  };
-
   const handleTextareaChange = () => {
     setNewTitle(textareaRef.current.value);
   };
@@ -325,6 +323,12 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
   const handleProfileClick = (username) => {
     navigate(`/user/${username}`);
   };
+
+  const handleKeyUp  = async (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      await handleSaveClick(e);
+    }
+  }
 
   while (!(video && author)) {
     if (!video) {
@@ -358,7 +362,7 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
                   <div>
 
                     <button type="button" className="btn" onClick={handleUnlike}>
-                      <i class="bi bi-hand-thumbs-up-fill"></i>
+                      <i className="bi bi-hand-thumbs-up-fill"></i>
                       <span className="icon-text"> {video.likeCount}</span>
                     </button>
                   </div>
@@ -367,25 +371,25 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
                 {((isSignedIn && !liked) || !isSignedIn) && (
                   <div>
                     <button type="button" className="btn" onClick={handleLike}>
-                      <i class="bi bi-hand-thumbs-up"></i>
+                      <i className="bi bi-hand-thumbs-up"></i>
                       <span className="icon-text"> {video.likeCount}</span>
                     </button>
                   </div>
                 )}
                 <button type="button" className="btn" onClick={handleShare}>
-                  <i class="bi bi-share"></i>
+                  <i className="bi bi-share"></i>
                   <span id="shareVideo" className="icon-text"> Share</span>
                 </button>
 
                 {((isSignedIn.username === video.username)) && (
                   <>
                     <button type="button" className="btn" onClick={handleEditClick}>
-                      <i class="bi bi-pencil"></i>
+                      <i className="bi bi-pencil"></i>
                       <span id="editVideo" className="icon-text"> edit</span>
                     </button>
 
                     <button type="button" className="btn" onClick={handleDeleteClick}>
-                      <i class="bi bi-trash"></i>
+                      <i className="bi bi-trash"></i>
                       <span id="deleteVideo" className="icon-text"> Delete</span>
                     </button>
                   </>
@@ -402,6 +406,7 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
               name="title"
               value={newTitle}
               onChange={handleTextareaChange}
+              onKeyUp={handleKeyUp}
             ></textarea>
 
             <div className="videoProfile">
@@ -429,16 +434,15 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
 
         <Description views={video.views} description={video.description} username={video.username} isSignedIn={isSignedIn} onSave={handleSaveDescription} />
         <div className="sidebarSmall">
-          <RelatedVideos id={id} />
+          <RelatedVideos id={id} itsBig={false}  />
         </div>
         <Comments
           videoId={video._id}
           isSignedIn={isSignedIn}
-          onCommentsChangeOnly={handleCommentsChangeOnly}
         />
       </div>
       <div className="sidebarBig">
-        <RelatedVideos id={id}  />
+        <RelatedVideos id={id} itsBig={true} />
       </div>
     </div>
   );

@@ -38,7 +38,7 @@ body.dark {
 }
 
 .App {
-  width: 100%;
+  width: 100vw;
   height: max-content;
 }
 

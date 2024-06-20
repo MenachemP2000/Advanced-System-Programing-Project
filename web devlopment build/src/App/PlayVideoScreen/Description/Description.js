@@ -3,6 +3,7 @@ import './Description.css';
 
 const Description = ({ description, onSave, isSignedIn, username, views }) => {
   const [currentDescription, setCurrentDescription] = useState(description);
+  const [savedDescription, setSavedDescription] = useState(description);
   const [isEditing, setIsEditing] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const textareaRef = useRef(null);
@@ -12,7 +13,6 @@ const Description = ({ description, onSave, isSignedIn, username, views }) => {
   }, [description]);
 
   useEffect(() => {
-    // Set the initial height of the textarea based on its content
     if (textareaRef.current && isEditing) {
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
@@ -24,13 +24,20 @@ const Description = ({ description, onSave, isSignedIn, username, views }) => {
     setIsExpanded(true);
   };
 
-  const handleSaveClick = () => {
-    onSave(currentDescription);
-    setIsEditing(false);
+  const handleSaveClick = async () => {
+    if (currentDescription && currentDescription.trim() !== '') {
+      await onSave(currentDescription);
+      setSavedDescription(currentDescription);
+    }
+    else{
+      setCurrentDescription(savedDescription);
+
+    }
+      setIsEditing(false);
   };
 
   const handleCancelClick = () => {
-    setCurrentDescription(description);
+    setCurrentDescription(savedDescription);
     setIsEditing(false);
   };
 
@@ -39,6 +46,12 @@ const Description = ({ description, onSave, isSignedIn, username, views }) => {
     textareaRef.current.style.height = 'auto';
     textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
   };
+
+  const handleKeyUp = async (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      await handleSaveClick(e);
+    }
+  }
 
   const toggleReadMore = () => {
     setIsExpanded(!isExpanded);
@@ -54,6 +67,7 @@ const Description = ({ description, onSave, isSignedIn, username, views }) => {
             name="description"
             value={currentDescription}
             onChange={handleTextareaChange}
+            onKeyUp={handleKeyUp}
           ></textarea>
           <div className="button-container">
             <button
@@ -89,7 +103,7 @@ const Description = ({ description, onSave, isSignedIn, username, views }) => {
                 aria-label="Edit description"
               >
 
-                <i class="bi bi-pencil"></i>
+                <i className="bi bi-pencil"></i>
                 <span className="icon-text">Edit</span>
 
 

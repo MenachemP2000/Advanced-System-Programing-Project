@@ -45,7 +45,7 @@ const RelatedBox = ({ video }) => {
         <li className='clickable' key={video._id} onClick={() => handleVideoClick(video._id)}>
             <img className="thumbNail" src={video.thumbnail} alt={video.title} />
             <div className="video-info">
-                <h3>{video.title}</h3>
+                <h3 id="related-title">{video.title}</h3>
                 <p onClick={(event) => {
                     event.stopPropagation();
                     handleProfileClick(video.username);

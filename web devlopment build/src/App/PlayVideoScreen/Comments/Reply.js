@@ -5,7 +5,7 @@ import './Reply.css'
 import config from '../../config';
 
 const Reply = ({
-  key,
+  rid,
   reply,
   handleDeleteReply,
   comment,
@@ -38,7 +38,7 @@ const Reply = ({
 
   useEffect(() => {
     const fetchReply = () => {
-      const currentReply = comment.replies.find(r => r._id === key);
+      const currentReply = comment.replies.find(r => r._id === rid);
       if (currentReply) {
         setThisReply(currentReply);
         setUsersLikedReply(currentReply.usersLikes);
@@ -52,7 +52,7 @@ const Reply = ({
       }
     };
     fetchReply();
-  }, [key]);
+  }, [rid]);
 
   useEffect(() => {
     setUsersLikedReply(thisReply.usersLikes);
@@ -147,9 +147,9 @@ const Reply = ({
     }
   };
 
-  const handleReply = (e) => {
+  const handleReply = async (e) => {
     e.preventDefault();
-    handleAddReply(e, comment._id);
+    await handleAddReply(e, comment._id);
     hideReplyForm();
   };
 
@@ -180,8 +180,8 @@ const Reply = ({
     e.target.style.height = e.target.scrollHeight + 'px';
   };
 
-  const handleSaveEdit = () => {
-    handleEditReply(editedContent);
+  const handleSaveEdit = async () => {
+    await handleEditReply(editedContent);
     setIsEditing(false);
   };
 
@@ -211,6 +211,21 @@ const Reply = ({
     navigate(`/user/${username}`);
   };
 
+  
+  
+  const handleReplyEditKeyUp = async (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      await handleSaveEdit(e);
+    }
+  };
+
+  const handleReplyKeyUp = async (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      await handleReply(e);
+    }
+  };
+
+
   return (
     <div id="outerreply">
       {author && (
@@ -233,11 +248,11 @@ const Reply = ({
           <div className="button-container">
 
             <button className="btn   " onClick={toggleEdit}>
-              <i class="bi bi-pencil"></i>
+              <i className="bi bi-pencil"></i>
               <span className="icon-text">Edit</span>
             </button>
             <button className="btn  " onClick={() => handleDeleteReply(reply._id)}>
-              <i class="bi bi-trash"></i>
+              <i className="bi bi-trash"></i>
               <span className="icon-text">Delete</span>
             </button>
 
@@ -253,7 +268,7 @@ const Reply = ({
                     onClick={() => handleLikeReply(reply._id)}
                     aria-label="Like reply"
                   >
-                    <i class="bi bi-hand-thumbs-up"></i>
+                    <i className="bi bi-hand-thumbs-up"></i>
                     <span className="icon-text"> {totalUserLikes}</span>
                   </button>
                 )}
@@ -263,7 +278,7 @@ const Reply = ({
                     onClick={() => handleUnlikeReply(reply._id)}
                     aria-label="Unlike reply"
                   >
-                    <i class="bi bi-hand-thumbs-up-fill"></i>
+                    <i className="bi bi-hand-thumbs-up-fill"></i>
                     <span className="icon-text"> {totalUserLikes}</span>
                   </button>
                 )}
@@ -283,6 +298,7 @@ const Reply = ({
                       <textarea
                         value={newReply[comment._id] || "@" + reply.user + " "}
                         onChange={handleReplyContentChange}
+                        onKeyUp={handleReplyKeyUp}
                         className="reply-textarea"
                       ></textarea>
                       <div className="button-container">
@@ -311,6 +327,7 @@ const Reply = ({
                 ref={editTextareaRef}
                 value={editedContent}
                 onChange={handleEditContentChange}
+                onKeyUp={handleReplyEditKeyUp}
                 className="edit-textarea"
               />
               <div className="button-container">

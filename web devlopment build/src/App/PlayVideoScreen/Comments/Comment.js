@@ -7,7 +7,7 @@ import './Comment.css';
 import config from '../../config';
 
 const Comment = ({
-  key,
+  cid,
   comment,
   onCommentChange,
   isSignedIn,
@@ -58,7 +58,7 @@ const Comment = ({
         setUserLikedComment(false);
       }
     }
-  }, [key, thisComment]);
+  }, [cid, thisComment]);
 
   useEffect(() => {
     setUsersLikedComment(thisComment.usersLikes);
@@ -289,8 +289,8 @@ const Comment = ({
     setIsReplyFormVisible(!isReplyFormVisible);
   };
 
-  const handleSaveEdit = () => {
-    handleEditComment(editContent);
+  const handleSaveEdit = async () => {
+    await handleEditComment(editContent);
     setIsEditing(false);
   };
 
@@ -374,15 +374,27 @@ const Comment = ({
     }
   };
 
-  const handleReply = (e) => {
+  const handleReply = async (e) => {
     e.preventDefault();
-    handleAddReply(e, comment._id);
+    await handleAddReply(e, comment._id);
     hideReplyForm();
   };
 
   const handleSendDeleteReply = (replyId) => {
     handleDeleteReply(replyId);
   };
+  
+  const handleReplyKeyUp = async (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      await handleReply(e);
+    }
+  };
+  
+  const handleEditKeyUp = async (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      await handleSaveEdit(e);
+    }
+  }
 
   const isLongComment = comment.content.length > 100;
 
@@ -407,6 +419,7 @@ const Comment = ({
               ref={editTextareaRef}
               value={editContent}
               onChange={handleEditContentChange}
+              onKeyUp={handleEditKeyUp}
               className="edit-textarea"
             />
             <div className="button-container">
@@ -446,7 +459,7 @@ const Comment = ({
                 aria-label="Edit comment"
               >
 
-                <i class="bi bi-pencil"></i>
+                <i className="bi bi-pencil"></i>
                 <span className="icon-text">Edit</span>
 
               </button>
@@ -456,7 +469,7 @@ const Comment = ({
                 onClick={() => deleteComment(comment._id)}
                 aria-label="Delete comment"
               >
-                <i class="bi bi-trash"></i>
+                <i className="bi bi-trash"></i>
                 <span className="icon-text">Delete</span>
               </button>
             </>
@@ -465,14 +478,14 @@ const Comment = ({
         <div className='button-container-like-reply'>
           {(isSignedIn && userLikedComment) && (
             <button className="btn  " onClick={handleUnlikeComment}>
-              <i class="bi bi-hand-thumbs-up-fill"></i>
+              <i className="bi bi-hand-thumbs-up-fill"></i>
               <span className="icon-text"> {totalUserLikes}</span>
             </button>
           )}
 
           {((isSignedIn && !userLikedComment) || !isSignedIn) && (
             <button className="btn  " onClick={handleLikeComment}>
-              <i class="bi bi-hand-thumbs-up"></i>
+              <i className="bi bi-hand-thumbs-up"></i>
               <span className="icon-text"> {totalUserLikes}</span>
             </button>
           )}
@@ -490,6 +503,7 @@ const Comment = ({
                 <textarea
                   value={newReply[comment._id] || ''}
                   onChange={handleReplyContentChange}
+                  onKeyUp={handleReplyKeyUp}
                   placeholder="Reply to this comment..."
                   className="reply-textarea"
                 ></textarea>
@@ -518,13 +532,14 @@ const Comment = ({
           )}
         </div>
         <div className={`replies ${isShowingReplies ? 'show' : 'hide'}`}>
-          {currentCommentReplies.map(reply => (
+          {currentCommentReplies.map((reply,index) => (
             <Reply
+              key={index} 
               reply={reply}
-              key={reply._id}
+              rid={reply._id}
               handleDeleteReply={handleSendDeleteReply}
               handleCommentReplyChange={handleCommentReplyChange}
-              comment={thisComment}
+              comment={comment}
               isSignedIn={isSignedIn}
               partialUpdateComment={partialUpdateComment}
 

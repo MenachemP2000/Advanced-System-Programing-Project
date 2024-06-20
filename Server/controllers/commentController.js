@@ -3,7 +3,7 @@ const Video = require('../models/Video');
 // Create a comment
 exports.createComment = async (req, res) => {
   const { videoId } = req.params;
-  const { user, content, date,usersLikes,replies } = req.body;
+  const { user, content, date, usersLikes, replies } = req.body;
   try {
     const video = await Video.findById(videoId);
     if (!video) {
@@ -34,12 +34,24 @@ exports.getComments = async (req, res) => {
   try {
     const video = await Video.findById(videoId);
     if (!video) {
-      return res.status(404).send('Video not found');
+      return res.status(404).json({ message: 'Video not found' });
     }
+    const sortedComments = video.comments.sort((a, b) => b.createdAt - a.createdAt);
+    const limit = parseInt(req.query.limit) || sortedComments.length;
+    const page = parseInt(req.query.page) || 1;
+    const skip = (page - 1) * limit;
+    const paginatedComments = sortedComments.slice(skip, skip + limit);
 
-    res.send(video.comments);
+    res.json({
+      comments: paginatedComments,
+      totalComments: sortedComments.length,
+      currentPage: page,
+      totalPages: Math.ceil(sortedComments.length / limit)
+    });
+
   } catch (error) {
-    res.status(500).send(error.message);
+    console.error('Error fetching comments:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
@@ -78,7 +90,7 @@ exports.updateComment = async (req, res) => {
     if (!comment) {
       return res.status(404).send('Comment not found');
     }
-    
+
     comment.user = updatedComment.user || comment.user; // retain the old value if the new value is not provided
     comment.content = updatedComment.content || comment.content;
     comment.date = updatedComment.date || comment.date;
@@ -134,7 +146,7 @@ exports.deleteComment = async (req, res) => {
     if (!video) {
       return res.status(404).send('Video not found');
     }
-    
+
     const comment = video.comments.id(commentId);
 
     video.comments.remove(comment);

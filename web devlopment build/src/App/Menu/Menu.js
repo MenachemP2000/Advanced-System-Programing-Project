@@ -16,7 +16,7 @@ const Menu = ({ isOpen, topBarHeight }) => {
 
           <li>
             <Link className='btn' to="/">
-              <i class="bi bi-house"></i>
+              <i className="bi bi-house"></i>
               <span className="icon-text"> Home</span>
             </Link>
           </li>

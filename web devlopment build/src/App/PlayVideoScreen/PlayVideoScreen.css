@@ -1,11 +1,12 @@
 .PlayVideoScreen {
   display: flex;
-  margin: 20px;
+  width: 100%;
+  padding-right: 20px;
+  padding-left: 20px;
 }
 
 .videoContainer {
   flex: 2;
-  margin-right: 20px;
   width: 100%;
 }
 
@@ -90,11 +91,11 @@
   outline: none;
 }
 
-@media (max-width:900px) {
-    .videoContainer{
-      margin-right: 0px;}
+@media (max-width:920px) {
+    .videoContainer{}
     .sidebarBig {display: none;}
-    .PlayVideoScreen {display:flex;flex-direction:column;}
+    .PlayVideoScreen {
+      display:flex;flex-direction:column;}
         .sidebar {order:2;}
         .videoContainer {order:1;}
         .comments {order:3;}
@@ -111,7 +112,10 @@
       flex-direction: column;
     }
 }
-@media (min-width:900px) {
+@media (min-width:920px) {
+  .videoContainer{
+    padding-right: 10px;}
+
   .sidebarSmall {display: none;}
 }
 @media (max-width:1100px) {

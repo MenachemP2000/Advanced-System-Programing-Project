@@ -6,7 +6,7 @@ import config from '../config';
 
 
 
-const Search = ({ toggleScreen }) => {
+const UserProfile = ({ toggleScreen }) => {
   const [searchVideos, setSearchVideos] = useState([]);
   const navigate = useNavigate();
   const { key } = useParams();
@@ -58,8 +58,9 @@ const Search = ({ toggleScreen }) => {
             <h3>No Results Found</h3>
           </div>
         )}
-        {searchVideos.map(video => (
+        {searchVideos.map((video, index) => (
           <UserBox
+            key={index}
             video={video}
           />
         ))}
@@ -68,4 +69,4 @@ const Search = ({ toggleScreen }) => {
   );
 };
 
-export default Search;
+export default UserProfile;

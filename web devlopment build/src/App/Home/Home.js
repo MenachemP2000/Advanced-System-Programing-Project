@@ -13,6 +13,7 @@ const Home = ({ toggleScreen, menuOpen }) => {
   useEffect(() => {
     toggleScreen("Home");
     getVideos();
+    window.scrollTo(0, 0);
   }, []);
 
   useEffect(() => {

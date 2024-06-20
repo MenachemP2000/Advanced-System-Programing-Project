@@ -1,4 +1,6 @@
 const Video = require('../models/Video');
+const mongoose = require('mongoose');
+
 
 // Create a new video
 exports.createVideo = async (req, res) => {
@@ -14,7 +16,7 @@ exports.createVideo = async (req, res) => {
 exports.getAllVideos = async (req, res) => {
   try {
     // Extract query parameters from the request
-    const { title, category, username, uploadDate } = req.query;
+    const { title, username, uploadDate } = req.query;
 
     // Initialize an array to hold individual query conditions
     let queryConditions = [];
@@ -48,37 +50,130 @@ exports.getAllVideos = async (req, res) => {
 
 exports.getRelatedVideos = async (req, res) => {
   try {
-    const id = req.params.id;
     const video = await Video.findById(req.params.id);
-
-    // Construct the initial query
-    let query = {};
-
-    // Add conditions to the query
-    if (video.username) {
-      query.username = video.username;
-    }
-
-    if (video.tags && video.tags.length > 0) {
-      query.tags = { $in: video.tags };
-    }
-
-    query._id = { $ne: video._id };
+    const { _id, username, tags } = video;
 
     // Fetch videos from the database based on the query
-    const videos = await Video.aggregate([
-      { $match: query },
-      { $sample: { size: 10 } }
-    ]);
+    let pipeline = [
+      {
+        $match: {
+          _id: { $ne: _id }
+        }
+      },
+      {
+        $addFields: {
+          priorityScore: {
+            $add: [
+              { $multiply: [{ $size: { $setIntersection: [tags, '$tags'] } }, 1] }, // Score for common tags
+              { $cond: { if: { $eq: ['$username', username] }, then: 5, else: 0 } }   // Score for matching username
+            ]
+          }
+        }
+      },
+      {
+        $sort: { priorityScore: -1, _id: 1 }
+      }
 
-    res.send(videos);
+    ];
+
+    const page = parseInt(req.query.page) || 1; // Get the page from the query or default to 1
+    const limit = parseInt(req.query.limit);
+    if (limit) {
+      const skip = (page - 1) * limit;
+      pipeline = [
+        ...pipeline,
+        { $skip: skip },
+        { $limit: limit },
+        { $sample: { size: limit }}
+      ];
+    }
+
+    const videos = await Video.aggregate(pipeline);
+    const totalVideos = await Video.countDocuments();
+
+    res.json({
+      videos: videos,
+      totalVideos: totalVideos,
+      currentPage: page,
+      totalPages: Math.ceil(totalVideos / limit)
+    });
+
   } catch (error) {
     res.status(500).send(error);
+    console.log(error);
   }
 };
 
 
+exports.getRelatedVideosWithoutCurrentOnes = async (req, res) => {
+  try {
+    const video = await Video.findById(req.params.id);
+    const { _id, username, tags } = video;
+    const relatedVideosIds = req.body;
+    const objectIdArray = relatedVideosIds
+      .filter(id => {
+        const isValid = mongoose.Types.ObjectId.isValid(id);
+        if (!isValid) {
+          console.error(`Invalid ObjectID: ${id}`);
+        }
+        return isValid;
+      })
+      .map(id => {
+        try {
+          return new mongoose.Types.ObjectId(id);
+        } catch (err) {
+          console.error(`Error converting to ObjectID: ${id}`, err);
+          return null;
+        }
+      })
+      .filter(id => id !== null);
+    // Fetch videos from the database based on the query
+    const pipeline = [
+      {
+        $match: {
+          _id: { $nin: objectIdArray },
+          $or: [
+            { username: username },
+            { tags: { $in: tags } }
+          ]
+        }
+      },
+      {
+        $addFields: {
+          commonTags: {
+            $size: {
+              $setIntersection: [tags, '$tags']
+            }
+          }
+        }
+      },
+      {
+        $sort: { commonTags: -1 } // Sort by most common tags descending
+      },
+      { $limit: 10 },
+      { $sample: { size: 10 } }
+    ];
 
+    const videos = await Video.aggregate(pipeline);
+    if (videos.length < 1) {
+      const pipelineFallback = [
+        {
+          $match: {
+            _id: { $nin: objectIdArray }
+          }
+        },
+        { $sample: { size: 10 } } // Sample 10 random documents
+      ];
+      const fallBackVideos = await Video.aggregate(pipelineFallback);
+      await res.send(fallBackVideos);
+    }
+    else {
+      await res.send(videos);
+    }
+  } catch (error) {
+    res.status(500).send(error);
+  }
+};
 
 // Get a specific video by ID
 exports.getVideoById = async (req, res) => {
