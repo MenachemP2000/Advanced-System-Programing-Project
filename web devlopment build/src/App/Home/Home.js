@@ -6,20 +6,13 @@ import './Home.css';
 
 
 const Home = ({ toggleScreen, menuOpen }) => {
-  const [menuOpenStatus, setMenuOpenStatus] = useState(false);
   const [recommendedVideos, setRecommendedVideos] = useState([]);
-
 
   useEffect(() => {
     toggleScreen("Home");
     getVideos();
     window.scrollTo(0, 0);
-  }, []);
-
-  useEffect(() => {
-    setMenuOpenStatus(menuOpen);
-    console.log("changed");
-  }, [menuOpen]);
+  }, [toggleScreen]);
 
   const getVideos = async () => {
     try {

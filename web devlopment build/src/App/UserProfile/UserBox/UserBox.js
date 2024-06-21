@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import config from '../../config';
+import './UserBox.css'
 
 
 const UserBox = ({ video }) => {
@@ -42,20 +43,16 @@ const UserBox = ({ video }) => {
     }
 
     return (
-        <li className='clickable userVideos' key={video._id} onClick={() => handleVideoClick(video._id)}>
+        <li className='clickable userBox' key={video._id} onClick={() => handleVideoClick(video._id)}>
             <img className='thumbNail' src={video.thumbnail} alt={video.title} />
-            <div className="video-info">
+            <div className="video-info-user">
                 <h3>{video.title}</h3>
                 <p>{video.views} views</p>
-                <div className='profileUserVideos' onClick={(event) => {
+                <div className='profileUserBox' onClick={(event) => {
                     event.stopPropagation();
                     handleProfileClick(video.username);
                 }}>
-                    <img className='profliePic' src={author.image} height="24px" width="24px" ></img>
-                    <p >{video.username}</p>
                 </div>
-
-                <p>{video.description}</p>
             </div>
         </li>
     );

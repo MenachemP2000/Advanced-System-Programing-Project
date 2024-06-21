@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Comments.css';
 import Comment from './Comment';
@@ -19,52 +19,7 @@ const Comments = ({
   const initialRender = useRef(true);
   const [count, setCount] = useState(0);
 
-
-  useEffect(() => {
-    setIsCommentFormVisible(false);
-    setNewComment('');
-    setPage(1);
-    setHasMore(true);
-    setCommentList([]);
-    setLoading(false);
-  }, []);
-
-  useEffect(() => {
-    if (initialRender.current) {
-      initialRender.current = false;
-      return;
-    }
-    setCount(0);
-
-    setIsCommentFormVisible(false);
-    setNewComment('');
-    setPage(1);
-    setHasMore(true);
-    setCommentList([]);
-    setLoading(false);
-    const getComments = async () => {
-      await getVideoComments(1);
-    };
-    if (commentList.length === 0) {
-      console.log(commentList.length);
-      getComments(page);
-    }
-  }, [videoId]);
-
-  useEffect(() => {
-    if (commentTextareaRef.current) {
-      commentTextareaRef.current.style.height = 'auto';
-      commentTextareaRef.current.style.height = commentTextareaRef.current.scrollHeight + 'px';
-    }
-  }, [newComment]);
-
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [loading, videoId]);
-
-
-  const getVideoComments = async (pageToLoad) => {
+  const getVideoComments = useCallback(async (pageToLoad) => {
     try {
       setLoading(true);
       const response = await fetch(`${config.apiBaseUrl}/api/videos/${videoId}/comments?page=${pageToLoad}&limit=10`, {
@@ -90,7 +45,42 @@ const Comments = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [videoId]);
+
+  useEffect(() => {
+    if (initialRender.current) {
+      initialRender.current = false;
+      return;
+    }
+    setCount(0);
+    setIsCommentFormVisible(false);
+    setNewComment('');
+    setPage(1);
+    setHasMore(true);
+    setCommentList([]);
+    setLoading(false);
+    const getComments = async () => {
+      await getVideoComments(1);
+    };
+    getComments();
+  }, [videoId, getVideoComments]);
+
+  useEffect(() => {
+    if (commentTextareaRef.current) {
+      commentTextareaRef.current.style.height = 'auto';
+      commentTextareaRef.current.style.height = commentTextareaRef.current.scrollHeight + 'px';
+    }
+  }, [newComment]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 120 && !loading && hasMore) {
+        getVideoComments(page);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  },);
 
   const addComment = async (comment) => {
     try {
@@ -105,7 +95,7 @@ const Comments = ({
         throw new Error('Failed to add new comment');
       }
       const newCommentFromServer = await response.json();
-      setCommentList(prevComments => [newCommentFromServer,...prevComments]);
+      setCommentList(prevComments => [newCommentFromServer, ...prevComments]);
       setCount(count + 1);
     } catch (error) {
       console.error('Error adding new comment:', error);
@@ -113,22 +103,24 @@ const Comments = ({
   };
   const handleAddComment = async (e) => {
     e.preventDefault();
-    let author = isSignedIn.username;
-    const commentToAdd = { content: newComment, replies: [], usersLikes: [], user: author, date: Date.now() }
-
-    try {
-      await addComment(commentToAdd);
-    } catch (error) {
-      console.error('Error Adding comment:', error);
+    if (newComment.trim() !== '') {
+      let author = isSignedIn.username;
+      const commentToAdd = { content: newComment, replies: [], usersLikes: [], user: author, date: Date.now() }
+      try {
+        await addComment(commentToAdd);
+      } catch (error) {
+        console.error('Error Adding comment:', error);
+      }
     }
+
     setIsCommentFormVisible(false);
     setNewComment('');
   };
   const handleDeleteComment = (commentId) => {
     const updatedComments = commentList.filter(comment => comment._id !== commentId);
+    setCount(count - 1);
     setCommentList(updatedComments);
   };
-
   const handleCancelEdit = () => {
     setNewComment('');
     setIsCommentFormVisible(false);
@@ -162,16 +154,9 @@ const Comments = ({
   const handleAddKeyUp = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       handleAddComment(e);
+      commentTextareaRef.current.blur();
     }
   }
-
-
-  const handleScroll = () => {
-    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 120 && !loading && hasMore) {
-      getVideoComments(page);
-    }
-  };
-
 
   return (
     <div className="comments-container">
@@ -179,7 +164,7 @@ const Comments = ({
       {(isSignedIn) && (
         <>
           <div className='newComment'>
-            <div><img src={isSignedIn.image} height="50px" width="50px" ></img></div>
+            <div><img src={isSignedIn.image} alt={isSignedIn.username} height="50px" width="50px" ></img></div>
             <form onSubmit={handleAddComment}>
               <textarea
                 ref={commentTextareaRef}
@@ -220,7 +205,7 @@ const Comments = ({
       {(!isSignedIn) && (
         <>
           <div className='newComment'>
-            <div><img className='profilePic' src="/pictures/users/notSignedin.jpg" height="50px" width="50px" ></img></div>
+            <div><img className='profilePic' alt='notSignedIn' src="/pictures/users/notSignedin.jpg" height="50px" width="50px" ></img></div>
             <form onSubmit={handleAddComment}>
               <textarea
                 ref={commentTextareaRef}
@@ -246,12 +231,6 @@ const Comments = ({
           videoId={videoId}
         />
       ))}
-      {loading && <p>Loading...</p>}
-      {((false)) && (
-        <>
-          no more comments
-        </>
-      )}
     </div>
   );
 };

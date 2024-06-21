@@ -1,5 +1,5 @@
 // App.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 import config from './config';
@@ -24,6 +24,12 @@ function App() {
     const savedStatus = localStorage.getItem('isSignedIn');
     return savedStatus ? JSON.parse(savedStatus) : false;
   });
+  const dropdownRef = useRef(null);
+  const bigProfilePicRef = useRef(null); 
+  const smallProfilePicRef = useRef(null);
+
+  useEffect(() => {
+  }, [dropDownOpen]);
 
   useEffect(() => {
     localStorage.setItem('isSignedIn', JSON.stringify(isSignedIn));
@@ -40,6 +46,7 @@ function App() {
   const toggleDropDown = () => {
     setDropDownOpen(!dropDownOpen);
   };
+
 
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
@@ -76,48 +83,74 @@ function App() {
     }
   };
 
-  const toggleScreen = (screen) => {
+  const toggleScreen = useCallback((screen) => {
     setScreen(screen);
-  };
+  }, []);
 
-  return (
-    <Router>
-      <div className={`App ${theme}`}>
-        {!(screen == "SignIn" || screen == "CreateAccount") && (
-          <>
-            <TopBar theme={theme} toggleMenu={toggleMenu} toggleDropDown={toggleDropDown} isSignedIn={isSignedIn} />
-            <Menu screen={screen} isOpen={menuOpen} />
-            <DropDown setIsOpen={setDropDownOpen} isOpen={dropDownOpen} isSignedIn={isSignedIn} toggleTheme={toggleTheme} toggleSignendIn={toggleSignendIn} />
-            {(menuOpen && screen != "Home") && (<div className="Overlay" onClick={toggleMenu}></div>)}
-          </>
-        )}
 
-        <Routes>
-          <Route path="/search/:key" element={<Search toggleScreen={toggleScreen} />} />
-          <Route path="/user/:key" element={<UserProfile toggleScreen={toggleScreen} />} />
-          <Route path="/signin" element={<SignIn
-            toggleScreen={toggleScreen}
-            isSignedIn={isSignedIn}
-            toggleSignendIn={toggleSignendIn}
-          />} />
-          <Route path="/createaccount" element={<CreateAccount
-            isSignedIn={isSignedIn}
-            toggleScreen={toggleScreen}
-            toggleSignendIn={toggleSignendIn}
-          />} />
-          <Route path="/" element={<Home
-            toggleScreen={toggleScreen}
-            isSignedIn={isSignedIn}
-            menuOpen={menuOpen}
-          />} />
-          <Route path="/video/:id" element={<PlayVideoScreen
-            toggleScreen={toggleScreen}
-            isSignedIn={isSignedIn}
-          />} />
-        </Routes>
-      </div>
-    </Router>
-  );
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target) &&
+        !(bigProfilePicRef.current && bigProfilePicRef.current.contains(event.target)) &&
+        !(smallProfilePicRef.current && smallProfilePicRef.current.contains(event.target))
+      ) {
+    setDropDownOpen(false);
+  }
+};
+if (dropDownOpen) {
+  document.addEventListener('mousedown', handleClickOutside);
+} else {
+  document.removeEventListener('mousedown', handleClickOutside);
+}
+
+return () => {
+  document.removeEventListener('mousedown', handleClickOutside);
+};
+  }, [dropDownOpen]);
+
+return (
+  <Router>
+    <div className={`App ${theme}`}>
+      {!(screen === "SignIn" || screen === "CreateAccount") && (
+        <>
+          <TopBar smallProfilePicRef={smallProfilePicRef} bigProfilePicRef={bigProfilePicRef} setDropDownOpen={setDropDownOpen} dropDownOpen={dropDownOpen} theme={theme} toggleMenu={toggleMenu} toggleDropDown={toggleDropDown} isSignedIn={isSignedIn} />
+          <Menu screen={screen} isOpen={menuOpen} />
+          {(isSignedIn && (
+            <DropDown dropdownRef={dropdownRef} setIsOpen={setDropDownOpen} isOpen={dropDownOpen} isSignedIn={isSignedIn} toggleTheme={toggleTheme} toggleSignendIn={toggleSignendIn} />
+          ))
+          }
+          {(menuOpen && screen !== "Home") && (<div className="Overlay" onClick={toggleMenu}></div>)}
+        </>
+      )}
+
+      <Routes>
+        <Route path="/search/:key" element={<Search toggleScreen={toggleScreen} />} />
+        <Route path="/user/:key" element={<UserProfile toggleScreen={toggleScreen} />} />
+        <Route path="/signin" element={<SignIn
+          toggleScreen={toggleScreen}
+          isSignedIn={isSignedIn}
+          toggleSignendIn={toggleSignendIn}
+        />} />
+        <Route path="/createaccount" element={<CreateAccount
+          isSignedIn={isSignedIn}
+          toggleScreen={toggleScreen}
+          toggleSignendIn={toggleSignendIn}
+        />} />
+        <Route path="/" element={<Home
+          toggleScreen={toggleScreen}
+          isSignedIn={isSignedIn}
+          menuOpen={menuOpen}
+        />} />
+        <Route path="/video/:id" element={<PlayVideoScreen
+          toggleScreen={toggleScreen}
+          isSignedIn={isSignedIn}
+        />} />
+      </Routes>
+    </div>
+  </Router>
+);
 }
 export default App;
 

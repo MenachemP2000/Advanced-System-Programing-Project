@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import {  useNavigate } from 'react-router-dom';
 import config from '../../../config';
 
 
@@ -45,7 +45,7 @@ const RecommendedBox = ({ video }) => {
         <li className='clickable' key={video._id} onClick={() => handleVideoClick(video._id)}>
             <img className='thumbNail' src={video.thumbnail} alt={video.title} />
             <div className='videoDetails'>
-                <img id="authorRecomended" onClick={(event) => {
+                <img id="authorRecomended" alt={author.username} onClick={(event) => {
                     event.stopPropagation();
                     handleProfileClick(video.username);
                 }} src={author.image} height="35px" width="35px" ></img>

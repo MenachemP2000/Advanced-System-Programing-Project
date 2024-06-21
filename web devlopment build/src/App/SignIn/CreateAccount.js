@@ -10,7 +10,6 @@ const CreateAccount = ({ toggleSignendIn, toggleScreen, isSignedIn }) => {
     const [passwordAgain, setPasswordAgain] = useState('');
     const [error, setError] = useState('');
     const [image, setImage] = useState(null);
-    const [imagePreview, setImagePreview] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -18,7 +17,7 @@ const CreateAccount = ({ toggleSignendIn, toggleScreen, isSignedIn }) => {
         if (isSignedIn) {
             navigate("/");
         }
-    }, []);
+    });
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];

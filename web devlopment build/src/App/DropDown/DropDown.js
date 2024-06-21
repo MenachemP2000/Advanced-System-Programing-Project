@@ -1,10 +1,10 @@
-import React, { useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './DropDown.css';
 
-const DropDown = ({ isOpen, topBarHeight, toggleTheme, isSignedIn, toggleSignendIn, setIsOpen }) => {
+const DropDown = ({ isOpen, topBarHeight, toggleTheme, isSignedIn, toggleSignendIn, setIsOpen,dropdownRef }) => {
   const navigate = useNavigate();
-  const dropdownRef = useRef(null);
+
 
   const dropDownStyle = {
     bottom: topBarHeight + 'px',
@@ -13,29 +13,15 @@ const DropDown = ({ isOpen, topBarHeight, toggleTheme, isSignedIn, toggleSignend
   const handleLogOut = () => {
     toggleSignendIn(false);
     navigate('/');
+    setIsOpen(false);
   };
 
-  const handleClickOutside = (event) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-      setIsOpen(false);
-    }
-  };
 
   const handleProfileClick = (username) => {
     navigate(`/user/${username}`);
+    setIsOpen(false);
   };
 
-  useEffect(() => {
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    } else {
-      document.removeEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isOpen]);
 
   return (
     <div ref={dropdownRef} className={`DropDown ${isOpen ? 'open' : ''}`} style={dropDownStyle}>

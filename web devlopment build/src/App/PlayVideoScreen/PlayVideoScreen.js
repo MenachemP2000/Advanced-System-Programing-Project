@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './PlayVideoScreen.css';
 import RelatedVideos from './RelatedVideos/RelatedVideos';
@@ -34,10 +34,48 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
     }
   }, [video]);
 
+  const partialUpdateVideo = useCallback(async (updatedVideo) => {
+    try {
+      const originalVideo = await getVideoWithoutChangingState(updatedVideo._id);
+      if (!originalVideo) {
+        throw new Error('Video not found in the local state');
+      }
+      // Prepare an object to store updated fields
+      const updatedFields = Object.keys(updatedVideo).reduce((fields, key) => {
+        if (updatedVideo[key] !== originalVideo[key]) {
+          fields[key] = updatedVideo[key];
+        }
+        return fields;
+      }, {});
+      updatedFields._id = originalVideo._id;
+
+      // Update the video with the updated fields
+      const updatedVideoFromServer = await sendUpdateRequest(updatedFields, 'PATCH');
+      setVideo(updatedVideoFromServer);
+    } catch (error) {
+      console.error('Error updating video:', error);
+    }
+  }, []);
+
   useEffect(() => {
     window.scrollTo(0, 0);
+    const addVideoView = async (videoId) => {
+      try {
+        const videoToUpdate = await getVideoWithoutChangingState(videoId);
+        if (!videoToUpdate) {
+          throw new Error('Video not found');
+        }
+        const updatedVideo = {
+          _id: id,
+          views: videoToUpdate.views + 1
+        };
+        await partialUpdateVideo(updatedVideo);
+      } catch (error) {
+        console.error('Error viewing video:', error);
+      }
+    };
     addVideoView(id);
-  }, [id]);
+  }, [id, partialUpdateVideo]);
 
 
   useEffect(() => {
@@ -47,7 +85,7 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
     else {
       setLiked(false)
     }
-  }, [video, video.usersLikes]);
+  }, [video, video.usersLikes, isSignedIn]);
 
 
   const getVideo = async (videoId) => {
@@ -67,6 +105,7 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
       console.error('Error fetching video:', error);
     }
   };
+
   const getVideoWithoutChangingState = async (videoId) => {
     try {
       const response = await fetch(`${config.apiBaseUrl}/api/videos/${videoId}`, {
@@ -84,6 +123,7 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
       console.error('Error fetching video:', error);
     }
   };
+
   const getAuthorByUserName = async (username) => {
     try {
       const response = await fetch(`${config.apiBaseUrl}/api/users/username/${username}`, {
@@ -101,6 +141,7 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
       console.error('Error fetching user:', error);
     }
   };
+  /* 
   const addVideo = async (newVideo) => {
     try {
       const response = await fetch(`${config.apiBaseUrl}/api/videos`, {
@@ -124,30 +165,9 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
     } catch (error) {
       console.error('Error updating video:', error);
     }
-  };
-  
-  const partialUpdateVideo = async (updatedVideo) => {
-    try {
-      const originalVideo = await getVideoWithoutChangingState(updatedVideo._id);
-      if (!originalVideo) {
-        throw new Error('Video not found in the local state');
-      }
-      // Prepare an object to store updated fields
-      const updatedFields = Object.keys(updatedVideo).reduce((fields, key) => {
-        if (updatedVideo[key] !== originalVideo[key]) {
-          fields[key] = updatedVideo[key];
-        }
-        return fields;
-      }, {});
-      updatedFields._id = originalVideo._id;
+  }; */
 
-      // Update the video with the updated fields
-      const updatedVideoFromServer = await sendUpdateRequest(updatedFields, 'PATCH');
-      setVideo(updatedVideoFromServer);
-    } catch (error) {
-      console.error('Error updating video:', error);
-    }
-  };
+
   const sendUpdateRequest = async (updatedVideo, method) => {
     const url = `${config.apiBaseUrl}/api/videos/${updatedVideo._id}`;
     let bodyData = {};
@@ -200,21 +220,6 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
       }
     } catch (error) {
       console.error('Error deleting video:', error);
-    }
-  };
-  const addVideoView = async (videoId) => {
-    try {
-      const videoToUpdate = await getVideoWithoutChangingState(videoId);
-      if (!videoToUpdate) {
-        throw new Error('Video not found');
-      }
-      const updatedVideo = {
-        _id: id,
-        views: videoToUpdate.views + 1
-      };
-      await partialUpdateVideo(updatedVideo);
-    } catch (error) {
-      console.error('Error viewing video:', error);
     }
   };
 
@@ -324,7 +329,7 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
     navigate(`/user/${username}`);
   };
 
-  const handleKeyUp  = async (e) => {
+  const handleKeyUp = async (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       await handleSaveClick(e);
     }
@@ -351,7 +356,7 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
 
             <div className="videoProfile">
               <div className='clickable' onClick={() => handleProfileClick(author.username)} id="profilepicandname">
-                <img className='profilePic' src={author.image} height="50px" width="50px" ></img>
+                <img className='profilePic' alt={author.username} src={author.image} height="50px" width="50px" ></img>
                 <div id="profilename">
                   {author.username}
                 </div>
@@ -411,7 +416,7 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
 
             <div className="videoProfile">
               <div id="profilepicandname">
-                <img className='profilePic' src={author.image} height="50px" width="50px" ></img>
+                <img className='profilePic' alt={author.username} src={author.image} height="50px" width="50px" ></img>
                 <div id="profilename">
                   {author.username}
                 </div>
@@ -434,7 +439,7 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
 
         <Description views={video.views} description={video.description} username={video.username} isSignedIn={isSignedIn} onSave={handleSaveDescription} />
         <div className="sidebarSmall">
-          <RelatedVideos id={id} itsBig={false}  />
+          <RelatedVideos id={id} itsBig={false} />
         </div>
         <Comments
           videoId={video._id}

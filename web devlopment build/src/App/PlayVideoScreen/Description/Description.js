@@ -95,7 +95,7 @@ const Description = ({ description, onSave, isSignedIn, username, views }) => {
               {isExpanded ? "Show less" : "...more"}
             </button>
           )}
-          {(username == isSignedIn.username) && (
+          {(username === isSignedIn.username) && (
             <div className="button-container">
               <button
                 className="btn"

@@ -30,6 +30,18 @@
 
 }
 
+
+li.hidden-flex-item{
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0px;
+  flex: 1 1 0;
+  min-width: 280px;
+
+  flex: 1 1 calc(25% - 20px);
+  visibility: hidden;
+}
+
 .video-info h3 {
   margin: 0;
   font-size: 15px;

@@ -1,7 +1,6 @@
 // Comment.js
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
 import Reply from './Reply'; // Import Reply component
 import './Comment.css';
 import config from '../../config';
@@ -31,55 +30,6 @@ const Comment = ({
   const [currentCommentRepliesLength, setCurrentCommentRepliesLength] = useState(0);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (isEditing && editTextareaRef.current) {
-      editTextareaRef.current.style.height = 'auto';
-      editTextareaRef.current.style.height = editTextareaRef.current.scrollHeight + 'px';
-    }
-  }, [isEditing, editContent]);
-
-  useEffect(() => {
-    const fetchComment = async () => {
-      await getComment();
-    };
-    fetchComment();
-    getAuthorByUserName(comment.user);
-  }, [comment]);
-
-  useEffect(() => {
-    if (thisComment) {
-      setUsersLikedComment(thisComment.usersLikes);
-      setTotaluserLikes(usersLikedComment.length || 0);
-      setCurrentCommentReplies(thisComment.replies);
-      setCurrentCommentRepliesLength(currentCommentReplies.length || 0);
-      if (usersLikedComment && usersLikedComment.length > 0 && usersLikedComment.find(user => user === isSignedIn.username)) {
-        setUserLikedComment(true);
-      } else {
-        setUserLikedComment(false);
-      }
-    }
-  }, [cid, thisComment]);
-
-  useEffect(() => {
-    setUsersLikedComment(thisComment.usersLikes);
-    setTotaluserLikes(usersLikedComment.length);
-  }, [thisComment, usersLikedComment]);
-
-  useEffect(() => {
-    setCurrentCommentReplies(thisComment.replies);
-  }, [thisComment]);
-
-  useEffect(() => {
-    setCurrentCommentRepliesLength(currentCommentReplies.length);
-  }, [currentCommentReplies]);
-
-  useEffect(() => {
-    if (usersLikedComment && usersLikedComment.length > 0 && usersLikedComment.find(user => user === isSignedIn.username)) {
-      setUserLikedComment(true);
-    } else {
-      setUserLikedComment(false);
-    }
-  }, [isSignedIn, thisComment, usersLikedComment]);
   const getAuthorByUserName = async (username) => {
     try {
       const response = await fetch(`${config.apiBaseUrl}/api/users/username/${username}`, {
@@ -95,23 +45,6 @@ const Comment = ({
       setAuthor(userFromServer);
     } catch (error) {
       console.error('Error fetching user:', error);
-    }
-  };
-  const getComment = async () => {
-    try {
-      const response = await fetch(`${config.apiBaseUrl}/api/videos/${videoId}/comments/${comment._id}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      if (!response.ok) {
-        throw new Error('Failed to fetch comment');
-      }
-      const commentFromServer = await response.json();
-      setThisComment(commentFromServer);
-    } catch (error) {
-      console.error('Error fetching comment:', error);
     }
   };
 
@@ -134,6 +67,8 @@ const Comment = ({
     }
   };
 
+  /*
+
   const updateComment = async (updatedComment) => {
     try {
       const updatedCommentFromServer = await sendUpdateRequest(updatedComment, 'PATCH');
@@ -143,6 +78,8 @@ const Comment = ({
       console.error('Error updating comment:', error);
     }
   };
+
+  */
 
   const partialUpdateComment = async (updatedComment) => {
     const originalComment = await getCommentWithoutChangingState(updatedComment._id);
@@ -221,6 +158,72 @@ const Comment = ({
       console.error('Error deleting comment:', error);
     }
   };
+
+  useEffect(() => {
+    if (isEditing && editTextareaRef.current) {
+      editTextareaRef.current.style.height = 'auto';
+      editTextareaRef.current.style.height = editTextareaRef.current.scrollHeight + 'px';
+    }
+  }, [isEditing, editContent]);
+
+  useEffect(() => {
+
+    const getComment = async () => {
+      try {
+        const response = await fetch(`${config.apiBaseUrl}/api/videos/${videoId}/comments/${comment._id}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        if (!response.ok) {
+          throw new Error('Failed to fetch comment');
+        }
+        const commentFromServer = await response.json();
+        setThisComment(commentFromServer);
+      } catch (error) {
+        console.error('Error fetching comment:', error);
+      }
+    };
+    getComment();
+    getAuthorByUserName(comment.user);
+  }, [comment, videoId]);
+
+  useEffect(() => {
+    if (thisComment) {
+      setUsersLikedComment(thisComment.usersLikes);
+      setTotaluserLikes(usersLikedComment.length || 0);
+      setCurrentCommentReplies(thisComment.replies);
+      setCurrentCommentRepliesLength(currentCommentReplies.length || 0);
+      if (usersLikedComment && usersLikedComment.length > 0 && usersLikedComment.find(user => user === isSignedIn.username)) {
+        setUserLikedComment(true);
+      } else {
+        setUserLikedComment(false);
+      }
+    }
+  }, [cid, thisComment, currentCommentReplies.length, isSignedIn.username, usersLikedComment]);
+
+  useEffect(() => {
+    setUsersLikedComment(thisComment.usersLikes);
+    setTotaluserLikes(usersLikedComment.length);
+  }, [thisComment, usersLikedComment]);
+
+  useEffect(() => {
+    setCurrentCommentReplies(thisComment.replies);
+  }, [thisComment]);
+
+  useEffect(() => {
+    setCurrentCommentRepliesLength(currentCommentReplies.length);
+  }, [currentCommentReplies]);
+
+  useEffect(() => {
+    if (usersLikedComment && usersLikedComment.length > 0 && usersLikedComment.find(user => user === isSignedIn.username)) {
+      setUserLikedComment(true);
+    } else {
+      setUserLikedComment(false);
+    }
+  }, [isSignedIn, thisComment, usersLikedComment]);
+
   const handleEditComment = async (editContent) => {
     try {
       const updatedComment = {
@@ -290,13 +293,17 @@ const Comment = ({
   };
 
   const handleSaveEdit = async () => {
-    await handleEditComment(editContent);
+    if (editContent.trim() !== '') {
+      await handleEditComment(editContent);
+    }
+    else{
+      setEditContent(thisComment.content);
+    }
     setIsEditing(false);
   };
-
   const handleCancelEdit = () => {
     setIsEditing(false);
-    setEditContent(comment.content);
+    setEditContent(thisComment.content);
   };
 
   const handleEditContentChange = (e) => {
@@ -383,15 +390,15 @@ const Comment = ({
   const handleSendDeleteReply = (replyId) => {
     handleDeleteReply(replyId);
   };
-  
+
   const handleReplyKeyUp = async (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       await handleReply(e);
     }
   };
-  
+
   const handleEditKeyUp = async (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey && editContent.trim() !== '') {
       await handleSaveEdit(e);
     }
   }
@@ -407,7 +414,7 @@ const Comment = ({
     <div id="outercomment">
       {author && (
         <div className='clickable' onClick={() => handleProfileClick(comment.user)} >
-          <img className='profilePic' src={author.image} height="50px" width="50px" ></img></div>
+          <img className='profilePic' alt={author.username} src={author.image} height="50px" width="50px" ></img></div>
       )
       }
 
@@ -450,7 +457,7 @@ const Comment = ({
           </button>
         )}
         <div className="button-container">
-          {(!isEditing && (comment.user == isSignedIn.username)) && (
+          {(!isEditing && (comment.user === isSignedIn.username)) && (
             <>
               <button
                 type="button"
@@ -498,7 +505,7 @@ const Comment = ({
         {isReplyFormVisible && (
           <>
             <div className='newReply'>
-              <div><img className='profilePic' src={isSignedIn.image} height="50px" width="50px" ></img></div>
+              <div><img className='profilePic' alt={author.username} src={isSignedIn.image} height="50px" width="50px" ></img></div>
               <form onSubmit={handleReply}>
                 <textarea
                   value={newReply[comment._id] || ''}
@@ -532,9 +539,9 @@ const Comment = ({
           )}
         </div>
         <div className={`replies ${isShowingReplies ? 'show' : 'hide'}`}>
-          {currentCommentReplies.map((reply,index) => (
+          {currentCommentReplies.map((reply, index) => (
             <Reply
-              key={index} 
+              key={index}
               reply={reply}
               rid={reply._id}
               handleDeleteReply={handleSendDeleteReply}

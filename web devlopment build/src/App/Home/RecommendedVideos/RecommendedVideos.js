@@ -8,6 +8,7 @@ const RecommendedVideos = ({ videos, menuOpen}) => {
   useEffect(() => {
     setRelatedVideos(shuffleArray(videos));
   }, [videos]);
+  const items = Array.from({ length: 10 });
 
   const shuffleArray = (array) => {
     const shuffledArray = [...array];
@@ -26,6 +27,9 @@ const RecommendedVideos = ({ videos, menuOpen}) => {
             key={index}
             video={video}
           />
+        ))}
+        {items.map((_, index) => (
+          <li key={index} className='hidden-flex-item' ></li>
         ))}
       </ul>
     </div>

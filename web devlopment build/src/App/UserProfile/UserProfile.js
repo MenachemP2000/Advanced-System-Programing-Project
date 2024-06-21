@@ -1,39 +1,60 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import './UserProfile.css';
 import UserBox from './UserBox/UserBox'
 import config from '../config';
 
 
 
+
 const UserProfile = ({ toggleScreen }) => {
-  const [searchVideos, setSearchVideos] = useState([]);
-  const navigate = useNavigate();
+  const [userVideos, setUserVideos] = useState([]);
+  const [author, setAuthor] = useState(null);
   const { key } = useParams();
+  const items = Array.from({ length: 10 });
+
+
 
   useEffect(() => {
     toggleScreen("UserProfile");
+    window.scrollTo(0, 0);
+  },);
+
+
+  useEffect(() => {
+    const getAuthorByUserName = async (key) => {
+      try {
+        const response = await fetch(`${config.apiBaseUrl}/api/users/username/${key}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        if (!response.ok) {
+          throw new Error('Failed to fetch user');
+        }
+        const userFromServer = await response.json();
+        setAuthor(userFromServer);
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      }
+    };
+    const getVideosByKeyAndFilter = async (filter1, key) => {
+      try {
+        // Fetch videos data
+        const videosResponse = await fetch(`${config.apiBaseUrl}/api/videos?${filter1}=${key}`);
+        const videosData = await videosResponse.json();
+        setUserVideos(shuffleArray([...videosData]));
+      } catch (error) {
+        console.error('Error fetching videos:', error);
+      }
+    };
+    const fetchVideos = async () => {
+      await getVideosByKeyAndFilter("username", key);
+    };
+    getAuthorByUserName(key);
     fetchVideos();
   }, [key]);
-
-  const fetchVideos = async () => {
-    await getVideosByKeyAndFilter("title", "username", key);
-  };
-
-  const getVideosByKeyAndFilter = async (filter1, filter2, key) => {
-    try {
-      // Fetch videos data
-      const videosResponse = await fetch(`${config.apiBaseUrl}/api/videos?${filter1}=${key}&${filter2}=${key}`);
-      const videosData = await videosResponse.json();
-      setSearchVideos(shuffleArray([...videosData]));
-    } catch (error) {
-      console.error('Error fetching videos:', error);
-    }
-  };
-
-  const handleVideoClick = (id) => {
-    navigate(`/video/${id}`);
-  };
 
   const shuffleArray = (array) => {
     const shuffledArray = [...array];
@@ -44,25 +65,44 @@ const UserProfile = ({ toggleScreen }) => {
     return shuffledArray;
   };
 
-  while (!(searchVideos)) {
-    fetchVideos();
-    return <div>Loading...</div>;
-  }
-
   return (
     <div className="userVideos">
-      <ul>
-        {searchVideos.length == 0 && (
-          <div>
-            <p></p>
-            <h3>No Results Found</h3>
+      <div className="userProfile">
+
+        {!(author === null) && (
+          <div className="userProfile">
+            <img alt={author.username} src={author.image} className='userProfileImage' ></img>
+            <div className='userDetails'>
+              <p className='userName' id="displayname">{author.displayname}</p>
+              <p className='userName'>@{author.username} • {userVideos.length} videos</p>
+            </div>
           </div>
         )}
-        {searchVideos.map((video, index) => (
+
+      </div>
+
+
+      {author === null && (
+        <div>
+          <p></p>
+          <h1> No Such User</h1>
+        </div>
+      )}
+      {userVideos.length === 0 && !(author === null) && (
+        <div>
+          <p></p>
+          <h1> No Videos</h1>
+        </div>
+      )}
+      <ul>
+        {userVideos.map((video, index) => (
           <UserBox
             key={index}
             video={video}
           />
+        ))}
+        {items.map((_, index) => (
+          <li key={index} className='hidden-flex-item' ></li>
         ))}
       </ul>
     </div>

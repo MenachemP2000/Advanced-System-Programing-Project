@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState} from 'react';
 import './TopBar.css';
 import { useNavigate, Link } from 'react-router-dom';
 
-const TopBar = ({ toggleMenu, toggleDropDown, isSignedIn, theme }) => {
+const TopBar = ({ toggleMenu, toggleDropDown ,isSignedIn, theme,bigProfilePicRef,smallProfilePicRef  }) => {
 
   const [appTheme, setTheme] = useState(theme);
   const [searchInput, setSearchInput] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
+  
 
   const handleInputChange = (e) => {
     setSearchInput(e.target.value);
   };
-
 
 
   useEffect(() => {
@@ -26,7 +26,7 @@ const TopBar = ({ toggleMenu, toggleDropDown, isSignedIn, theme }) => {
   const handleSearch = () => {
     const query = searchInput;
     console.log('Search query:', query);
-    if (query != "") {
+    if (query !== "") {
       navigate(`/search/${query}`);
     }
   };
@@ -42,6 +42,11 @@ const TopBar = ({ toggleMenu, toggleDropDown, isSignedIn, theme }) => {
   const handleCollapseSearch = () => {
     setSearchOpen(false);
   };
+
+  const handleDropDown = () => {
+    toggleDropDown();
+  };
+  
 
   return (
     <>
@@ -72,10 +77,10 @@ const TopBar = ({ toggleMenu, toggleDropDown, isSignedIn, theme }) => {
                 <div className={`bar ${appTheme}`}></div>
                 <div className={`bar ${appTheme}`}></div>
               </div>
-              <h1 className="app-title clickable" onClick={handleClick}> 
-              <img  className="icon" src="/favicon.ico" width="30px" highet="30px"></img>
-                  FooTube&trade;
-                  </h1>
+              <h1 className="app-title clickable" onClick={handleClick}>
+                <img alt="icon" className="icon" src="/favicon.ico" width="30px" highet="30px"></img>
+                FooTube<span id="country-code">IL</span>
+              </h1>
             </div>
 
             {isSignedIn && (
@@ -86,7 +91,7 @@ const TopBar = ({ toggleMenu, toggleDropDown, isSignedIn, theme }) => {
                   </button>
                 </div>
                 <div className="drop-down">
-                  <img  className="clickable profilePic" src={isSignedIn.image} onClick={toggleDropDown} height="40px" width="40px" ></img>
+                  <img className="clickable profilePic"  ref={smallProfilePicRef}alt={isSignedIn.username} src={isSignedIn.image} onClick={handleDropDown} height="40px" width="40px" ></img>
                 </div>
               </div>
             )}
@@ -116,10 +121,11 @@ const TopBar = ({ toggleMenu, toggleDropDown, isSignedIn, theme }) => {
               <div className={`bar ${appTheme}`}></div>
               <div className={`bar ${appTheme}`}></div>
             </div>
-              <h1 className="app-title clickable" onClick={handleClick}> 
-              <img className='icon' src="/favicon.ico" width="30px" highet="30px"></img>
-                  FooTube&trade;
-                  </h1>
+            <h1 className="app-title clickable" onClick={handleClick}>
+              <img alt="icon" className='icon' src="/favicon.ico" width="30px" highet="30px"></img>
+              FooTube<span id="country-code">IL</span>
+
+            </h1>
           </div>
           <div className="search">
             <input
@@ -138,8 +144,8 @@ const TopBar = ({ toggleMenu, toggleDropDown, isSignedIn, theme }) => {
 
           {isSignedIn && (
             <div className="RightTop">
-              <div className="drop-down">
-                <img className="clickable profilePic" src={isSignedIn.image} onClick={toggleDropDown} height="40px" width="40px" ></img>
+              <div className="drop-down" >
+                <img className="clickable profilePic" alt={isSignedIn.username} src={isSignedIn.image}  ref={bigProfilePicRef} onClick={handleDropDown} height="40px" width="40px" ></img>
               </div>
             </div>
           )}

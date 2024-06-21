@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import './Search.css';
 import VideoBox from './VideoBox/VideoBox';
 import config from '../config';
@@ -7,33 +7,31 @@ import config from '../config';
 
 const Search = ({ toggleScreen }) => {
   const [searchVideos, setSearchVideos] = useState([]);
-  const navigate = useNavigate();
   const { key } = useParams();
 
   useEffect(() => {
     toggleScreen("Search");
-    fetchVideos();
     window.scrollTo(0, 0);
+  },);
+
+  useEffect(() => {
+    const getVideosByKeyAndFilter = async (filter1, filter2, key) => {
+      try {
+        // Fetch videos data
+        const videosResponse = await fetch(`${config.apiBaseUrl}/api/videos?${filter1}=${key}&${filter2}=${key}`);
+        const videosData = await videosResponse.json();
+        setSearchVideos(shuffleArray([...videosData]));
+      } catch (error) {
+        console.error('Error fetching videos:', error);
+      }
+    };
+    const fetchVideos = async () => {
+      await getVideosByKeyAndFilter("title", "username", key);
+    };
+    fetchVideos();
   }, [key]);
 
-  const fetchVideos = async () => {
-    await getVideosByKeyAndFilter("title", "username", key);
-  };
 
-  const getVideosByKeyAndFilter = async (filter1, filter2, key) => {
-    try {
-      // Fetch videos data
-      const videosResponse = await fetch(`${config.apiBaseUrl}/api/videos?${filter1}=${key}&${filter2}=${key}`);
-      const videosData = await videosResponse.json();
-      setSearchVideos(shuffleArray([...videosData]));
-    } catch (error) {
-      console.error('Error fetching videos:', error);
-    }
-  };
-
-  const handleVideoClick = (id) => {
-    navigate(`/video/${id}`);
-  };
 
   const shuffleArray = (array) => {
     const shuffledArray = [...array];
@@ -44,18 +42,13 @@ const Search = ({ toggleScreen }) => {
     return shuffledArray;
   };
 
-  while (!(searchVideos)) {
-    fetchVideos();
-    return <div>Loading...</div>;
-  }
-
   return (
     <div className="searchVideos">
       <ul>
-        {searchVideos.length == 0 && (
+        {searchVideos.length === 0 && (
           <div>
             <p></p>
-            <h3>No Results Found</h3>
+            <h3 className='noResults'>No Results Found</h3>
           </div>
         )}
         {searchVideos.map((video, index) => (

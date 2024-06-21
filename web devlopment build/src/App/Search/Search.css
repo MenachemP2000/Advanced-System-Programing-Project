@@ -6,7 +6,10 @@
   margin-right: 10px;
   aspect-ratio: 16 / 9;
 }
-
+.noResults{
+  display: flex;
+  justify-content: center;
+}
 .searchVideos ul {
   width: 90%;
   display: flex;
@@ -41,6 +44,13 @@
 
 }
 
+
+.searchVideos .video-info {
+  padding-top: 20px;
+  overflow: hidden;
+
+}
+
 .searchVideos .video-info p {
   width: inherit;
   margin: 0;
@@ -50,12 +60,6 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-
-}
-
-.searchVideos .video-info {
-  padding-top: 20px;
-  overflow: hidden;
 
 }
 

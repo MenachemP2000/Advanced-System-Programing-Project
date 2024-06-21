@@ -1,4 +1,8 @@
-/* topbar.css */
+#country-code {
+  margin: 1px 0px 20px 0px;
+  font-size: 8px;
+  color: rgb(128, 128, 128);
+}
 
 .TopBar {
   position: fixed;
@@ -16,7 +20,6 @@
 }
 .leftTop{
   align-items: center;
-  min-width: 210px;
 }
 .icon{
   border-radius: 10px;
@@ -30,7 +33,6 @@
   flex-direction: row;
   display: flex;
   align-items: center;
-  min-width: 170px;
 }
 
 .hamburger-menu {

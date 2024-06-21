@@ -33,7 +33,7 @@ const Reply = ({
       editTextareaRef.current.style.height = editTextareaRef.current.scrollHeight + 'px';
     }
     getAuthorByUserName(reply.user);
-  }, [isEditing, editedContent]);
+  }, [isEditing, editedContent, reply.user]);
 
 
   useEffect(() => {
@@ -52,7 +52,7 @@ const Reply = ({
       }
     };
     fetchReply();
-  }, [rid]);
+  }, [rid, comment.replies, isSignedIn.username, usersLikedReply]);
 
   useEffect(() => {
     setUsersLikedReply(thisReply.usersLikes);
@@ -63,7 +63,7 @@ const Reply = ({
     if (usersLikedReply) {
       setTotaluserLikes(usersLikedReply.length);
     }
-  }, [usersLikedReply]);
+  }, [usersLikedReply, thisReply.usersLikes]);
 
   useEffect(() => {
     if (usersLikedReply && usersLikedReply.length > 0 && usersLikedReply.find(user => user === isSignedIn.username)) {
@@ -129,7 +129,7 @@ const Reply = ({
       try {
         const newReplyObject = {
           user: isSignedIn.username,
-          content: replyContent,
+          content: "@" + reply.user + " " + replyContent,
           date: Date.now(),
           usersLikes: [],
 
@@ -181,12 +181,15 @@ const Reply = ({
   };
 
   const handleSaveEdit = async () => {
-    await handleEditReply(editedContent);
+    if (editedContent.trim() !== '') {
+      await handleEditReply(editedContent);
+    }
+    else setEditedContent(thisReply.content);
     setIsEditing(false);
   };
 
   const handleCancelEdit = () => {
-    setEditedContent(reply.content);
+    setEditedContent(thisReply.content);
     setIsEditing(false);
   };
   const showReplyForm = () => {
@@ -211,8 +214,8 @@ const Reply = ({
     navigate(`/user/${username}`);
   };
 
-  
-  
+
+
   const handleReplyEditKeyUp = async (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       await handleSaveEdit(e);
@@ -229,7 +232,7 @@ const Reply = ({
   return (
     <div id="outerreply">
       {author && (
-        <div className='clickable' onClick={() => handleProfileClick(reply.user)}><img className='profilePic' src={author.image} height="50px" width="50px" ></img></div>
+        <div className='clickable' onClick={() => handleProfileClick(reply.user)}><img className='profilePic' alt={author.username} src={author.image} height="50px" width="50px" ></img></div>
       )}
       <div className="reply" id="innerreply" key={reply._id}>
         {!isEditing && (<>
@@ -244,7 +247,7 @@ const Reply = ({
           </div>
         </>)
         }
-        {!isEditing && (isSignedIn.username == reply.user) && (
+        {!isEditing && (isSignedIn.username === reply.user) && (
           <div className="button-container">
 
             <button className="btn   " onClick={toggleEdit}>
@@ -293,10 +296,11 @@ const Reply = ({
               {isReplyFormVisible && (
                 <>
                   <div className='newReply'>
-                    <div><img className='profilePic' src={isSignedIn.image} height="50px" width="50px" ></img></div>
+                    <div><img className='profilePic' alt={isSignedIn.username} src={isSignedIn.image} height="50px" width="50px" ></img></div>
                     <form onSubmit={handleReply}>
                       <textarea
-                        value={newReply[comment._id] || "@" + reply.user + " "}
+                        placeholder={`@${reply.user} `}
+                        value={newReply[comment._id] || ''}
                         onChange={handleReplyContentChange}
                         onKeyUp={handleReplyKeyUp}
                         className="reply-textarea"

@@ -73,10 +73,10 @@ const SignIn = ({ toggleScreen, isSignedIn, toggleSignendIn }) => {
 
     useEffect(() => {
         toggleScreen("SignIn");
-    }, []);
+    });
 
     return (
-        <div>
+        <div className='container'>
             <div className="signin-box">
                 <h2>Sign In</h2>
                 {!userNameGood && (

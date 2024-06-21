@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import {useNavigate } from 'react-router-dom';
 import './VideoBox.css';
 import config from '../../config';
 
@@ -52,7 +52,7 @@ const VideoBox = ({ video }) => {
                     event.stopPropagation();
                     handleProfileClick(video.username);
                 }}>
-                    <img className='profliePic' src={author.image} height="24px" width="24px" ></img>
+                    <img  className='profliePic' alt={author.usernameser} src={author.image} height="24px" width="24px" ></img>
                     <p>{video.username}</p>
                 </div>
                 <p >{video.description}</p>
