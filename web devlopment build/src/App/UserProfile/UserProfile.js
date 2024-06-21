@@ -73,7 +73,7 @@ const UserProfile = ({ toggleScreen }) => {
           <div className="userProfile">
             <img alt={author.username} src={author.image} className='userProfileImage' ></img>
             <div className='userDetails'>
-              <p className='userName' id="displayname">{author.displayname}</p>
+              <p className='userName' id="displayNameUserProfile">{author.displayname}</p>
               <p className='userName'>@{author.username} • {userVideos.length} videos</p>
             </div>
           </div>
