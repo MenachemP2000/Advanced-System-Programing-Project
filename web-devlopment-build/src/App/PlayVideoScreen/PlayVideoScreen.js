@@ -319,8 +319,7 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
         });
         console.log('Successfully shared.');
       } else {
-        console.log('Web Share API not supported.');
-      }
+        console.error('Web Share API is not supported in your browser.');}
     } catch (error) {
       console.error('Error sharing:', error);
     }

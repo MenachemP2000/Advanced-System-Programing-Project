@@ -128,7 +128,6 @@ exports.getRelatedVideos = async (req, res) => {
 
   } catch (error) {
     res.status(500).send(error);
-    console.log(error);
   }
 };
 // Get a specific video by ID

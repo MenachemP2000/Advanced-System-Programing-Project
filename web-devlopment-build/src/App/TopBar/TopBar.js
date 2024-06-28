@@ -25,7 +25,6 @@ const TopBar = ({ toggleMenu, toggleDropDown ,isSignedIn, theme,bigProfilePicRef
   };
   const handleSearch = () => {
     const query = searchInput;
-    console.log('Search query:', query);
     if (query !== "") {
       navigate(`/search/${query}`);
     }

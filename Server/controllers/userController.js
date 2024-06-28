@@ -213,14 +213,12 @@ exports.partialUpdateUser = async (req, res) => {
             fs.writeFileSync(imagePath, imageBuffer);
 
             req.body.image = `/pictures/users/${imageName}`;
-            console.log("Image 3");
 
         }
 
         const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
         res.send(user);
     } catch (error) {
-        console.log(error);
         res.status(400).send(error);
     }
 };
@@ -266,7 +264,6 @@ exports.deleteUser = async (req, res) => {
         res.status(204).send("User deleted");
 
     } catch (error) {
-        console.log(error);
         res.status(500).send(error);
     }
 };

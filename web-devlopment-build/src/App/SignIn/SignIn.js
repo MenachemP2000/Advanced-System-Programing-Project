@@ -24,7 +24,6 @@ const SignIn = ({ toggleScreen, isSignedIn, toggleSignendIn }) => {
                 throw new Error('Failed to fetch token');
             }
             const { token } = await response.json();
-            console.log('Received token:', token);
             localStorage.setItem('token', token);
             return true
         } catch (error) {

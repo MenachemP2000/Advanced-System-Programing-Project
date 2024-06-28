@@ -49,7 +49,6 @@ const Comment = ({
   };
 
   const getCommentWithoutChangingState = async (cid) => {
-    console.log(cid);
     try {
       const response = await fetch(`${config.apiBaseUrl}/api/videos/${videoId}/comments/${cid}`, {
         method: 'GET',

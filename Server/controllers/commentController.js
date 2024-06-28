@@ -23,11 +23,7 @@ exports.createComment = async (req, res) => {
     };
     
 
-    video.comments.push(newComment);
-    
-    
-    console.log(video.comments[0].replies)
-    
+    video.comments.push(newComment);    
     await video.save();
 
     res.status(201).send(video.comments[video.comments.length - 1]);
@@ -102,7 +98,7 @@ exports.updateComment = async (req, res) => {
     
     const token = req.headers.authorization.split(" ")[1];
     const data = jwt.verify(token, key);
-    if (data.username !== comment.username) {
+    if (data.username !== comment.user) {
       return res.status(403).send('Forbidden');
     }
 
@@ -139,7 +135,7 @@ exports.partialUpdateComment = async (req, res) => {
     
     const token = req.headers.authorization.split(" ")[1];
     const data = jwt.verify(token, key);
-    if (data.username !== comment.username) {
+    if (data.username !== comment.user) {
       if ('user' in updatedFields || 'content' in updatedFields || 'date' in updatedFields ) {
         return res.status(403).send('Forbidden');
       }
@@ -187,8 +183,9 @@ exports.deleteComment = async (req, res) => {
     }
     
     const token = req.headers.authorization.split(" ")[1];
+
     const data = jwt.verify(token, key);
-    if (data.username !== comment.username) {
+    if (data.username !== comment.user) {
       return res.status(403).send('Forbidden');
     }
 
