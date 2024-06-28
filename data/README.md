@@ -1,4 +1,4 @@
-# Prerequisites to run the script:
+Prerequisites to run the script:
 
 1. Ensure that MongoDB is installed and running on your localhost. You can start MongoDB by executing the following command in a terminal or command prompt:
 

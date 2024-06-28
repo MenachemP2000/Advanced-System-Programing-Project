@@ -3,7 +3,7 @@ import './EditAccount.css';
 import { useNavigate } from 'react-router-dom';
 import config from '../config';
 
-const EditAccount = ({ toggleScreen, isSignedIn,toggleSignendIn }) => {
+const EditAccount = ({ toggleScreen, isSignedIn, toggleSignendIn }) => {
     const [displayname, setDisplayname] = useState('');
     const [password, setPassword] = useState('');
     const [passwordAgain, setPasswordAgain] = useState('');
@@ -17,7 +17,7 @@ const EditAccount = ({ toggleScreen, isSignedIn,toggleSignendIn }) => {
             navigate("/");
         }
     });
-    
+
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -35,7 +35,7 @@ const EditAccount = ({ toggleScreen, isSignedIn,toggleSignendIn }) => {
         e.preventDefault();
         // Construct the payload
 
-        const payload = {_id : isSignedIn._id, username: isSignedIn.username } ;
+        const payload = { _id: isSignedIn._id, username: isSignedIn.username };
         if (displayname !== '') {
             payload.displayname = displayname;
         }
@@ -57,7 +57,7 @@ const EditAccount = ({ toggleScreen, isSignedIn,toggleSignendIn }) => {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + `${localStorage.getItem('token')}`,
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
                 },
                 body: JSON.stringify(payload)
             });

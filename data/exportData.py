@@ -1,6 +1,6 @@
 import json
 from pymongo import MongoClient
-from bson import json_util
+from bson import ObjectId
 
 def connect_to_mongodb(uri):
     client = MongoClient(uri)
@@ -15,6 +15,12 @@ def read_json_file(file_path):
         data = json.load(file)
     return data
 
+def convert_oid(data):
+    if isinstance(data, list):
+        for item in data:
+            if '_id' in item and isinstance(item['_id'], dict) and '$oid' in item['_id']:
+                item['_id'] = ObjectId(item['_id']['$oid'])
+    return data
 
 def insert_data_to_mongodb(collection, data):
     collection.insert_many(data)
@@ -25,9 +31,9 @@ def export_json_to_mongodb(uri, db_name, collections_files):
     
     for collection_name, file_path in collections_files.items():
         data = read_json_file(file_path)
+        data = convert_oid(data)
         collection = db[collection_name]
-        data_processed = json_util.loads(json_util.dumps(data))
-        insert_data_to_mongodb(collection, data_processed)
+        insert_data_to_mongodb(collection, data)
         print(f"Data from {file_path} has been successfully exported to MongoDB collection '{collection_name}' in database '{db_name}'.")
 
 if __name__ == "__main__":
