@@ -232,11 +232,11 @@ const Reply = ({
   return (
     <div id="outerreply">
       {author && (
-        <div className='clickable' onClick={() => handleProfileClick(reply.user)}><img className='profilePic' alt={author.username} src={author.image} height="50px" width="50px" ></img></div>
+        <div ><img className='profilePic clickable' onClick={() => handleProfileClick(reply.user)} alt={author.username} src={author.image} height="50px" width="50px" ></img></div>
       )}
       <div className="reply" id="innerreply" key={reply._id}>
         {!isEditing && (<>
-          <div className='clickable' onClick={() => handleProfileClick(reply.user)}>@{reply.user}</div>
+          <div className='clickable' id="replyUsername" onClick={() => handleProfileClick(reply.user)}>@{reply.user}</div>
           <div>
             <p>{isExpanded ? reply.content : reply.content.substring(0, 100)}</p>
             {isLongReply && (

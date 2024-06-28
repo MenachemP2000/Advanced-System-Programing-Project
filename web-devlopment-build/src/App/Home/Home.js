@@ -7,6 +7,8 @@ import './Home.css';
 
 const Home = ({ toggleScreen, menuOpen }) => {
   const [recommendedVideos, setRecommendedVideos] = useState([]);
+  const [loading, setLoading] = useState(false);
+
 
   useEffect(() => {
     toggleScreen("Home");
@@ -16,14 +18,24 @@ const Home = ({ toggleScreen, menuOpen }) => {
 
   const getVideos = async () => {
     try {
+      setLoading(true);
       // Fetch videos data
       const videosResponse = await fetch(`${config.apiBaseUrl}/api/videos`);
       const videosData = await videosResponse.json();
       setRecommendedVideos(videosData);
     } catch (error) {
       console.error('Error fetching videos:', error);
+    } finally {
+      setLoading(false);
     }
   };
+  while (loading) {
+    return (
+      <div className="loading">
+        <h3>Loading...</h3>
+      </div>
+    );
+  }
 
   return (
     <div>

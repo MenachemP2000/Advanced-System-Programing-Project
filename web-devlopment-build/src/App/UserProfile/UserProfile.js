@@ -12,6 +12,7 @@ const UserProfile = ({ toggleScreen }) => {
   const [author, setAuthor] = useState(null);
   const { key } = useParams();
   const items = Array.from({ length: 10 });
+  const [loading, setLoading] = useState(false);
 
 
 
@@ -24,6 +25,7 @@ const UserProfile = ({ toggleScreen }) => {
   useEffect(() => {
     const getAuthorByUserName = async (key) => {
       try {
+        setLoading(true);
         const response = await fetch(`${config.apiBaseUrl}/api/users/username/${key}`, {
           method: 'GET',
           headers: {
@@ -37,16 +39,21 @@ const UserProfile = ({ toggleScreen }) => {
         setAuthor(userFromServer);
       } catch (error) {
         console.error('Error fetching user:', error);
+      } finally {
+        setLoading(false);
       }
     };
     const getVideosByKeyAndFilter = async (filter1, key) => {
       try {
+        setLoading(true);
         // Fetch videos data
-        const videosResponse = await fetch(`${config.apiBaseUrl}/api/videos?${filter1}=${key}`);
+        const videosResponse = await fetch(`${config.apiBaseUrl}/api/videos/all?${filter1}=${key}`);
         const videosData = await videosResponse.json();
         setUserVideos(shuffleArray([...videosData]));
       } catch (error) {
         console.error('Error fetching videos:', error);
+      } finally {
+        setLoading(false);
       }
     };
     const fetchVideos = async () => {
@@ -80,9 +87,10 @@ const UserProfile = ({ toggleScreen }) => {
         )}
 
       </div>
+      {loading && ( <div className="loading">Loading...</div>)}
 
 
-      {author === null && (
+      {(!loading && author === null) && (
         <div>
           <p></p>
           <h1> No Such User</h1>

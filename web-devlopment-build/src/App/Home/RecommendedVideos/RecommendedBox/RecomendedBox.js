@@ -51,7 +51,7 @@ const RecommendedBox = ({ video }) => {
                 }} src={author.image} height="35px" width="35px" ></img>
                 <div className="video-info">
                     <h3>{video.title}</h3>
-                    <p onClick={(event) => {
+                    <p  id ="recommendedUserName" onClick={(event) => {
                         event.stopPropagation();
                         handleProfileClick(video.username);
                     }}>{video.username}</p>

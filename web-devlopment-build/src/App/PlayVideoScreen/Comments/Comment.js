@@ -125,6 +125,7 @@ const Comment = ({
       method: method,
       headers: {
         'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
       },
       body: JSON.stringify(bodyData),
     };
@@ -147,6 +148,7 @@ const Comment = ({
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
       });
 
@@ -413,13 +415,13 @@ const Comment = ({
   return (
     <div id="outercomment">
       {author && (
-        <div className='clickable' onClick={() => handleProfileClick(comment.user)} >
-          <img className='profilePic' alt={author.username} src={author.image} height="50px" width="50px" ></img></div>
+        <div  >
+          <img onClick={() => handleProfileClick(comment.user)}  className='profilePic clickable' alt={author.username} src={author.image} height="50px" width="50px" ></img></div>
       )
       }
 
       <div className="comment" id="innercomment" key={comment._id}>
-        <div className='clickable' onClick={() => handleProfileClick(comment.user)} >@{comment.user}</div>
+        <div className='clickable' id="commentUsername" onClick={() => handleProfileClick(comment.user)} >@{comment.user}</div>
         {isEditing ? (
           <div>
             <textarea

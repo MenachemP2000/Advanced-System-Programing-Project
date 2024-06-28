@@ -21,6 +21,10 @@
     font-size: 14px;
     border: 0px;
   }
+  #commentUsername{
+    width: fit-content;
+
+  }
   img{
     margin: 10px;
     border-radius: 100%;

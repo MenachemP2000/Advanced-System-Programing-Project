@@ -5,6 +5,9 @@
   margin-right: 10px;
   aspect-ratio: 16 / 9;
 }
+#recommendedUserName{
+  width: fit-content;
+}
 
 #authorRecomended{
   flex-shrink:  0;

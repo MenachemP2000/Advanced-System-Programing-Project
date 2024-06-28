@@ -6,6 +6,8 @@ import Comments from './Comments/Comments';
 import Description from './Description/Description';
 import config from '../config';
 
+
+
 const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
   const { id } = useParams();
   const [video, setVideo] = useState(false);
@@ -148,6 +150,7 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + `${localStorage.getItem('token')}`,
         },
         body: JSON.stringify(newVideo),
       });
@@ -190,6 +193,7 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
       method: method,
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
       },
       body: JSON.stringify(bodyData),
     };
@@ -212,6 +216,7 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
       });
 
@@ -342,8 +347,13 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
     else if (!author) {
       getAuthorByUserName(video.username);
     }
+    return (
 
-    return <div>Loading...</div>;
+      <div className='loading'>
+          <h3>Loading...</h3>
+      </div>
+
+    );
   }
 
   return (
@@ -355,9 +365,9 @@ const PlayVideoScreen = ({ toggleScreen, isSignedIn }) => {
             <div className="videoTitle">{currentTitle}</div>
 
             <div className="videoProfile">
-              <div className='clickable' onClick={() => handleProfileClick(author.username)} id="profilepicandname">
-                <img className='profilePic' alt={author.username} src={author.image} height="50px" width="50px" ></img>
-                <div id="profilename">
+              <div id="profilepicandname">
+                <img className='profilePic clickable' onClick={() => handleProfileClick(author.username)} alt={author.username} src={author.image} height="50px" width="50px" ></img>
+                <div className='clickable' id="profilename" onClick={() => handleProfileClick(author.username)} >
                   {author.username}
                 </div>
 

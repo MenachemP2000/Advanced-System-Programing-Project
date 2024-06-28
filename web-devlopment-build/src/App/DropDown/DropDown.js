@@ -1,9 +1,31 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './DropDown.css';
+import config from '../config';
 
-const DropDown = ({ isOpen, topBarHeight, toggleTheme, isSignedIn, toggleSignendIn, setIsOpen,dropdownRef }) => {
+const DropDown = ({ isOpen, topBarHeight, toggleTheme, isSignedIn, toggleSignendIn, setIsOpen, dropdownRef }) => {
   const navigate = useNavigate();
+
+
+  const handleDeleteAccount = async () => {
+    try {
+      const response = await fetch(`${config.apiBaseUrl}/api/users/${isSignedIn._id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete Account');
+      }
+      else {
+        handleLogOut();
+      }
+    } catch (error) {
+      console.error('Error deleting Account:', error);
+    }
+  };
 
 
   const dropDownStyle = {
@@ -15,6 +37,12 @@ const DropDown = ({ isOpen, topBarHeight, toggleTheme, isSignedIn, toggleSignend
     navigate('/');
     setIsOpen(false);
   };
+
+  const handleEditAccount = () => {
+    navigate('/editaccount');
+    setIsOpen(false);
+  };
+
 
 
   const handleProfileClick = (username) => {
@@ -38,14 +66,22 @@ const DropDown = ({ isOpen, topBarHeight, toggleTheme, isSignedIn, toggleSignend
               </div>
 
               <p></p>
-              <button className="dropDownButton btn" onClick={handleLogOut}>
-                <i className="bi bi-box-arrow-right"></i>
-                <span className="icon-text"> Sign out</span>
-              </button>
 
               <button className="theme-toggle btn dropDownButton" onClick={toggleTheme}>
                 <i className="bi bi-moon"></i>
                 <span className="icon-text"> Toggle Theme</span>
+              </button>
+              <button className="dropDownButton btn" onClick={handleEditAccount}>
+                <i className="bi bi-pencil"></i>
+                <span className="icon-text"> Edit Account</span>
+              </button>
+              <button className="dropDownButton btn" onClick={handleDeleteAccount}>
+                <i className="bi bi-trash"></i>
+                <span className="icon-text"> Delete Account</span>
+              </button>
+              <button className="dropDownButton btn" onClick={handleLogOut}>
+                <i className="bi bi-box-arrow-right"></i>
+                <span className="icon-text"> Sign out</span>
               </button>
             </div>
           </>

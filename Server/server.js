@@ -10,6 +10,7 @@ const mongodbUri = process.env.MONGODB_URI || "mongodb://localhost:27017/mydatab
 // Middleware to increase payload size limit
 app.use(express.json({ limit: '1000mb' })); // You can adjust the limit as needed
 app.use(express.urlencoded({ limit: '1000mb', extended: true })); // Also increase for URL-encoded payloads
+const jwt = require("jsonwebtoken")
 
 if (!mongodbUri) {
   console.error('MONGODB_URI is not defined');
@@ -36,10 +37,12 @@ mongoose.connect(mongodbUri, { useNewUrlParser: true, useUnifiedTopology: true }
 // Import routes
 const userRoutes = require('./routes/userRoutes');
 const videoRoutes = require('./routes/videoRoutes');
+const tokenRoutes = require('./routes/tokenRoutes');
 
 // Use routes
 app.use('/api/users', userRoutes);
 app.use('/api/videos', videoRoutes);
+app.use('/api/tokens', tokenRoutes);
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, '../web-devlopment-build/build')));

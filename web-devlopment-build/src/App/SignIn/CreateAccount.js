@@ -19,6 +19,30 @@ const CreateAccount = ({ toggleSignendIn, toggleScreen, isSignedIn }) => {
         }
     });
 
+    const logIn = async () => {
+        localStorage.setItem('token', '');
+        const data = { username: username, password: password }
+        try {
+            const response = await fetch(`${config.apiBaseUrl}/api/tokens`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+            if (!response.ok) {
+                throw new Error('Failed to fetch token');
+            }
+            const { token } = await response.json();
+            console.log('Received token:', token);
+            localStorage.setItem('token', token);
+            return true
+        } catch (error) {
+            console.error('Error loggin in:', error);
+            return false
+        }
+    };
+
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -56,6 +80,7 @@ const CreateAccount = ({ toggleSignendIn, toggleScreen, isSignedIn }) => {
             }
 
             // If registration is successful, proceed with login or other actions
+            await logIn();
             toggleSignendIn(username);
             navigate("/");
         } catch (error) {

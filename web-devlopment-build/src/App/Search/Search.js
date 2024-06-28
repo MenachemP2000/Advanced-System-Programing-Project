@@ -8,6 +8,7 @@ import config from '../config';
 const Search = ({ toggleScreen }) => {
   const [searchVideos, setSearchVideos] = useState([]);
   const { key } = useParams();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     toggleScreen("Search");
@@ -17,12 +18,15 @@ const Search = ({ toggleScreen }) => {
   useEffect(() => {
     const getVideosByKeyAndFilter = async (filter1, filter2, key) => {
       try {
+        setLoading(true);
         // Fetch videos data
-        const videosResponse = await fetch(`${config.apiBaseUrl}/api/videos?${filter1}=${key}&${filter2}=${key}`);
+        const videosResponse = await fetch(`${config.apiBaseUrl}/api/videos/all?${filter1}=${key}&${filter2}=${key}`);
         const videosData = await videosResponse.json();
         setSearchVideos(shuffleArray([...videosData]));
       } catch (error) {
         console.error('Error fetching videos:', error);
+      } finally {
+        setLoading(false);
       }
     };
     const fetchVideos = async () => {
@@ -41,6 +45,14 @@ const Search = ({ toggleScreen }) => {
     }
     return shuffledArray;
   };
+
+  while (loading) {
+    return (
+      <div className="searchVideos">
+        <h3>Loading...</h3>
+      </div>
+    );
+  }
 
   return (
     <div className="searchVideos">

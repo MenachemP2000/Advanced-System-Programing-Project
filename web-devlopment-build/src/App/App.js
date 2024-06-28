@@ -14,6 +14,7 @@ import './App.css';
 import CreateAccount from './SignIn/CreateAccount';
 import Search from './Search/Search';
 import UserProfile from './UserProfile/UserProfile';
+import EditAccount from './SignIn/EditAccount';
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -69,6 +70,7 @@ function App() {
       console.error('Error fetching user:', error);
     }
   };
+  
   const toggleSignendIn = async (username) => {
 
     if (username) {
@@ -79,6 +81,7 @@ function App() {
       }
     }
     else {
+      localStorage.setItem('token', '');
       setSignedInStatus(false);
     }
   };
@@ -113,7 +116,7 @@ return () => {
 return (
   <Router>
     <div className={`App ${theme}`}>
-      {!(screen === "SignIn" || screen === "CreateAccount") && (
+      {!(screen === "SignIn" || screen === "CreateAccount" || screen  === "EditAccount") && (
         <>
           <TopBar smallProfilePicRef={smallProfilePicRef} bigProfilePicRef={bigProfilePicRef} setDropDownOpen={setDropDownOpen} dropDownOpen={dropDownOpen} theme={theme} toggleMenu={toggleMenu} toggleDropDown={toggleDropDown} isSignedIn={isSignedIn} />
           <Menu screen={screen} isOpen={menuOpen} />
@@ -134,6 +137,11 @@ return (
           toggleSignendIn={toggleSignendIn}
         />} />
         <Route path="/createaccount" element={<CreateAccount
+          isSignedIn={isSignedIn}
+          toggleScreen={toggleScreen}
+          toggleSignendIn={toggleSignendIn}
+        />} />
+        <Route path="/editaccount" element={<EditAccount
           isSignedIn={isSignedIn}
           toggleScreen={toggleScreen}
           toggleSignendIn={toggleSignendIn}

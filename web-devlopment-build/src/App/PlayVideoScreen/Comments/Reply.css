@@ -1,4 +1,9 @@
 
+#replyUsername{
+  width: fit-content;
+
+}
+
 #outerreply{
   display: flex;
   justify-content: row;

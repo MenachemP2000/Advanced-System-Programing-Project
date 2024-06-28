@@ -6,6 +6,9 @@
   margin-bottom: 3px;
   margin-top: 3px;
 }
+#relatedUsername{
+  width: fit-content;
+}
 
 .RelatedVideos ul {
   list-style: none;

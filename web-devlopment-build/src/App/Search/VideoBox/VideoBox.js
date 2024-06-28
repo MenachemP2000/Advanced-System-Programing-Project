@@ -48,12 +48,15 @@ const VideoBox = ({ video }) => {
             <div className="video-info ">
                 <h3>{video.title}</h3>
                 <p>{video.views} views</p>
-                <div className='profileVideoBox' onClick={(event) => {
+                <div className='profileVideoBox' >
+                    <img  className='profliePic' onClick={(event) => {
                     event.stopPropagation();
                     handleProfileClick(video.username);
-                }}>
-                    <img  className='profliePic' alt={author.usernameser} src={author.image} height="24px" width="24px" ></img>
-                    <p>{video.username}</p>
+                }} alt={author.usernameser} src={author.image} height="24px" width="24px" ></img>
+                    <p onClick={(event) => {
+                    event.stopPropagation();
+                    handleProfileClick(video.username);
+                }}> {video.username}</p>
                 </div>
                 <p >{video.description}</p>
             </div>
