@@ -166,6 +166,10 @@ const Comment = ({
       editTextareaRef.current.style.height = editTextareaRef.current.scrollHeight + 'px';
     }
   }, [isEditing, editContent]);
+  
+  useEffect(() => {
+    setEditContent(thisComment.content);
+  }, [isEditing, thisComment.content]);
 
   useEffect(() => {
 
