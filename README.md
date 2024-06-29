@@ -16,10 +16,10 @@ To run the server, follow these steps:
    npm run build
     ```
 
-5. Navigate to the directory where the server files are located (server).
+5. Navigate to the directory where the server files are located : /server.
 6. navigate to the data directory: server/data.
 7. run the script as instructed in the README.md file in the data directory.
-8. run the following command to install the required packages:
+8. return to server directory and run the following command to install the required packages:
     ```
    npm install
     ```
