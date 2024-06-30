@@ -1,4 +1,8 @@
 const Video = require('../models/Video');
+const jwt = require("jsonwebtoken")
+const key = "Some super secret key"
+
+
 
 // Create a comment
 exports.createComment = async (req, res) => {
@@ -17,8 +21,9 @@ exports.createComment = async (req, res) => {
       usersLikes,
       replies,
     };
+    
 
-    video.comments.push(newComment);
+    video.comments.push(newComment);    
     await video.save();
 
     res.status(201).send(video.comments[video.comments.length - 1]);
@@ -90,6 +95,12 @@ exports.updateComment = async (req, res) => {
     if (!comment) {
       return res.status(404).send('Comment not found');
     }
+    
+    const token = req.headers.authorization.split(" ")[1];
+    const data = jwt.verify(token, key);
+    if (data.username !== comment.user) {
+      return res.status(403).send('Forbidden');
+    }
 
     comment.user = updatedComment.user || comment.user; // retain the old value if the new value is not provided
     comment.content = updatedComment.content || comment.content;
@@ -104,7 +115,6 @@ exports.updateComment = async (req, res) => {
     res.status(400).send(error.message);
   }
 };
-
 
 // Update a comment (PATCH)
 exports.partialUpdateComment = async (req, res) => {
@@ -122,6 +132,27 @@ exports.partialUpdateComment = async (req, res) => {
       return res.status(404).send('Comment not found');
     }
 
+    
+    const token = req.headers.authorization.split(" ")[1];
+    const data = jwt.verify(token, key);
+    if (data.username !== comment.user) {
+      if ('user' in updatedFields || 'content' in updatedFields || 'date' in updatedFields ) {
+        return res.status(403).send('Forbidden');
+      }
+      if ('usersLikes' in updatedFields ) {
+        if (updatedFields.usersLikes.length !== comment.usersLikes.length +1 && updatedFields.usersLikes.length !== comment.usersLikes.length -1 ) {
+          return res.status(403).send('Forbidden');
+        }
+      }
+      if ('replies' in updatedFields ) {
+        if (updatedFields.replies.length !== comment.replies.length +1 &&
+           updatedFields.replies.length !== comment.replies.length -1 &&
+            updatedFields.replies.length !== comment.replies.length ) {
+          return res.status(403).send('Forbidden');
+        }
+      }
+    }
+
     // Update only the provided fields
     Object.keys(updatedFields).forEach(field => {
       comment[field] = updatedFields[field];
@@ -136,7 +167,6 @@ exports.partialUpdateComment = async (req, res) => {
   }
 };
 
-
 // Delete a comment
 exports.deleteComment = async (req, res) => {
   const { videoId, commentId } = req.params;
@@ -148,6 +178,16 @@ exports.deleteComment = async (req, res) => {
     }
 
     const comment = video.comments.id(commentId);
+    if (!comment) {
+      return res.status(404).send('Comment not found');
+    }
+    
+    const token = req.headers.authorization.split(" ")[1];
+
+    const data = jwt.verify(token, key);
+    if (data.username !== comment.user) {
+      return res.status(403).send('Forbidden');
+    }
 
     video.comments.remove(comment);
     await video.save();

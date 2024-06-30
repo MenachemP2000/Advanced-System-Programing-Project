@@ -2,6 +2,9 @@ const User = require('../models/User');
 const Video = require('../models/Video');
 const path = require('path');
 const fs = require('fs');
+const jwt = require("jsonwebtoken")
+const key = "Some super secret key"
+
 
 exports.createUser = async (req, res) => {
     const { username, displayname, password, passwordAgain, image } = req.body;
@@ -35,14 +38,14 @@ exports.createUser = async (req, res) => {
         // Check if the username is already taken
         const existingUser = await User.findOne({ username: username });
         if (existingUser) {
-            return res.status(400).json({ message: 'Username already taken' });
+            return res.status(409).json({ message: 'Username already taken' });
         }
 
         // Save base64 image to server
         const base64Image = image.split(';base64,').pop();
         const imageBuffer = Buffer.from(base64Image, 'base64');
-        const imageName =`${Date.now()}-${username}.jpg`
-        const imagePath = path.join(__dirname, '..', 'build', 'pictures', 'users', imageName);
+        const imageName = `${Date.now()}-${username}.jpg`
+        const imagePath = path.join(__dirname, '..', '..', 'web-devlopment-build', 'build', 'pictures', 'users', imageName);
 
         fs.writeFileSync(imagePath, imageBuffer);
 
@@ -59,21 +62,22 @@ exports.createUser = async (req, res) => {
     }
 };
 
-
 // Get all users
 exports.getAllUsers = async (req, res) => {
     try {
-        const users = await User.find();
+        const users = await User.find().select('-password');;
         res.send(users);
     } catch (error) {
         res.status(500).send(error);
     }
 };
 
+
+
 // Get user by id
 exports.getUser = async (req, res) => {
     try {
-        const user = await User.findById(req.params.id);
+        const user = await User.findById(req.params.id).select('-password');
         if (!user) {
             return res.status(404).send();
         }
@@ -85,7 +89,7 @@ exports.getUser = async (req, res) => {
 // Get user by name
 exports.getUserByUserName = async (req, res) => {
     try {
-        const user = await User.findOne({ username: req.params.username });
+        const user = await User.findOne({ username: req.params.username }).select('-password');
         if (!user) {
             return res.status(404).send({ message: 'User not found' });
         }
@@ -95,17 +99,59 @@ exports.getUserByUserName = async (req, res) => {
     }
 };
 
-
-
-
-
 // Update a user (PUT)
 exports.updateUser = async (req, res) => {
+
+    const { username, displayname, password, passwordAgain, image } = req.body;
     try {
-        const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-        if (!user) {
+        const test = await User.findById(req.params.id);
+        if (!test) {
             return res.status(404).send();
         }
+        const token = req.headers.authorization.split(" ")[1];
+        const data = jwt.verify(token, key);
+        if (data.username !== test.username) {
+            return res.status(403).send('Forbidden');
+        }
+        if (req.body.username !== test.username) {
+            return res.status(400).send({ message: 'Cannot change username' });
+        }
+        if (req.body._id !== test._id) {
+            return res.status(400).send({ message: 'Cannot change _id' });
+        }
+        if (!displayname || !password || !passwordAgain || !image) {
+            return res.status(400).json({ message: 'All fields are required' });
+        }
+
+        const displaynameWords = displayname.trim().split(/\s+/);
+        if (displaynameWords.length < 2) {
+            return res.status(400).json({ message: 'Must input first and last name' });
+        }
+
+        if (password !== passwordAgain) {
+            return res.status(400).json({ message: 'Password fields do not match' });
+        }
+
+        if (password.length < 8) {
+            return res.status(400).json({ message: 'Password must be at least 8 characters' });
+        }
+
+        const hasLetter = /[a-zA-Z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+
+        if (!hasLetter || !hasNumber) {
+            return res.status(400).json({ message: 'Password must contain both letters and numbers' });
+        }
+
+        // Save base64 image to server
+        const base64Image = image.split(';base64,').pop();
+        const imageBuffer = Buffer.from(base64Image, 'base64');
+        const imageName = `${Date.now()}-${username}.jpg`
+        const imagePath = path.join(__dirname, '..', '..', 'web-devlopment-build', 'build', 'pictures', 'users', imageName);
+        fs.writeFileSync(imagePath, imageBuffer);
+        req.body.image = `/pictures/users/${imageName}`;
+
+        const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
         res.send(user);
     } catch (error) {
         res.status(400).send(error);
@@ -114,11 +160,63 @@ exports.updateUser = async (req, res) => {
 
 // Update a user
 exports.partialUpdateUser = async (req, res) => {
+
     try {
-        const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-        if (!user) {
+        const test = await User.findById(req.params.id);
+        if (!test) {
             return res.status(404).send();
         }
+
+        const token = req.headers.authorization.split(" ")[1];
+        const data = jwt.verify(token, key);
+        if (data.username !== test.username) {
+            return res.status(403).send('Forbidden');
+        }
+        if (req.body.username && req.body.username !== test.username) {
+            return res.status(400).send({ message: 'Cannot change username' });
+        }
+
+        if (req.body.displayname) {
+            const displaynameWords = req.body.displayname.trim().split(/\s+/);
+            if (displaynameWords.length < 2) {
+                return res.status(400).json({ message: 'Must input first and last name' });
+            }
+        }
+        if (req.body.password) {
+            if (!req.body.passwordAgain) {
+                return res.status(400).send({ message: 'Please confirm password' });
+            }
+            const password = req.body.password;
+            const passwordAgain = req.body.passwordAgain;
+            if (password !== passwordAgain) {
+                return res.status(400).json({ message: 'Password fields do not match' });
+            }
+
+            if (password.length < 8) {
+                return res.status(400).json({ message: 'Password must be at least 8 characters' });
+            }
+            const hasLetter = /[a-zA-Z]/.test(password);
+            const hasNumber = /[0-9]/.test(password);
+            if (!hasLetter || !hasNumber) {
+                return res.status(400).json({ message: 'Password must contain both letters and numbers' });
+            }
+        }
+
+        if (req.body.image) {
+            const { username, image } = req.body;
+            // Save base64 image to server
+            const base64Image = image.split(';base64,').pop();
+            const imageBuffer = Buffer.from(base64Image, 'base64');
+            const imageName = `${Date.now()}-${username}.jpg`
+            const imagePath = path.join(__dirname, '..', '..', 'web-devlopment-build', 'build', 'pictures', 'users', imageName);
+
+            fs.writeFileSync(imagePath, imageBuffer);
+
+            req.body.image = `/pictures/users/${imageName}`;
+
+        }
+
+        const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
         res.send(user);
     } catch (error) {
         res.status(400).send(error);
@@ -128,11 +226,43 @@ exports.partialUpdateUser = async (req, res) => {
 // Delete a user
 exports.deleteUser = async (req, res) => {
     try {
-        const user = await User.findByIdAndDelete(req.params.id);
-        if (!user) {
+
+        const test = await User.findById(req.params.id);
+        if (!test) {
             return res.status(404).send();
         }
-        res.send(user);
+        const token = req.headers.authorization.split(" ")[1];
+        const data = jwt.verify(token, key);
+        if (data.username !== test.username) {
+            return res.status(403).send('Forbidden');
+        }
+
+        // Delete all user videos
+        await Video.deleteMany({ username: test.username });
+        // Delete all user comments
+        const videos = await Video.find({ 'comments.user': test.username });
+
+        for (const video of videos) {
+            video.comments = video.comments.filter(comment => comment.user !== test.username);
+            await video.save(); // Save the updated video document
+        }
+
+        // Delete all user replies
+        const videosReplies = await Video.find({});
+
+        // Iterate over the videos and remove the replies made by the user
+        for (const video of videosReplies) {
+            for (const comment of video.comments) {
+                // Filter out replies made by the user
+                comment.replies = comment.replies.filter(reply => reply.user !== test.username);
+            }
+            await video.save(); // Save the updated video document
+        }
+
+        // Delete the user
+        await User.findByIdAndDelete(req.params.id);
+        res.status(204).send("User deleted");
+
     } catch (error) {
         res.status(500).send(error);
     }

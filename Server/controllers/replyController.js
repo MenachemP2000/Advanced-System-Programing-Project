@@ -1,4 +1,6 @@
 const Video = require('../models/Video');
+const jwt = require("jsonwebtoken")
+const key = "Some super secret key"
 
 // Create a reply
 exports.createReply = async (req, res) => {

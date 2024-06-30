@@ -1,23 +1,30 @@
-# Advanced-System-Programing-Project
-Advanced System Programing Project part 1
+# Advanced Web Development Project part 2
 
-How we built the project:
+# Running the Server
 
-we begun by creating a new jira project and creating tasks and then assigning different tasks to different team members,
-each team member has done his tasks in separate github branch, and we pulled and merge from those feature branches to the main branch each time we finished a certain task, all the while tracking the progress in the jira project.
+To run the server, follow these steps:
 
-How to run the code:
+1. Open your terminal or command prompt.
+2. navigate to the dirctory where the web development build is located (web-development-build).
+3. run the following command to install the required packages:
+    ```
+   npm install
+    ```
 
-web part:
+4. Run the following command to build the production version of the web development files:
+    ```
+   npm run build
+    ```
 
-in order to run the web part. create a new eact app using the following command:
-npx create-react-app deafult
-and install react-router-dom using the following command:
-npm install react-router-dom
-
-then, copy the files that are on "foo-tube" folder to the new react project.
-then start the web app the following command: npm start.
-
-
-android part:
-in order to run the application you will need to open the project in android studio and run the program through the IDE
+5. Navigate to the directory where the server files are located : /server.
+6. navigate to the data directory: server/data.
+7. run the script as instructed in the README.md file in the data directory.
+8. return to server directory and run the following command to install the required packages:
+    ```
+   npm install
+    ```
+9. after that Run the following command to start the server:
+    ```
+   node server.js
+    ```
+10. The server should now be running and accessible. Check the terminal output for the address and port it is listening on, it should be `http://localhost:4000`.
