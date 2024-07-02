@@ -2,8 +2,6 @@ package com.example.aspp.fragments;
 
 import static android.app.Activity.RESULT_OK;
 
-import static com.example.aspp.Utils.getPath;
-
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -18,10 +16,8 @@ import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 
 import android.provider.MediaStore;
 import android.util.Log;
@@ -38,7 +34,7 @@ import android.widget.Toast;
 
 import com.example.aspp.MainActivity;
 import com.example.aspp.R;
-import com.example.aspp.objects.Video;
+import com.example.aspp.entities.Video;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -147,7 +143,7 @@ public class AddVideoFragment extends Fragment {
             if (!isValid) {
                 return;
             }
-            Video newVideo = new Video(123243, "demi user", 0.0,title,
+            Video newVideo = new Video(123243, "demi user",title,
                     description, tags, uri, videoPath);
             HomeFragment.videoArrayList.add(newVideo);
             HomeFragment.adp.notifyDataSetChanged();

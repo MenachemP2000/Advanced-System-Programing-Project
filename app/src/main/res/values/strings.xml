@@ -13,4 +13,5 @@
     <string name="playlist">0000006</string>
     <string name="not_recommend">0000007</string>
     <string name="download">0000008</string>
+    <string name="BaseURL">http://10.0.2.2:4000/api/</string>
 </resources>

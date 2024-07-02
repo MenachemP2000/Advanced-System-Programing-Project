@@ -11,10 +11,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -40,8 +40,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.aspp.adapters.CommentsRVAdapter;
 import com.example.aspp.adapters.HomeRVAdapter;
 import com.example.aspp.fragments.HomeFragment;
-import com.example.aspp.objects.Comment;
-import com.example.aspp.objects.Video;
+import com.example.aspp.entities.Comment;
+import com.example.aspp.entities.Video;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -72,26 +72,34 @@ public class VideoPlayerActivity extends AppCompatActivity {
         Intent intent = getIntent();
         currentVideo = HomeFragment.videoArrayList.get(intent.getIntExtra("pos",0));
         currentVideo.addView();
-        loadComments(currentVideo.getId());
+        if (currentVideo.getComments().isEmpty())
+            loadComments(currentVideo.getId());
         currentVideo = HomeFragment.videoArrayList.get(intent.getIntExtra("pos",0));
         ArrayList<Comment> commentSection = currentVideo.getComments();
-        String vid = currentVideo.getVideoPath();
+        String vid = "http://10.0.2.2:4000" + currentVideo.getSource();
 
         videoView = findViewById(R.id.videoView);
         mediaController = new MediaController(this);
-        videoView.setMediaController(mediaController);
-        if (intent.getIntExtra("video_thumbnail",0) != 0)
-            videoView.setVideoURI(Uri.parse("android.resource://com.example.aspp/"+getResources().getIdentifier(vid,"raw",getPackageName())));
-        else
-            videoView.setVideoURI(Uri.parse(vid));
-        videoView.start();
+//        if (intent.getIntExtra("video_thumbnail",0) != 0)
+//            videoView.setVideoURI(Uri.parse("android.resource://com.example.aspp/"+getResources().getIdentifier(vid,"raw",getPackageName())));
+//        else
+        Log.i("Current Vid", currentVideo.toString());
+        Log.i("PATH", vid);
+        videoView.setVideoURI(Uri.parse(vid));
+        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mediaPlayer) {
+                videoView.setMediaController(mediaController);
+                mediaPlayer.start();
+            }
+        });
 
         title = findViewById(R.id.title);
         title.setText(currentVideo.getTitle());
         views = findViewById(R.id.views);
         views.setText(currentVideo.getViews() + "Views");
         time = findViewById(R.id.time);
-        time.setText(new SimpleDateFormat("hh:mm dd-mm-yyyy").format(currentVideo.getDateOfPublish()));
+//        time.setText(new SimpleDateFormat("hh:mm dd-mm-yyyy").format(currentVideo.getDateOfPublish()));
         more = findViewById(R.id.more);
         more.setOnClickListener(new View.OnClickListener() {
             @Override

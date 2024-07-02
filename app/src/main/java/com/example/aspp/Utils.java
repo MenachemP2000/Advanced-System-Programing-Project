@@ -9,8 +9,8 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 
 import com.example.aspp.fragments.HomeFragment;
-import com.example.aspp.objects.Comment;
-import com.example.aspp.objects.Video;
+import com.example.aspp.entities.Comment;
+import com.example.aspp.entities.Video;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -102,7 +102,7 @@ public class Utils {
                 int id = json_obj.getInt("id");
                 String videoPathInRaw = json_obj.getString("videoPathInRaw");
 
-                Video temp = new Video(id, publisher_id, duration, title, description, tags, thumbnailDrawableID, videoPathInRaw);
+                Video temp = new Video(id, publisher_id, title, description, tags, thumbnailDrawableID, videoPathInRaw);
                 result.add(temp);
             }
         } catch (JSONException | IOException e) {

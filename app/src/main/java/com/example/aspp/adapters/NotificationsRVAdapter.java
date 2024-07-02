@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.aspp.R;
 import com.example.aspp.VideoPlayerActivity;
-import com.example.aspp.objects.Video;
+import com.example.aspp.entities.Video;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,9 +56,9 @@ public class NotificationsRVAdapter extends RecyclerView.Adapter<NotificationsRV
                 intent.putExtra("video_thumbnail", selectedNotifications.getThumbnailDrawableId());
                 intent.putExtra("video_videoPath", selectedNotifications.getVideoPath());
                 intent.putExtra("video_description", selectedNotifications.getDescription());
-                intent.putExtra("video_videoPathInRaw", selectedNotifications.getVideoPathInRaw());
+//                intent.putExtra("video_videoPathInRaw", selectedNotifications.getVideoPathInRaw());
                 intent.putExtra("video_thumbnailUri", selectedNotifications.getThumbnailUri());
-                intent.putExtra("video_tags", selectedNotifications.getTags());
+                intent.putExtra("video_tags", selectedNotifications.getTag());
                 intent.putExtra("video_views", selectedNotifications.getViews());
                 intent.putExtra("video_likes", selectedNotifications.getLikes());
                 intent.putExtra("video_dislikes", selectedNotifications.getDislikes());

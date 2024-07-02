@@ -22,6 +22,8 @@ import androidx.core.view.MenuItemCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -43,8 +45,11 @@ import android.widget.Toast;
 
 import com.example.aspp.R;
 import com.example.aspp.adapters.HomeRVAdapter;
-import com.example.aspp.objects.Comment;
-import com.example.aspp.objects.Video;
+import com.example.aspp.api.VideoAPI;
+import com.example.aspp.entities.Comment;
+import com.example.aspp.entities.Video;
+import com.example.aspp.repositories.VideoRepository;
+import com.example.aspp.viewmodels.VideosViewModel;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -68,6 +73,7 @@ public class HomeFragment extends Fragment {
     DrawerLayout drawerLayout;
     ImageButton openSideNav;
     Button all_btn, gaming_btn, music_btn, tutorials_btn;
+    VideosViewModel viewModel;
     boolean nightMode;
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -271,9 +277,17 @@ public class HomeFragment extends Fragment {
         activity.setSupportActionBar(toolbar);
         activity.getSupportActionBar().setTitle("");
         surveyListContainer = v.findViewById(R.id.ActiveSurveys);
-        if (videoArrayList == null)
-            videoArrayList = readVideosList(getContext());
-        adp = new HomeRVAdapter(getContext(), videoArrayList);
+//        VideoRepository vr = new VideoRepository();
+//        vr.getAll();
+        adp = new HomeRVAdapter(getContext(), new ArrayList<>());
+//        if (videoArrayList == null)
+//            videoArrayList = readVideosList(getContext());
+        viewModel = new ViewModelProvider(this).get(VideosViewModel.class);
+        viewModel.get().observe(getViewLifecycleOwner(), videos -> {
+            videoArrayList = new ArrayList<>(videos);
+            adp.setVideos(videos);
+            adp.notifyDataSetChanged();
+        });
         surveyListContainer.setAdapter(adp);
         surveyListContainer.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -286,16 +300,16 @@ public class HomeFragment extends Fragment {
     }
 
     private void onRefreshList() {
-        videoArrayList = readVideosList(getContext());
-        adp = new HomeRVAdapter(getContext(), videoArrayList);
+//        videoArrayList = readVideosList(getContext());
+//        adp = new HomeRVAdapter(getContext(), videoArrayList);
         surveyListContainer.setAdapter(adp);
         swipeRefreshLayout.setRefreshing(false);
     }
 
     private void onFilterList(View view) {
         if (view.getId() == R.id.all) {
-            videoArrayList = readVideosList(getContext());
-            adp = new HomeRVAdapter(getContext(), videoArrayList);
+//            videoArrayList = readVideosList(getContext());
+//            adp = new HomeRVAdapter(getContext(), videoArrayList);
             surveyListContainer.setAdapter(adp);
         } else {
             mySearch(((Button)view).getText().toString().trim());

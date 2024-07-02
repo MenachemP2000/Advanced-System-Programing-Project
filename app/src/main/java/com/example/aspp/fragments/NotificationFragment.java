@@ -2,14 +2,9 @@ package com.example.aspp.fragments;
 
 import static com.example.aspp.Utils.readVideosList;
 
-import android.app.SearchManager;
-import android.content.Context;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,16 +13,12 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.aspp.R;
-import com.example.aspp.adapters.HomeRVAdapter;
 import com.example.aspp.adapters.NotificationsRVAdapter;
-import com.example.aspp.objects.Video;
+import com.example.aspp.entities.Video;
 
 import java.util.ArrayList;
 

@@ -50,7 +50,11 @@ dependencies {
     implementation ("androidx.camera:camera-lifecycle:1.2.2")
     implementation ("androidx.camera:camera-view:1.2.2")
     implementation(libs.camera.video)
+    implementation(libs.room.runtime)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    annotationProcessor(libs.room.compiler)
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.5.0")
 }

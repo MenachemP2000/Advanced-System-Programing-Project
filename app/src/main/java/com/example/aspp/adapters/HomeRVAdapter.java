@@ -1,7 +1,5 @@
 package com.example.aspp.adapters;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -16,19 +14,24 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.aspp.R;
 import com.example.aspp.VideoPlayerActivity;
 import com.example.aspp.fragments.HomeFragment;
-import com.example.aspp.objects.Video;
+import com.example.aspp.entities.Video;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 public class HomeRVAdapter extends RecyclerView.Adapter<HomeRVAdapter.MyViewHolder> {
 
     Context context;
     ArrayList<Video> videos;
     int pos;
-    public HomeRVAdapter(Context context, ArrayList<Video> videos) {
+    public HomeRVAdapter(Context context, List<Video> videos) {
         this.context = context;
-        this.videos = videos;
+        this.videos = new ArrayList<>(videos);
+    }
+
+    public void setVideos(List<Video> videos) {
+        this.videos = new ArrayList<>(videos);
     }
 
     @NonNull
@@ -45,7 +48,7 @@ public class HomeRVAdapter extends RecyclerView.Adapter<HomeRVAdapter.MyViewHold
         holder.videoName.setText(videos.get(position).getTitle());
         holder.publisher.setText(videos.get(position).getPublisher());
         holder.views.setText(videos.get(position).getViews() + " Views");
-        holder.time.setText(new SimpleDateFormat("hh:mm dd-mm-yyyy").format(videos.get(position).getDateOfPublish()));
+//        holder.time.setText(new SimpleDateFormat("hh:mm dd-mm-yyyy").format(videos.get(position).getDateOfPublish()));
         if (videos.get(position).getThumbnailDrawableId() != 0)
             holder.thumbnail.setImageResource(videos.get(position).getThumbnailDrawableId());
         else
@@ -60,12 +63,12 @@ public class HomeRVAdapter extends RecyclerView.Adapter<HomeRVAdapter.MyViewHold
                 intent.putExtra("video_videoPath", selectedVideo.getVideoPath());
                 intent.putExtra("video_description", selectedVideo.getDescription());
                 intent.putExtra("video_thumbnailUri", selectedVideo.getThumbnailUri());
-                intent.putExtra("video_tags", selectedVideo.getTags());
+                intent.putExtra("video_tags", selectedVideo.getTag());
                 intent.putExtra("video_views", selectedVideo.getViews());
                 intent.putExtra("video_likes", selectedVideo.getLikes());
                 intent.putExtra("video_dislikes", selectedVideo.getDislikes());
                 intent.putExtra("video_comments", selectedVideo.getComments());
-                intent.putExtra("video_date", new SimpleDateFormat("hh:mm dd-mm-yyyy").format(selectedVideo.getDateOfPublish()));
+//                intent.putExtra("video_date", new SimpleDateFormat("hh:mm dd-mm-yyyy").format(selectedVideo.getDateOfPublish()));
                 intent.putExtra("video_publisher", selectedVideo.getPublisher());
                 intent.putExtra("pos", position);
                 context.startActivity(intent);

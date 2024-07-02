@@ -2,9 +2,7 @@ package com.example.aspp.adapters;
 
 import static com.example.aspp.Utils.getVideoById;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,10 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.aspp.R;
 import com.example.aspp.VideoPlayerActivity;
 import com.example.aspp.fragments.HomeFragment;
-import com.example.aspp.objects.Comment;
-import com.example.aspp.objects.Video;
+import com.example.aspp.entities.Comment;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class CommentsRVAdapter extends RecyclerView.Adapter<CommentsRVAdapter.MyViewHolder> {

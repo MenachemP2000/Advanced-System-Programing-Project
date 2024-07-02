@@ -6,7 +6,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.viewpager2.widget.ViewPager2;
+
 import com.example.aspp.R;
+import com.example.aspp.adapters.ShortsRVAdapter;
 
 /**
  * A simple {@link androidx.fragment.app.Fragment} subclass.
@@ -15,6 +18,8 @@ import com.example.aspp.R;
  */
 public class ShortsFragment extends androidx.fragment.app.Fragment {
 
+    ViewPager2 viewPager2;
+    ShortsRVAdapter adp;
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -59,6 +64,10 @@ public class ShortsFragment extends androidx.fragment.app.Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_shorts, container, false);
+        View v = inflater.inflate(R.layout.fragment_shorts, container, false);
+        viewPager2 = v.findViewById(R.id.viewPager2);
+        adp = new ShortsRVAdapter(getContext(), HomeFragment.videoArrayList);
+        viewPager2.setAdapter(adp);
+        return v;
     }
 }
