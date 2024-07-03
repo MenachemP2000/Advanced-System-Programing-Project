@@ -1,12 +1,14 @@
 package com.example.aspp.objects;
 
-import android.graphics.Bitmap;
 
-
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Random;
 
-public class User {
+public class User implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private String username;
 
@@ -17,25 +19,30 @@ public class User {
     private Date dateOfJoin;
     private ArrayList<User> subscribers;
     private ArrayList<Video> videos;
-    private Bitmap profilePicture;
-    private String profilePictureUrl;
 
-    // Default constructor
-    public User() {
+    private String profilePictureUri;
+
+
+    public User(String username,String password, String fullName, String url) {
+        this.username = username;
+        this.id = generateUniqueId();
+        this.fullName = fullName;
+        this.password = password;
+        this.profilePictureUri = url;
         this.subscribers = new ArrayList<>();
         this.videos = new ArrayList<>();
         this.dateOfJoin = new Date(); // Defaults to current date/time
     }
 
-    // Constructor with username and id
-    public User(String username,String password, String fullName, String id) {
+    public User(String username,String password, String fullName, String url, String id) {
         this.username = username;
         this.id = id;
         this.fullName = fullName;
         this.password = password;
+        this.profilePictureUri = url;
         this.subscribers = new ArrayList<>();
         this.videos = new ArrayList<>();
-        this.dateOfJoin = new Date(); // Defaults to current date/time
+        this.dateOfJoin = new Date();
     }
 
     // Getters and setters
@@ -78,14 +85,6 @@ public class User {
         this.videos.add(video);
     }
 
-    public Bitmap getProfilePicture() {
-        return profilePicture;
-    }
-
-    public void setProfilePicture(Bitmap profilePicture) {
-        this.profilePicture = profilePicture;
-    }
-
     @Override
     public String toString() {
         return "User{" +
@@ -105,13 +104,13 @@ public class User {
         this.fullName = fullName;
     }
 
-    public String getProfilePictureUrl() {
-        return profilePictureUrl;
+    public String getProfilePictureUri() {
+        return profilePictureUri;
     }
 
 
     public void setProfilePictureUrl(String profilePictureUri) {
-        this.profilePictureUrl = profilePictureUri;
+        this.profilePictureUri = profilePictureUri;
     }
 
     public String getFullName() {
@@ -120,5 +119,11 @@ public class User {
 
     public String getPassword() {
         return this.password;
+    }
+
+    private String generateUniqueId() {
+        Random random = new Random();
+        int randomNumber = random.nextInt(100000000);
+        return String.format("%08d", randomNumber);
     }
 }
