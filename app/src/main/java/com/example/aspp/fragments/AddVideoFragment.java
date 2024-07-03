@@ -38,6 +38,7 @@ import android.widget.Toast;
 
 import com.example.aspp.MainActivity;
 import com.example.aspp.R;
+import com.example.aspp.objects.User;
 import com.example.aspp.objects.Video;
 
 import java.io.ByteArrayInputStream;
@@ -56,6 +57,8 @@ public class AddVideoFragment extends Fragment {
     Uri uri;
     boolean photoWasSelected = false;
     String videoPath;
+
+    private User myUser;
     private final ActivityResultLauncher<String> activityResultLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), result -> {
         if (ActivityCompat.checkSelfPermission(getContext(), android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
             showBottomDialog(getContext());
@@ -71,6 +74,10 @@ public class AddVideoFragment extends Fragment {
 
     public AddVideoFragment() {
         // Required empty public constructor
+    }
+
+    public AddVideoFragment(User user) {
+        myUser = user;
     }
 
     /**
@@ -151,11 +158,15 @@ public class AddVideoFragment extends Fragment {
                     description, tags, uri, videoPath);
             HomeFragment.videoArrayList.add(newVideo);
             HomeFragment.adp.notifyDataSetChanged();
-            startActivity(new Intent(getContext(), MainActivity.class));
+            Intent intent = new Intent(requireContext(), MainActivity.class);
+            intent.putExtra("loggedInUser", myUser);
+            startActivity(intent);
         });
         cancel = view.findViewById(R.id.cancel);
         cancel.setOnClickListener(v -> {
-            startActivity(new Intent(getContext(), MainActivity.class));
+            Intent intent = new Intent(requireContext(), MainActivity.class);
+            intent.putExtra("loggedInUser", myUser);
+            startActivity(intent);
         });
 
         SharedPreferences sp = getContext().getSharedPreferences("MODE", Context.MODE_PRIVATE);
@@ -206,9 +217,10 @@ public class AddVideoFragment extends Fragment {
         layout_return.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 dialog.dismiss();
-                startActivity(new Intent(getContext(), MainActivity.class));
+                Intent intent = new Intent(requireContext(), MainActivity.class);
+                intent.putExtra("loggedInUser", myUser);
+                startActivity(intent);
             }
         });
 
