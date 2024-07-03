@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.aspp.R;
+import com.example.aspp.objects.User;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -16,6 +17,9 @@ import com.example.aspp.R;
  * create an instance of this fragment.
  */
 public class ProfileFragment extends Fragment {
+
+    private User myUser;
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
