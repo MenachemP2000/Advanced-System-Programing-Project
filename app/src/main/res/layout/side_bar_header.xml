@@ -6,6 +6,7 @@
     android:background="#A9179191">
 
     <ImageButton
+        android:id="@+id/profile"
         android:layout_width="160dp"
         android:layout_height="150dp"
         android:layout_marginStart="20dp"
