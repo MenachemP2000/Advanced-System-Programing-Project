@@ -10,14 +10,8 @@
     </style>
 
     <style name="Theme.ASPP" parent="Base.Theme.ASPP" />
-
     <style name="DialogAnimation">
         <item name="android:windowEnterAnimation">@anim/slide_in</item>
         <item name="android:windowExitAnimation">@anim/slide_out</item>
-    </style>
-
-    <style name="ThemeOverlay.ASPP.FullscreenContainer" parent="">
-        <item name="fullscreenBackgroundColor">@color/light_blue_600</item>
-        <item name="fullscreenTextColor">@color/light_blue_A200</item>
     </style>
 </resources>
