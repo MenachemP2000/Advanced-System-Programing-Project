@@ -41,6 +41,7 @@ import com.example.aspp.adapters.CommentsRVAdapter;
 import com.example.aspp.adapters.HomeRVAdapter;
 import com.example.aspp.fragments.HomeFragment;
 import com.example.aspp.objects.Comment;
+import com.example.aspp.objects.User;
 import com.example.aspp.objects.Video;
 
 import java.text.SimpleDateFormat;
@@ -48,6 +49,8 @@ import java.util.ArrayList;
 
 public class VideoPlayerActivity extends AppCompatActivity {
     private static final int CURRENT_USER = 123123123;
+
+    private User myUser;
     TextView title, views, time, more, publisher, subscribers, comments, comment;
     RecyclerView related_videos;
     ImageView c_profile, profilePic;
@@ -70,6 +73,12 @@ public class VideoPlayerActivity extends AppCompatActivity {
             return insets;
         });
         Intent intent = getIntent();
+        User loggedInUser = (User) getIntent().getSerializableExtra("loggedInUser");
+        // Log the retrieved user for debugging
+        if (loggedInUser != null) {
+            Log.d("MainActivity", "Logged in user: " + loggedInUser.getUsername());
+            myUser = loggedInUser;
+        }
         currentVideo = HomeFragment.videoArrayList.get(intent.getIntExtra("pos",0));
         currentVideo.addView();
         loadComments(currentVideo.getId());
@@ -80,11 +89,13 @@ public class VideoPlayerActivity extends AppCompatActivity {
         videoView = findViewById(R.id.videoView);
         mediaController = new MediaController(this);
         videoView.setMediaController(mediaController);
+
         if (intent.getIntExtra("video_thumbnail",0) != 0)
             videoView.setVideoURI(Uri.parse("android.resource://com.example.aspp/"+getResources().getIdentifier(vid,"raw",getPackageName())));
         else
             videoView.setVideoURI(Uri.parse(vid));
         videoView.start();
+
 
         title = findViewById(R.id.title);
         title.setText(currentVideo.getTitle());
@@ -252,6 +263,8 @@ public class VideoPlayerActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        startActivity(new Intent(this, MainActivity.class));
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra("loggedInUser", myUser);
+        startActivity(intent);
     }
 }
