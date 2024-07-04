@@ -169,7 +169,7 @@ public class HomeFragment extends Fragment {
 
     private void mySearch(String query) {
         if (query.equals("")) {
-            adp = new HomeRVAdapter(getContext(), videoArrayList);
+            adp = new HomeRVAdapter(getContext(), videoArrayList, myUser);
             surveyListContainer.setAdapter(adp);
             return;
         }
@@ -211,7 +211,7 @@ public class HomeFragment extends Fragment {
 
     private void searchByTag(String tags) {
         if (tags.equals("")) {
-            adp = new HomeRVAdapter(getContext(), videoArrayList);
+            adp = new HomeRVAdapter(getContext(), videoArrayList, myUser);
             surveyListContainer.setAdapter(adp);
             return;
         }
@@ -245,7 +245,7 @@ public class HomeFragment extends Fragment {
         }
 
         updatedArr.addAll(updatedSet);
-        adp = new HomeRVAdapter(getContext(), updatedArr);
+        adp = new HomeRVAdapter(getContext(), updatedArr, myUser);
         surveyListContainer.setAdapter(adp);
     }
 
@@ -316,7 +316,7 @@ public class HomeFragment extends Fragment {
         surveyListContainer = v.findViewById(R.id.ActiveSurveys);
         if (videoArrayList == null)
             videoArrayList = readVideosList(getContext());
-        adp = new HomeRVAdapter(getContext(), videoArrayList);
+        adp = new HomeRVAdapter(getContext(), videoArrayList, myUser);
         surveyListContainer.setAdapter(adp);
         surveyListContainer.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -331,7 +331,7 @@ public class HomeFragment extends Fragment {
 
     private void onRefreshList() {
         videoArrayList = readVideosList(getContext());
-        adp = new HomeRVAdapter(getContext(), videoArrayList);
+        adp = new HomeRVAdapter(getContext(), videoArrayList, myUser);
         surveyListContainer.setAdapter(adp);
         swipeRefreshLayout.setRefreshing(false);
     }
@@ -339,7 +339,7 @@ public class HomeFragment extends Fragment {
     private void onFilterList(View view) {
         if (view.getId() == R.id.all) {
             videoArrayList = readVideosList(getContext());
-            adp = new HomeRVAdapter(getContext(), videoArrayList);
+            adp = new HomeRVAdapter(getContext(), videoArrayList, myUser);
             surveyListContainer.setAdapter(adp);
         } else {
             mySearch(((Button)view).getText().toString().trim());
