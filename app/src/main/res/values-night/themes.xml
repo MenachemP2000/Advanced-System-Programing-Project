@@ -7,4 +7,9 @@
         <item name="colorOnSurface">@color/colorOnSurface_night</item>
         <item name="colorSecondaryContainer">@color/colorSecondaryContainer_night</item>
     </style>
+
+    <style name="ThemeOverlay.ASPP.FullscreenContainer" parent="">
+        <item name="fullscreenBackgroundColor">@color/light_blue_900</item>
+        <item name="fullscreenTextColor">@color/light_blue_A400</item>
+    </style>
 </resources>
