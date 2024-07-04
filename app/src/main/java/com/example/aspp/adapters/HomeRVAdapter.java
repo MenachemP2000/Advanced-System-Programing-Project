@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.aspp.R;
 import com.example.aspp.VideoPlayerActivity;
 import com.example.aspp.fragments.HomeFragment;
+import com.example.aspp.objects.User;
 import com.example.aspp.objects.Video;
 
 import java.text.SimpleDateFormat;
@@ -25,10 +27,18 @@ public class HomeRVAdapter extends RecyclerView.Adapter<HomeRVAdapter.MyViewHold
 
     Context context;
     ArrayList<Video> videos;
+
+    private User myUser;
     int pos;
     public HomeRVAdapter(Context context, ArrayList<Video> videos) {
         this.context = context;
         this.videos = videos;
+    }
+
+    public HomeRVAdapter(Context context, ArrayList<Video> videos, User myUser) {
+        this.context = context;
+        this.videos = videos;
+        this.myUser = myUser;
     }
 
     @NonNull
@@ -36,7 +46,6 @@ public class HomeRVAdapter extends RecyclerView.Adapter<HomeRVAdapter.MyViewHold
     public HomeRVAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(context);
         View v = inflater.inflate(R.layout.home_rv_template, parent, false);
-
         return new HomeRVAdapter.MyViewHolder(v);
     }
 
@@ -55,6 +64,7 @@ public class HomeRVAdapter extends RecyclerView.Adapter<HomeRVAdapter.MyViewHold
             public void onClick(View view) {
                 Video selectedVideo = videos.get(position);
                 Intent intent = new Intent(context, VideoPlayerActivity.class);
+                intent.putExtra("loggedInUser", myUser);
                 intent.putExtra("video_title", selectedVideo.getTitle());
                 intent.putExtra("video_thumbnail", selectedVideo.getThumbnailDrawableId());
                 intent.putExtra("video_videoPath", selectedVideo.getVideoPath());
