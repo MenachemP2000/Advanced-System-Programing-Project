@@ -27,6 +27,7 @@ import android.view.ViewGroup;
 import com.example.aspp.R;
 import com.example.aspp.adapters.HomeRVAdapter;
 import com.example.aspp.adapters.NotificationsRVAdapter;
+import com.example.aspp.objects.User;
 import com.example.aspp.objects.Video;
 
 import java.util.ArrayList;
@@ -37,6 +38,8 @@ import java.util.ArrayList;
  * create an instance of this fragment.
  */
 public class NotificationFragment extends Fragment {
+
+    private User myUser;
 
     Toolbar toolbar;
     SwipeRefreshLayout swipeRefreshLayout;
@@ -101,7 +104,7 @@ public class NotificationFragment extends Fragment {
         notificationListContainer = v.findViewById(R.id.recent_notifications);
         notificationArrayList = readVideosList(getContext());
         Log.i("DATA", notificationArrayList.toString());
-        adp = new NotificationsRVAdapter(getContext(), notificationArrayList);
+        adp = new NotificationsRVAdapter(getContext(), notificationArrayList, myUser);
         notificationListContainer.setAdapter(adp);
         notificationListContainer.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -113,7 +116,7 @@ public class NotificationFragment extends Fragment {
 
     private void onRefreshList() {
         notificationArrayList = readVideosList(getContext());
-        adp = new NotificationsRVAdapter(getContext(), notificationArrayList);
+        adp = new NotificationsRVAdapter(getContext(), notificationArrayList, myUser);
         notificationListContainer.setAdapter(adp);
         swipeRefreshLayout.setRefreshing(false);
     }
