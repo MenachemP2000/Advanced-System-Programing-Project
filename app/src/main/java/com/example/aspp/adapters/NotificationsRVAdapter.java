@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.aspp.R;
 import com.example.aspp.VideoPlayerActivity;
+import com.example.aspp.objects.User;
 import com.example.aspp.objects.Video;
 
 import java.text.SimpleDateFormat;
@@ -20,12 +21,15 @@ import java.util.ArrayList;
 
 public class NotificationsRVAdapter extends RecyclerView.Adapter<NotificationsRVAdapter.MyViewHolder> {
 
+    private User myUser;
+
     Context context;
     ArrayList<Video> notifications;
     int pos;
-    public NotificationsRVAdapter(Context context, ArrayList<Video> notifications) {
+    public NotificationsRVAdapter(Context context, ArrayList<Video> notifications, User myUser) {
         this.context = context;
         this.notifications = notifications;
+        this.myUser = myUser;
     }
 
     @NonNull
@@ -52,6 +56,7 @@ public class NotificationsRVAdapter extends RecyclerView.Adapter<NotificationsRV
             public void onClick(View view) {
                 Video selectedNotifications = notifications.get(position);
                 Intent intent = new Intent(context, VideoPlayerActivity.class);
+                intent.putExtra("loggedInUser", myUser);
                 intent.putExtra("video_title", selectedNotifications.getTitle());
                 intent.putExtra("video_thumbnail", selectedNotifications.getThumbnailDrawableId());
                 intent.putExtra("video_videoPath", selectedNotifications.getVideoPath());

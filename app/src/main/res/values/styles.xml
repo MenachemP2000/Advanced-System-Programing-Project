@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="CustomViewStyle">
+        <item name="fullscreenBackgroundColor">@color/white</item>
+        <item name="fullscreenTextColor">@color/white</item>
+    </style>
+</resources>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/values/attrs.xml -->
+<resources>
+    <declare-styleable name="CustomStyle">
+        <attr name="fullscreenBackgroundColor" format="color"/>
+        <attr name="fullscreenTextColor" format="color"/>
+    </declare-styleable>
+</resources>

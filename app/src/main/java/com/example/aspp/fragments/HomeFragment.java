@@ -8,8 +8,17 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.BitmapShader;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Shader;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -44,8 +53,10 @@ import android.widget.Toast;
 import com.example.aspp.R;
 import com.example.aspp.adapters.HomeRVAdapter;
 import com.example.aspp.objects.Comment;
+import com.example.aspp.objects.User;
 import com.example.aspp.objects.Video;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -56,6 +67,7 @@ import java.util.Set;
  * create an instance of this fragment.
  */
 public class HomeFragment extends Fragment {
+    private User myUser;
 
     RecyclerView surveyListContainer;
     SwipeRefreshLayout swipeRefreshLayout;
@@ -81,8 +93,13 @@ public class HomeFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public HomeFragment(boolean mode) {
+    public HomeFragment(boolean mode, User user) {
         nightMode = mode;
+        myUser = user;
+    }
+
+    public HomeFragment(User user) {
+        myUser = user;
     }
 
     /**
@@ -152,7 +169,7 @@ public class HomeFragment extends Fragment {
 
     private void mySearch(String query) {
         if (query.equals("")) {
-            adp = new HomeRVAdapter(getContext(), videoArrayList);
+            adp = new HomeRVAdapter(getContext(), videoArrayList, myUser);
             surveyListContainer.setAdapter(adp);
             return;
         }
@@ -188,13 +205,13 @@ public class HomeFragment extends Fragment {
         }
 
         updatedArr.addAll(updatedSet);
-        adp = new HomeRVAdapter(getContext(), updatedArr);
+        adp = new HomeRVAdapter(getContext(), updatedArr, myUser);
         surveyListContainer.setAdapter(adp);
     }
 
     private void searchByTag(String tags) {
         if (tags.equals("")) {
-            adp = new HomeRVAdapter(getContext(), videoArrayList);
+            adp = new HomeRVAdapter(getContext(), videoArrayList, myUser);
             surveyListContainer.setAdapter(adp);
             return;
         }
@@ -228,13 +245,39 @@ public class HomeFragment extends Fragment {
         }
 
         updatedArr.addAll(updatedSet);
-        adp = new HomeRVAdapter(getContext(), updatedArr);
+        adp = new HomeRVAdapter(getContext(), updatedArr, myUser);
         surveyListContainer.setAdapter(adp);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_home, container, false);
+        toolbar = v.findViewById(R.id.toolbar);
+
+
+//handle the situation the user logged in and design the toolbar according to it.
+        if (myUser != null) {
+            String name = myUser.getFullName();
+            String[] parts = name.split("\\s+");
+            toolbar.setSubtitle("     "+ "Hi " + parts[0] + "!");
+            // Load and set the profile picture
+            Uri profilePictureUri = Uri.parse(myUser.getProfilePictureUri());
+            try {
+                InputStream inputStream = getContext().getContentResolver().openInputStream(profilePictureUri);
+                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                Bitmap circularBitmap = getCircularBitmap(bitmap);
+                Bitmap resizedBitmap = Bitmap.createScaledBitmap(circularBitmap, 115, 115, false); // Adjust the size as needed
+                Drawable drawable = new BitmapDrawable(getResources(), resizedBitmap);
+                toolbar.setLogo(drawable);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            // If no user is logged in, set default logo and subtitle
+            toolbar.setLogo(R.mipmap.app_logo_round);  // Replace with your default logo resource
+            toolbar.setSubtitle(getString(R.string.app_name));  // Replace with your app name string resource
+        }
+
 
         SharedPreferences sp = getContext().getSharedPreferences("MODE", Context.MODE_PRIVATE);
         nightMode = sp.getBoolean("night", false);
@@ -273,7 +316,7 @@ public class HomeFragment extends Fragment {
         surveyListContainer = v.findViewById(R.id.ActiveSurveys);
         if (videoArrayList == null)
             videoArrayList = readVideosList(getContext());
-        adp = new HomeRVAdapter(getContext(), videoArrayList);
+        adp = new HomeRVAdapter(getContext(), videoArrayList, myUser);
         surveyListContainer.setAdapter(adp);
         surveyListContainer.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -285,9 +328,10 @@ public class HomeFragment extends Fragment {
         return v;
     }
 
+
     private void onRefreshList() {
         videoArrayList = readVideosList(getContext());
-        adp = new HomeRVAdapter(getContext(), videoArrayList);
+        adp = new HomeRVAdapter(getContext(), videoArrayList, myUser);
         surveyListContainer.setAdapter(adp);
         swipeRefreshLayout.setRefreshing(false);
     }
@@ -295,7 +339,7 @@ public class HomeFragment extends Fragment {
     private void onFilterList(View view) {
         if (view.getId() == R.id.all) {
             videoArrayList = readVideosList(getContext());
-            adp = new HomeRVAdapter(getContext(), videoArrayList);
+            adp = new HomeRVAdapter(getContext(), videoArrayList, myUser);
             surveyListContainer.setAdapter(adp);
         } else {
             mySearch(((Button)view).getText().toString().trim());
@@ -433,5 +477,26 @@ public class HomeFragment extends Fragment {
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
         dialog.getWindow().setGravity(Gravity.BOTTOM);
+    }
+
+    private Bitmap getCircularBitmap(Bitmap bitmap) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        int minEdge = Math.min(width, height);
+        int dx = (width - minEdge) / 2;
+        int dy = (height - minEdge) / 2;
+
+        BitmapShader shader = new BitmapShader(Bitmap.createBitmap(bitmap, dx, dy, minEdge, minEdge),
+                Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+        Bitmap output = Bitmap.createBitmap(minEdge, minEdge, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(output);
+        Paint paint = new Paint();
+        paint.setShader(shader);
+        paint.setAntiAlias(true);
+
+        float r = minEdge / 2f;
+        canvas.drawCircle(r, r, r, paint);
+
+        return output;
     }
 }
