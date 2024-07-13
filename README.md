@@ -21,3 +21,4 @@ then start the web app the following command: npm start.
 
 android part:
 in order to run the application you will need to open the project in android studio and run the program through the IDE
+alternatively, you can download the foo-tube.apk file to your phone from the App-Apk folder and install it.  
