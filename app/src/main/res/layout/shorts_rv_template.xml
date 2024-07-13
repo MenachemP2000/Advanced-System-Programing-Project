@@ -52,13 +52,6 @@
             android:gravity="center"
             android:text="Like" />
 
-        <ImageView
-            android:id="@+id/dislike"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            app:srcCompat="@drawable/sharp_thumb_down_off_alt_24" />
-
         <TextView
             android:id="@+id/textView6"
             android:layout_width="match_parent"

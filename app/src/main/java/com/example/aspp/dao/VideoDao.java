@@ -14,7 +14,7 @@ public interface VideoDao {
     @Query("SELECT * FROM Video")
     List<Video> index();
 
-    @Query("SELECT * FROM Video WHERE id = :id")
+    @Query("SELECT * FROM Video WHERE _id = :id")
     Video get(int id);
 
     @Insert

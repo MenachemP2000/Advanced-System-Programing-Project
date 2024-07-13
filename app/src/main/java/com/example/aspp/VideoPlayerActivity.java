@@ -1,20 +1,23 @@
 package com.example.aspp;
 
 import static com.example.aspp.Utils.generateId;
-import static com.example.aspp.Utils.loadComments;
+//import static com.example.aspp.Utils.loadComments;
 import static com.example.aspp.fragments.HomeFragment.adp;
-import static com.example.aspp.fragments.HomeFragment.videoArrayList;
+//import static com.example.aspp.fragments.HomeFragment.videoArrayList;
 
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -25,7 +28,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import androidx.activity.EdgeToEdge;
@@ -34,17 +39,31 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.aspp.adapters.CommentsRVAdapter;
 import com.example.aspp.adapters.HomeRVAdapter;
+import com.example.aspp.entities.Reply;
+import com.example.aspp.entities.SignedPartialVideoUpdate;
+import com.example.aspp.entities.UnsignedPartialVideoUpdate;
 import com.example.aspp.fragments.HomeFragment;
 import com.example.aspp.entities.Comment;
 import com.example.aspp.entities.Video;
+import com.example.aspp.repositories.VideoRepository;
+import com.example.aspp.viewmodels.CommentsViewModel;
+import com.example.aspp.viewmodels.UsersViewModel;
+import com.example.aspp.viewmodels.VideosViewModel;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 public class VideoPlayerActivity extends AppCompatActivity {
     private static final int CURRENT_USER = 123123123;
@@ -54,15 +73,19 @@ public class VideoPlayerActivity extends AppCompatActivity {
     Button subscribe, like, dislike, share, watch_later, playlist;
     MediaController mediaController;
     VideoView videoView;
+    ProgressBar progressBar;
     HomeRVAdapter related;
     ArrayList<Video> relatedVideoArrayList;
     Video currentVideo;
+    //    private boolean commentsAvailable = false;
+    private List<Comment> commentSection;
+    private boolean alreadyLiked = false;
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
+//        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_video_player);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -70,36 +93,56 @@ public class VideoPlayerActivity extends AppCompatActivity {
             return insets;
         });
         Intent intent = getIntent();
-        currentVideo = HomeFragment.videoArrayList.get(intent.getIntExtra("pos",0));
-        currentVideo.addView();
-        if (currentVideo.getComments().isEmpty())
-            loadComments(currentVideo.getId());
-        currentVideo = HomeFragment.videoArrayList.get(intent.getIntExtra("pos",0));
-        ArrayList<Comment> commentSection = currentVideo.getComments();
-        String vid = "http://10.0.2.2:4000" + currentVideo.getSource();
+//        currentVideo = HomeFragment.videoArrayList.get(intent.getIntExtra("pos",0));
+        progressBar = findViewById(R.id.progressBar);
+        progressBar.setActivated(true);
+        commentSection = new ArrayList<>();
+        like = findViewById(R.id.like);
+        VideosViewModel viewModel = new ViewModelProvider(this).get(VideosViewModel.class);
+
+        viewModel.getVideoById(intent.getStringExtra("id"))
+                .observe(this, video -> {
+                    currentVideo = video;
+                    if (currentVideo != null) {
+                        loadVideo();
+                        commentSection = video.getComments();
+                        loadComments();
+                        if (Helper.isSignedIn() &&
+                                currentVideo.getUsersLikes().contains(Helper.getSignedInUser().get_id())) {
+                            alreadyLiked = true;
+                            like.setBackgroundTintList(VideoPlayerActivity.this.getColorStateList(R.color.dark_blue));
+                        }
+                    }
+                });
+//        if (currentVideo.getComments().isEmpty())
+//            loadComments(currentVideo.getId());
+//        currentVideo = HomeFragment.videoArrayList.get(intent.getIntExtra("pos",0));
+
+        new Thread(() -> {
+            while (currentVideo == null) {
+                Log.i("Something", "Something");
+            }
+
+        }).start();
 
         videoView = findViewById(R.id.videoView);
         mediaController = new MediaController(this);
 //        if (intent.getIntExtra("video_thumbnail",0) != 0)
 //            videoView.setVideoURI(Uri.parse("android.resource://com.example.aspp/"+getResources().getIdentifier(vid,"raw",getPackageName())));
 //        else
-        Log.i("Current Vid", currentVideo.toString());
-        Log.i("PATH", vid);
-        videoView.setVideoURI(Uri.parse(vid));
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {
                 videoView.setMediaController(mediaController);
+                progressBar.setVisibility(View.GONE);
                 mediaPlayer.start();
             }
         });
-
         title = findViewById(R.id.title);
-        title.setText(currentVideo.getTitle());
+
         views = findViewById(R.id.views);
-        views.setText(currentVideo.getViews() + "Views");
         time = findViewById(R.id.time);
-//        time.setText(new SimpleDateFormat("hh:mm dd-mm-yyyy").format(currentVideo.getDateOfPublish()));
+
         more = findViewById(R.id.more);
         more.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -108,42 +151,65 @@ public class VideoPlayerActivity extends AppCompatActivity {
             }
         });
         publisher = findViewById(R.id.publisher);
-        publisher.setText(currentVideo.getPublisher());
+
         subscribers = findViewById(R.id.subscribers);
         comments = findViewById(R.id.comments);
         comment = findViewById(R.id.comment);
-        comments.setText(commentSection.size() + " ");
-        try {
-            comment.setText(commentSection.get(0).getText());
-        }
-        catch (Exception e) {
-            Log.d("Exception", e.getMessage());
-            comment.setText("No comments are available right now");
-        }
+
         LinearLayout layout_commentSection = findViewById(R.id.comment_section);
         layout_commentSection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showCommentsDialog(VideoPlayerActivity.this, currentVideo.getComments(), currentVideo);
+                showCommentsDialog(VideoPlayerActivity.this, commentSection, viewModel);
             }
         });
         c_profile = findViewById(R.id.c_profile);
         profilePic = findViewById(R.id.profilePic);
         subscribe = findViewById(R.id.subscribe);
-        like = findViewById(R.id.like);
+
         like.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                currentVideo.addLike();
-                adp.notifyDataSetChanged();
-            }
-        });
-        dislike = findViewById(R.id.dislike);
-        dislike.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                currentVideo.subLike();
-                adp.notifyDataSetChanged();
+                if (!Helper.isSignedIn()) {
+                    Toast.makeText(VideoPlayerActivity.this,
+                            "In order to like a video you first need to sign in", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                if (viewModel.getVideoById(intent.getStringExtra("id")).hasActiveObservers()) {
+                    viewModel.getVideoById(intent.getStringExtra("id"))
+                            .removeObservers(VideoPlayerActivity.this);
+                }
+                if (alreadyLiked) {
+                    like.setBackgroundTintList(VideoPlayerActivity.this.getColorStateList(R.color.colorSecondaryContainer_day));
+                    currentVideo.setLikeCount(currentVideo.getLikeCount() - 1);
+                    currentVideo.getUsersLikes().add(Helper.getSignedInUser().get_id());
+                    SignedPartialVideoUpdate update = new SignedPartialVideoUpdate(
+                            currentVideo.getUsersLikes(),
+                            currentVideo.getComments(),
+                            currentVideo.getLikeCount(),
+                            currentVideo.getViews()
+                    );
+                    viewModel.partialUpdateVideo(update, currentVideo.get_id())
+                            .observe(VideoPlayerActivity.this, video -> {
+
+                            });
+                    alreadyLiked = false;
+                } else {
+                    like.setBackgroundTintList(VideoPlayerActivity.this.getColorStateList(R.color.dark_blue));
+                    currentVideo.setLikeCount(currentVideo.getLikeCount() + 1);
+                    currentVideo.getUsersLikes().add(Helper.getSignedInUser().get_id());
+                    SignedPartialVideoUpdate update = new SignedPartialVideoUpdate(
+                            currentVideo.getUsersLikes(),
+                            currentVideo.getComments(),
+                            currentVideo.getLikeCount(),
+                            currentVideo.getViews()
+                    );
+                    viewModel.partialUpdateVideo(update, currentVideo.get_id())
+                            .observe(VideoPlayerActivity.this, video -> {
+
+                            });
+                    alreadyLiked = true;
+                }
             }
         });
         share = findViewById(R.id.share);
@@ -175,34 +241,117 @@ public class VideoPlayerActivity extends AppCompatActivity {
         });
 
         related_videos = findViewById(R.id.related_videos);
-        relatedVideoArrayList = new ArrayList<>();
-        relatedVideoArrayList.addAll(videoArrayList);
-        related = new HomeRVAdapter(this, videoArrayList);
+        related = new HomeRVAdapter(this, new LinkedList<>());
+        viewModel.getRelatedVideos(intent.getStringExtra("id")).observe(this, videos ->
+        {
+            related.setVideos(videos);
+            Log.i("Related Videos", videos.toString());
+            related.notifyDataSetChanged();
+        });
         related_videos.setAdapter(related);
         related_videos.setLayoutManager(new LinearLayoutManager(this));
     }
-    public static void showCommentsDialog(Context context, ArrayList<Comment> c, Video vid) {
+
+    private void loadComments() {
+        try {
+            comments.setText(commentSection.size() + " ");
+            comment.setText(commentSection.get(0).getContent());
+            UsersViewModel vm = new UsersViewModel();
+            vm.getUserByUsername(commentSection.get(0).getUser()).observe(this, user ->
+            {
+                String profile_url_str = getResources().getString(R.string.Base_Url)
+                        + user.getImage();
+                Glide.with(this)
+                        .load(profile_url_str)
+                        .into(c_profile);
+            });
+        } catch (Exception e) {
+            Log.d("Exception", e.getMessage());
+            comment.setText("No comments are available right now");
+        }
+    }
+
+    private void loadVideo() {
+
+        String vid = "http://10.0.2.2:4000";
+        vid += currentVideo.getSource();
+        if (currentVideo.getSource().equals(""))
+            return;
+        videoView.setVideoURI(Uri.parse(vid));
+        Log.i("Current Vid", currentVideo.toString());
+        Log.i("PATH", vid);
+
+        time.setText(currentVideo.getUpload_date());
+        title.setText(currentVideo.getTitle());
+        views.setText(currentVideo.getViews() + " Views");
+        publisher.setText(currentVideo.getUsername());
+        UsersViewModel vm = new UsersViewModel();
+        vm.getUserByUsername(currentVideo.getUsername()).observe(this, user ->
+        {
+            String profile_url_str = getResources().getString(R.string.Base_Url)
+                    + user.getImage();
+            Glide.with(this)
+                    .load(profile_url_str)
+                    .into(profilePic);
+        });
+    }
+
+    public void showCommentsDialog(Context context, List<Comment> c, VideosViewModel viewModel) {
 
         final Dialog dialog = new Dialog(context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.comment_section_bottom_sheet_layout);
 
+        EditText comment = dialog.findViewById(R.id.comment);
+        Button send = dialog.findViewById(R.id.send);
         RecyclerView comments = dialog.findViewById(R.id.comment_section);
-        CommentsRVAdapter Cadp = new CommentsRVAdapter(context, c);
+        if (commentSection == null) {
+            Toast.makeText(VideoPlayerActivity.this, "Comments are loading", Toast.LENGTH_LONG).show();
+            return;
+        }
+        CommentsRVAdapter Cadp = new CommentsRVAdapter(context, commentSection);
+        Cadp.setVideoIdParent(currentVideo.get_id());
+        Cadp.setEditTextAndBtn(send, comment);
         comments.setAdapter(Cadp);
         comments.setLayoutManager(new LinearLayoutManager(dialog.getContext()));
         ImageView profilePic = dialog.findViewById(R.id.profilePic);
-        EditText comment = dialog.findViewById(R.id.comment);
-        Button send = dialog.findViewById(R.id.send);
+        if (viewModel.getVideoById(currentVideo.get_id()).hasActiveObservers()) {
+            viewModel.getVideoById(currentVideo.get_id())
+                    .removeObservers(VideoPlayerActivity.this);
+        }
+        if (Helper.isSignedIn()) {
+            String profile_url_str = getResources().getString(R.string.Base_Url)
+                    + Helper.getSignedInUser().getImage();
+            Glide.with(this)
+                    .load(profile_url_str)
+                    .into(profilePic);
+        } else {
+            Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.app_logo);
+            profilePic.setImageBitmap(bm);
+        }
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (!Helper.isSignedIn()) {
+                    Toast.makeText(VideoPlayerActivity.this,
+                            "In order to comment on a video you first need to sign in",
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
                 if (comment.getText().toString().isEmpty()) {
                     comment.setError("Please enter a comment");
                 } else {
-                    c.add(new Comment(CURRENT_USER,comment.getText().toString(), vid.getId(), generateId()));
-                    comment.setText("");
-                    Cadp.notifyDataSetChanged();
+                    Comment newComment = new Comment(Helper.getSignedInUser().get_id(),
+                            Helper.getSignedInUser().getUsername(), comment.getText().toString().trim(),
+                            Calendar.getInstance().getTime(), new LinkedList<>(), new LinkedList<>());
+                    c.add(newComment);
+                    CommentsViewModel vm = new CommentsViewModel(currentVideo.get_id());
+                    vm.createComment(newComment).observe(VideoPlayerActivity.this,
+                            comment1 -> {
+                                comment.setText("");
+                                Cadp.setComments(c);
+                                Cadp.notifyDataSetChanged();
+                            });
                 }
             }
         });
@@ -228,6 +377,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
         dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
         dialog.getWindow().setGravity(Gravity.BOTTOM);
     }
+
     public void showBottomDialog(Context context) {
 
         final Dialog dialog = new Dialog(context);
@@ -238,8 +388,10 @@ public class VideoPlayerActivity extends AppCompatActivity {
         dtitle.setText(currentVideo.getTitle());
         TextView dviews = dialog.findViewById(R.id.views);
         dviews.setText(currentVideo.getViews() + "\nViews");
+        TextView dtime = dialog.findViewById(R.id.time);
+        dtime.setText(currentVideo.getUpload_date());
         TextView dlikes = dialog.findViewById(R.id.likes);
-        dlikes.setText(currentVideo.getLikes() + "\nLikes");
+        dlikes.setText(currentVideo.getLikeCount() + "\nLikes");
         TextView ddescription = dialog.findViewById(R.id.description);
         ddescription.setText(currentVideo.getDescription());
         ImageView layout_cancel = dialog.findViewById(R.id.cancelButton);
@@ -257,6 +409,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
         dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
         dialog.getWindow().setGravity(Gravity.BOTTOM);
     }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();

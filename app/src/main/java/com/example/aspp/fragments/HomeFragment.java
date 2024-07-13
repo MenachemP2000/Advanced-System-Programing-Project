@@ -47,6 +47,7 @@ import com.example.aspp.R;
 import com.example.aspp.adapters.HomeRVAdapter;
 import com.example.aspp.api.VideoAPI;
 import com.example.aspp.entities.Comment;
+import com.example.aspp.entities.User;
 import com.example.aspp.entities.Video;
 import com.example.aspp.repositories.VideoRepository;
 import com.example.aspp.viewmodels.VideosViewModel;
@@ -62,10 +63,11 @@ import java.util.Set;
  */
 public class HomeFragment extends Fragment {
 
+    private User myUser;
     RecyclerView surveyListContainer;
     SwipeRefreshLayout swipeRefreshLayout;
     public static HomeRVAdapter adp;
-    public static ArrayList<Video> videoArrayList;
+    public ArrayList<Video> videoArrayList;
     public static ArrayList<Comment> commentArrayList;
     Toolbar toolbar;
     MenuItem searchMenuItem, notifMenuItem;
@@ -87,10 +89,14 @@ public class HomeFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public HomeFragment(boolean mode) {
+    public HomeFragment(boolean mode, User user) {
         nightMode = mode;
+        myUser = user;
     }
 
+    public HomeFragment(User user) {
+        myUser = user;
+    }
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -169,7 +175,7 @@ public class HomeFragment extends Fragment {
         for (Video v:videoArrayList) {
             if (v.getTitle().startsWith(query.trim()))
                 updatedSet.add(v);
-            else if (v.getPublisher().startsWith(query.trim()))
+            else if (v.getUsername().startsWith(query.trim()))
                 updatedSet.add(v);
             else if (v.getDescription().startsWith(query.trim()))
                 updatedSet.add(v);
@@ -179,12 +185,12 @@ public class HomeFragment extends Fragment {
             for (Video v:videoArrayList) {
                 if (v.getTitle().contains(query.trim()))
                     updatedSet.add(v);
-                else if (v.getPublisher().contains(query.trim()))
+                else if (v.getUsername().contains(query.trim()))
                     updatedSet.add(v);
                 else if (v.getDescription().contains(query.trim()))
                     updatedSet.add(v);
-                else if (v.getTags().contains(query.trim()))
-                    updatedSet.add(v);
+//                else if (v.getTags().contains(query.trim()))
+//                    updatedSet.add(v);
             }
         }
 
@@ -209,8 +215,8 @@ public class HomeFragment extends Fragment {
         Set<Video> updatedSet = new HashSet<>();
 
         for (Video v:videoArrayList) {
-            if (v.getTags().contains(tags.trim()))
-                updatedSet.add(v);
+//            if (v.getTags().contains(tags.trim()))
+//                updatedSet.add(v);
 //            else if (v.getPublisher().startsWith(tags.trim()))
 //                updatedSet.add(v);
 //            else if (v.getDescription().startsWith(tags.trim()))
@@ -300,9 +306,12 @@ public class HomeFragment extends Fragment {
     }
 
     private void onRefreshList() {
-//        videoArrayList = readVideosList(getContext());
-//        adp = new HomeRVAdapter(getContext(), videoArrayList);
-        surveyListContainer.setAdapter(adp);
+        viewModel = new ViewModelProvider(this).get(VideosViewModel.class);
+        viewModel.get().observe(getViewLifecycleOwner(), videos -> {
+            videoArrayList = new ArrayList<>(videos);
+            adp.setVideos(videos);
+            adp.notifyDataSetChanged();
+        });
         swipeRefreshLayout.setRefreshing(false);
     }
 
@@ -336,116 +345,5 @@ public class HomeFragment extends Fragment {
             tutorials_btn.setTextColor(getContext().getColorStateList(R.color.black));
             view.setBackgroundTintList(getContext().getColorStateList(R.color.colorOnSurface_day));
         }
-    }
-
-    public static void showBottomDialog(Context context, Video choosenVideo) {
-
-        final Dialog dialog = new Dialog(context);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.home_bottom_sheet_layout);
-
-//        LinearLayout layout_download = dialog.findViewById(R.id.layout_download);
-//        layout_download.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                dialog.dismiss();
-//
-//            }
-//        });
-
-        LinearLayout layout_not_interested = dialog.findViewById(R.id.layout_not_interested);
-        layout_not_interested.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                dialog.dismiss();
-                videoArrayList.remove(choosenVideo);
-                adp.notifyDataSetChanged();
-                Toast.makeText(context, choosenVideo.getTitle()+" was removed", Toast.LENGTH_SHORT).show();
-
-            }
-        });
-
-//        LinearLayout layout_not_recommend = dialog.findViewById(R.id.layout_not_recommend);
-//        layout_not_recommend.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                dialog.dismiss();
-//
-//            }
-//        });
-
-        LinearLayout layout_playlist = dialog.findViewById(R.id.layout_playlist);
-        layout_playlist.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                dialog.dismiss();
-
-            }
-        });
-
-        LinearLayout layout_queue = dialog.findViewById(R.id.layout_queue);
-        layout_queue.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                dialog.dismiss();
-
-            }
-        });
-
-//        LinearLayout layout_report = dialog.findViewById(R.id.layout_report);
-//        layout_report.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                dialog.dismiss();
-//
-//            }
-//        });
-
-        LinearLayout layout_watch_later = dialog.findViewById(R.id.layout_watch_later);
-        layout_watch_later.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                dialog.dismiss();
-
-            }
-        });
-
-        LinearLayout layout_share = dialog.findViewById(R.id.layout_share);
-        layout_share.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                dialog.dismiss();
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.setType("text/plain");
-                String body = "Check out this video!";
-                String sub = "Check out this video!\n" + choosenVideo.getTitle();
-                shareIntent.putExtra(Intent.EXTRA_TEXT, body);
-                shareIntent.putExtra(Intent.EXTRA_TEXT, sub);
-                context.startActivity(Intent.createChooser(shareIntent, "Share using"));
-
-            }
-        });
-
-        ImageView cancelButton = dialog.findViewById(R.id.cancelButton);
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.dismiss();
-            }
-        });
-
-        dialog.show();
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
-        dialog.getWindow().setGravity(Gravity.BOTTOM);
     }
 }

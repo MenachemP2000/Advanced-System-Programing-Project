@@ -66,7 +66,7 @@ public class ShortsFragment extends androidx.fragment.app.Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_shorts, container, false);
         viewPager2 = v.findViewById(R.id.viewPager2);
-        adp = new ShortsRVAdapter(getContext(), HomeFragment.videoArrayList);
+//        adp = new ShortsRVAdapter(getContext(), HomeFragment.videoArrayList);
         viewPager2.setAdapter(adp);
         return v;
     }

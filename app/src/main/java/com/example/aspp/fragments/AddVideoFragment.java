@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -32,13 +34,18 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.example.aspp.Helper;
 import com.example.aspp.MainActivity;
 import com.example.aspp.R;
+import com.example.aspp.entities.User;
 import com.example.aspp.entities.Video;
+import com.example.aspp.repositories.VideoRepository;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -46,6 +53,7 @@ import java.io.IOException;
  * create an instance of this fragment.
  */
 public class AddVideoFragment extends Fragment {
+    private User myUser;
     Button createVideo, cancel;
     EditText videoTitle, videoDescription, videoTags;
     ImageView videoThumbnail;
@@ -68,6 +76,11 @@ public class AddVideoFragment extends Fragment {
     public AddVideoFragment() {
         // Required empty public constructor
     }
+
+    public AddVideoFragment(User user) {
+        myUser = user;
+    }
+
 
     /**
      * Use this factory method to create a new instance of
@@ -143,10 +156,29 @@ public class AddVideoFragment extends Fragment {
             if (!isValid) {
                 return;
             }
-            Video newVideo = new Video(123243, "demi user",title,
-                    description, tags, uri, videoPath);
-            HomeFragment.videoArrayList.add(newVideo);
-            HomeFragment.adp.notifyDataSetChanged();
+            BitmapDrawable drawable = (BitmapDrawable) videoThumbnail.getDrawable();
+            Bitmap bitmap = drawable.getBitmap();
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, bos);
+            byte[] bb = bos.toByteArray();
+            String image = Base64.encodeToString(bb, Base64.DEFAULT);
+
+            String[] tag = null;
+            try {
+                tag = tags.split(", ");
+            } catch (Exception e) {
+                tag = new String[]{tags};
+            }
+            Video newVideo = new Video(
+                    tag,
+                    new ArrayList<>(),
+                    "",
+                    title,
+                    description, videoPath, image, Calendar.getInstance().getTime().toString(),
+                    Helper.getSignedInUser().getUsername(), 0, 0, 0, new ArrayList<>()
+            );
+            VideoRepository vr = new VideoRepository();
+            vr.add(newVideo);
             startActivity(new Intent(getContext(), MainActivity.class));
         });
         cancel = view.findViewById(R.id.cancel);
@@ -159,8 +191,7 @@ public class AddVideoFragment extends Fragment {
         if (nightMode) {
             createVideo.setBackgroundTintList(getContext().getColorStateList(R.color.colorOnSurface_night));
             cancel.setBackgroundTintList(getContext().getColorStateList(R.color.colorOnSurface_night));
-        }
-        else {
+        } else {
             createVideo.setBackgroundTintList(getContext().getColorStateList(R.color.colorOnSurface_day));
             cancel.setBackgroundTintList(getContext().getColorStateList(R.color.colorOnSurface_day));
         }
@@ -193,7 +224,7 @@ public class AddVideoFragment extends Fragment {
                 dialog.dismiss();
                 Intent videoIntent = new Intent(Intent.ACTION_PICK);
                 videoIntent.setType("video/*");
-                startActivityForResult(Intent.createChooser(videoIntent,"Select Video"),2);
+                startActivityForResult(Intent.createChooser(videoIntent, "Select Video"), 2);
 
             }
         });
@@ -219,7 +250,7 @@ public class AddVideoFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK){
+        if (resultCode == RESULT_OK) {
             if (requestCode == 2 || requestCode == 1) {
                 videoPath = data.toURI().split(";")[0];
                 Log.i("DATA", data.toURI().split(";")[0] + "  ");

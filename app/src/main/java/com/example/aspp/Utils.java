@@ -40,8 +40,8 @@ public class Utils {
                 String text = json_obj.getString("text");
                 int video = json_obj.getInt("video");
 
-                Comment temp = new Comment(publisher_id, text, video, id);
-                result.add(temp);
+//                Comment temp = new Comment(publisher_id, text, video, id);
+//                result.add(temp);
             }
         } catch (JSONException | IOException e) {
             throw new RuntimeException(e);
@@ -49,30 +49,30 @@ public class Utils {
         return result;
     }
 
-    public static int getVideoById(int id) {
-        for (int i = 0; i < HomeFragment.videoArrayList.size(); i++) {
-            if (HomeFragment.videoArrayList.get(i).getId() == id) {
-                return i;
-            }
-        }
-        return -1;
-    }
-    public static void loadComments(int id) {
-        int pos = getVideoById(id);
-        for (int i = 0; i < HomeFragment.commentArrayList.size(); i++) {
-            if (HomeFragment.commentArrayList.get(i).getVideoId() == id) {
-                int finalI = i;
-                final boolean[] load = {true};
-                HomeFragment.videoArrayList.get(pos).getComments().forEach(comment -> {
-                    if (comment.getId() == HomeFragment.commentArrayList.get(finalI).getId()){
-                        load[0] = false;
-                    }
-                });
-                if (load[0])
-                    HomeFragment.videoArrayList.get(pos).getComments().add(HomeFragment.commentArrayList.get(finalI));
-            }
-        }
-    }
+//    public static int getVideoById(int id) {
+//        for (int i = 0; i < HomeFragment.videoArrayList.size(); i++) {
+//            if (HomeFragment.videoArrayList.get(i).get_id().equals(String.valueOf(id))) {
+//                return i;
+//            }
+//        }
+//        return -1;
+//    }
+//    public static void loadComments(String id) {
+//        int pos = getVideoById(Integer.parseInt(id));
+//        for (int i = 0; i < HomeFragment.commentArrayList.size(); i++) {
+//            if (HomeFragment.commentArrayList.get(i).getVideoId() == Integer.parseInt(id)) {
+//                int finalI = i;
+//                final boolean[] load = {true};
+////                HomeFragment.videoArrayList.get(pos).getComments().forEach(comment -> {
+////                    if (comment.getId() == HomeFragment.commentArrayList.get(finalI).getId()){
+////                        load[0] = false;
+////                    }
+////                });
+////                if (load[0])
+////                    HomeFragment.videoArrayList.get(pos).getComments().add(HomeFragment.commentArrayList.get(finalI));
+//            }
+//        }
+//    }
     public static int generateId() {
         int id = 0;
         for (int i = 0; i < 50; i++) {
@@ -99,11 +99,11 @@ public class Utils {
                 String description = json_obj.getString("description");
                 String tags = json_obj.getString("tags");
                 int thumbnailDrawableID = string2drawbleId(context, json_obj.getString("thumbnailID"));
-                int id = json_obj.getInt("id");
+                String id = json_obj.getString("id");
                 String videoPathInRaw = json_obj.getString("videoPathInRaw");
 
-                Video temp = new Video(id, publisher_id, title, description, tags, thumbnailDrawableID, videoPathInRaw);
-                result.add(temp);
+//                Video temp = new Video(id, publisher_id, title, description, tags, thumbnailDrawableID, videoPathInRaw);
+//                result.add(temp);
             }
         } catch (JSONException | IOException e) {
             throw new RuntimeException(e);

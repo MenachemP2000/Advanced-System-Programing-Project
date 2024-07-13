@@ -1,6 +1,6 @@
 package com.example.aspp.adapters;
 
-import static com.example.aspp.Utils.loadComments;
+//import static com.example.aspp.Utils.loadComments;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -48,10 +48,10 @@ public class ShortsRVAdapter extends RecyclerView.Adapter<ShortsRVAdapter.MyView
 
     @Override
     public void onBindViewHolder(@NonNull ShortsRVAdapter.MyViewHolder holder, int position) {
-        if (shorts.get(position).getComments().isEmpty())
-            loadComments(shorts.get(position).getId());
+//        if (shorts.get(position).getComments().isEmpty())
+//            loadComments(shorts.get(position).getId());
         holder.videoName.setText(shorts.get(position).getTitle());
-        holder.publisher.setText(shorts.get(position).getPublisher());
+        holder.publisher.setText(shorts.get(position).getUsername());
         final VideoView vid = holder.videoView;
         holder.videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
@@ -69,37 +69,37 @@ public class ShortsRVAdapter extends RecyclerView.Adapter<ShortsRVAdapter.MyView
         });
         holder.videoView.setScaleX(vid.getScaleX());
         holder.videoView.setScaleY(vid.getScaleY());
-        shorts.get(position).addView();
+//        shorts.get(position).addView();
         holder.videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
                 mediaPlayer.start();
             }
         });
-        String vid_path = shorts.get(position).getVideoPath();
-        if (shorts.get(position).getThumbnailDrawableId() != 0)
-            holder.videoView.setVideoURI(Uri.parse("android.resource://com.example.aspp/"+context.getResources().getIdentifier(vid_path,"raw",context.getPackageName())));
-        else
-            holder.videoView.setVideoURI(Uri.parse(vid_path));
-        holder.like.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                shorts.get(position).addLike();
-            }
-        });
-        holder.dislike.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                shorts.get(position).subLike();
-            }
-        });
-        holder.comment_section.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                VideoPlayerActivity.showCommentsDialog(context,
-                        shorts.get(position).getComments(), shorts.get(position));
-            }
-        });
+//        String vid_path = shorts.get(position).getVideoPath();
+//        if (shorts.get(position).getThumbnailDrawableId() != 0)
+//            holder.videoView.setVideoURI(Uri.parse("android.resource://com.example.aspp/"+context.getResources().getIdentifier(vid_path,"raw",context.getPackageName())));
+//        else
+//            holder.videoView.setVideoURI(Uri.parse(vid_path));
+//        holder.like.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                shorts.get(position).addLike();
+//            }
+//        });
+//        holder.dislike.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                shorts.get(position).subLike();
+//            }
+//        });
+//        holder.comment_section.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                VideoPlayerActivity.showCommentsDialog(context,
+//                        shorts.get(position).getComments(), shorts.get(position));
+//            }
+//        });
         holder.share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -139,7 +139,7 @@ public class ShortsRVAdapter extends RecyclerView.Adapter<ShortsRVAdapter.MyView
         TextView dviews = dialog.findViewById(R.id.views);
         dviews.setText(currentVideo.getViews() + "\nViews");
         TextView dlikes = dialog.findViewById(R.id.likes);
-        dlikes.setText(currentVideo.getLikes() + "\nLikes");
+        dlikes.setText(currentVideo.getLikeCount() + "\nLikes");
         TextView ddescription = dialog.findViewById(R.id.description);
         ddescription.setText(currentVideo.getDescription());
         ImageView layout_cancel = dialog.findViewById(R.id.cancelButton);
@@ -174,7 +174,6 @@ public class ShortsRVAdapter extends RecyclerView.Adapter<ShortsRVAdapter.MyView
             publisher = itemView.findViewById(R.id.username);
             profilePic = itemView.findViewById(R.id.profilePic);
             like = itemView.findViewById(R.id.like);
-            dislike = itemView.findViewById(R.id.dislike);
             comment_section = itemView.findViewById(R.id.comment_section);
             share = itemView.findViewById(R.id.share);
             more = itemView.findViewById(R.id.more);

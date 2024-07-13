@@ -5,59 +5,76 @@ import androidx.room.PrimaryKey;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 //@Entity
-public class Comment implements Serializable {
+public class Comment implements Serializable{
 //    @PrimaryKey(autoGenerate = true)
-    int id;
-    int publisherId, videoId;
-    String text;
-    int likes;
-    int dislikes;
-    ArrayList<Comment> replayComments;
 
-    public Comment(int publisherId, String text, int videoId, int id) {
-        this.publisherId = publisherId;
-        this.text = text;
-        this.videoId = videoId;
-        this.id = id;
-        this.likes = 0;
-        this.dislikes = 0;
-        this.replayComments = new ArrayList<>();
-    }
-    public void addLike() {
-        this.likes++;
-    }
-    public void subLike() {
-        this.dislikes++;
-    }
-    public void addReplay(Comment replay) {
-        this.replayComments.add(replay);
+    String _id;
+    String user, content;
+    Date date;
+    List<String> usersLikes;
+    List<Reply> replies;
+
+    public Comment() {
     }
 
-    public ArrayList<Comment> getReplayComments() {
-        return replayComments;
+    public Comment(String _id, String user, String content, Date date, List<String> usersLikes, List<Reply> replies) {
+        this._id = _id;
+        this.user = user;
+        this.content = content;
+        this.date = date;
+        this.usersLikes = usersLikes;
+        this.replies = replies;
     }
 
-    public int getPublisherId() {
-        return publisherId;
+    public String get_id() {
+        return _id;
     }
 
-    public int getLikes() {
-        return likes;
+    public void set_id(String _id) {
+        this._id = _id;
     }
 
-    public int getDislikes() {
-        return dislikes;
+    public String getUser() {
+        return user;
     }
 
-    public String getText() {
-        return this.text;
-    }
-    public int getVideoId() {
-        return this.videoId;
+    public void setUser(String user) {
+        this.user = user;
     }
 
-    public int getId() {
-        return id;
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public List<String> getUsersLikes() {
+        return usersLikes;
+    }
+
+    public void setUsersLikes(List<String> usersLikes) {
+        this.usersLikes = usersLikes;
+    }
+
+    public List<Reply> getReplies() {
+        return replies;
+    }
+
+    public void setReplies(List<Reply> replies) {
+        this.replies = replies;
     }
 }
