@@ -1,9 +1,7 @@
-const Video = require('../models/Video');
-const jwt = require("jsonwebtoken")
-const key = "Some super secret key"
-const mongoose = require('mongoose');
-
-
+const Video = require("../models/Video");
+const jwt = require("jsonwebtoken");
+const key = "Some super secret key";
+const mongoose = require("mongoose");
 
 // Create a new video
 exports.createVideo = async (req, res) => {
@@ -19,13 +17,13 @@ exports.createVideo = async (req, res) => {
 exports.getVideos = async (req, res) => {
   try {
     // Fetch top 10 videos by views
-    const topVideos = await Video.find().sort({ views: -1, _id: 1  }).limit(10);
-    const topVideoIds = topVideos.map(video => video._id);
+    const topVideos = await Video.find().sort({ views: -1, _id: 1 }).limit(10);
+    const topVideoIds = topVideos.map((video) => video._id);
 
     // Fetch 10 random videos excluding the top 10
     const randomVideos = await Video.aggregate([
       { $match: { _id: { $nin: topVideoIds } } },
-      { $sample: { size: 10 } }
+      { $sample: { size: 10 } },
     ]);
 
     // Combine both results
@@ -34,12 +32,10 @@ exports.getVideos = async (req, res) => {
     // Send the combined results
     res.send(videos);
   } catch (error) {
-
-    console.error('Error fetching videos:', error);
+    console.error("Error fetching videos:", error);
     res.status(500).send(error);
   }
 };
-
 
 exports.getAllVideos = async (req, res) => {
   try {
@@ -50,7 +46,7 @@ exports.getAllVideos = async (req, res) => {
     let queryConditions = [];
 
     if (title) {
-      queryConditions.push({ title: { $regex: title, $options: 'i' } }); // Case-insensitive regex search
+      queryConditions.push({ title: { $regex: title, $options: "i" } }); // Case-insensitive regex search
     }
 
     if (username) {
@@ -85,23 +81,33 @@ exports.getRelatedVideos = async (req, res) => {
     let pipeline = [
       {
         $match: {
-          _id: { $ne: _id }
-        }
+          _id: { $ne: _id },
+        },
       },
       {
         $addFields: {
           priorityScore: {
             $add: [
-              { $multiply: [{ $size: { $setIntersection: [tags, '$tags'] } }, 1] }, // Score for common tags
-              { $cond: { if: { $eq: ['$username', username] }, then: 5, else: 0 } }   // Score for matching username
-            ]
-          }
-        }
+              {
+                $multiply: [
+                  { $size: { $setIntersection: [tags, "$tags"] } },
+                  1,
+                ],
+              }, // Score for common tags
+              {
+                $cond: {
+                  if: { $eq: ["$username", username] },
+                  then: 5,
+                  else: 0,
+                },
+              }, // Score for matching username
+            ],
+          },
+        },
       },
       {
-        $sort: { priorityScore: -1, _id: 1 }
-      }
-
+        $sort: { priorityScore: -1, _id: 1 },
+      },
     ];
 
     const page = parseInt(req.query.page) || 1; // Get the page from the query or default to 1
@@ -112,7 +118,7 @@ exports.getRelatedVideos = async (req, res) => {
         ...pipeline,
         { $skip: skip },
         { $limit: limit },
-        { $sample: { size: limit } }
+        { $sample: { size: limit } },
       ];
     }
 
@@ -123,9 +129,8 @@ exports.getRelatedVideos = async (req, res) => {
       videos: videos,
       totalVideos: totalVideos,
       currentPage: page,
-      totalPages: Math.ceil(totalVideos / limit)
+      totalPages: Math.ceil(totalVideos / limit),
     });
-
   } catch (error) {
     res.status(500).send(error);
   }
@@ -143,12 +148,9 @@ exports.getVideoById = async (req, res) => {
   }
 };
 
-
 // Update a video by ID (PUT)
 exports.updateVideo = async (req, res) => {
   try {
-
-
     const test = await Video.findById(req.params.id);
     if (!test) {
       return res.status(404).send();
@@ -156,10 +158,13 @@ exports.updateVideo = async (req, res) => {
     const token = req.headers.authorization.split(" ")[1];
     const data = jwt.verify(token, key);
     if (data.username !== test.username) {
-      return res.status(403).send('Forbidden');
+      return res.status(403).send("Forbidden");
     }
 
-    const video = await Video.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    const video = await Video.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
 
     res.send(video);
   } catch (error) {
@@ -179,62 +184,109 @@ exports.partialUpdateVideo = async (req, res) => {
       try {
         const token = req.headers.authorization.split(" ")[1];
         const data = jwt.verify(token, key);
+        console.log(data.username + test.username);
         if (data.username !== test.username) {
-          if ('title' in req.body || 'description' in req.body || 'source' in req.body ||
-            'thumbnail' in req.body || 'tags' in req.body || 'upload_date' in req.body ||
-            'duration' in req.body || 'username' in req.body) {
-            return res.status(403).send('Forbidden');
+          if (
+            "title" in req.body ||
+            "description" in req.body ||
+            "source" in req.body ||
+            "thumbnail" in req.body ||
+            "tags" in req.body ||
+            "upload_date" in req.body ||
+            "duration" in req.body ||
+            "username" in req.body
+          ) {
+            console.log("request body ilegal");
+            return res.status(403).send("Forbidden");
           }
 
-          if ('views' in req.body) {
-            if (req.body.views !== test.views + 1 && req.body.views !== test.views) {
-              return res.status(403).send('Forbidden');
+          if ("views" in req.body) {
+            if (
+              req.body.views !== test.views + 1 &&
+              req.body.views !== test.views
+            ) {
+              console.log("views ilegal");
+              return res.status(403).send("Forbidden");
             }
           }
-          if ('likeCount' in req.body) {
-            if (req.body.likeCount !== test.likeCount + 1 && req.body.likeCount !== test.likeCount - 1) {
-              return res.status(403).send('Forbidden');
+          if ("likeCount" in req.body) {
+            if (
+              req.body.likeCount !== test.likeCount + 1 &&
+              req.body.likeCount !== test.likeCount - 1
+            ) {
+              console.log("likecount ilegal");
+              return res.status(403).send("Forbidden");
             }
           }
 
-          if ('usersLikes' in req.body) {
-            if (req.body.usersLikes.length !== test.usersLikes.length + 1 && req.body.usersLikes.length !== test.usersLikes.length - 1) {
-              return res.status(403).send('Forbidden');
+          if ("usersLikes" in req.body) {
+            if (
+              req.body.usersLikes.length !== test.usersLikes.length + 1 &&
+              req.body.usersLikes.length !== test.usersLikes.length - 1
+            ) {
+              console.log("userlikes ilegal");
+              return res.status(403).send("Forbidden");
             }
           }
-          if ('comments' in req.body) {
-            if (req.body.comments.length !== test.comments.length + 1 && req.body.comments.length !== test.comments.length - 1) {
-              return res.status(403).send('Forbidden');
+          if ("comments" in req.body) {
+            if (
+              req.body.comments.length !== test.comments.length + 1 &&
+              req.body.comments.length !== test.comments.length &&
+              req.body.comments.length !== test.comments.length - 1
+            ) {
+              console.log("comments ilegal");
+              return res.status(403).send("Forbidden");
             }
           }
         }
-        const video = await Video.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+        const video = await Video.findByIdAndUpdate(req.params.id, req.body, {
+          new: true,
+          runValidators: true,
+        });
 
         res.send(video);
-      }
-      catch (err) {
-        if ('title' in req.body || 'description' in req.body || 'source' in req.body ||
-          'thumbnail' in req.body || 'tags' in req.body || 'upload_date' in req.body ||
-          'duration' in req.body || 'username' in req.body || 'likeCount' in req.body ||
-          'usersLikes' in req.body || 'comments' in req.body) {
-          return res.status(403).send('Forbidden');
-        }
-        else if ('views' in req.body) {
-          if (req.body.views !== test.views + 1 && req.body.views !== test.views) {
-            return res.status(403).send('Forbidden');
+      } catch (err) {
+        if (
+          "title" in req.body ||
+          "description" in req.body ||
+          "source" in req.body ||
+          "thumbnail" in req.body ||
+          "tags" in req.body ||
+          "upload_date" in req.body ||
+          "duration" in req.body ||
+          "username" in req.body ||
+          "likeCount" in req.body ||
+          "usersLikes" in req.body ||
+          "comments" in req.body
+        ) {
+          console.log("request body 2 ilegal");
+          // console.log(req.body);
+          return res.status(403).send("Forbidden");
+        } else if ("views" in req.body) {
+          if (
+            req.body.views !== test.views + 1 &&
+            req.body.views !== test.views
+          ) {
+            console.log("views 2 ilegal");
+            return res.status(403).send("Forbidden");
           }
           try {
-            const video = await Video.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+            const video = await Video.findByIdAndUpdate(
+              req.params.id,
+              req.body,
+              { new: true, runValidators: true }
+            );
             res.send(video);
-          }
-          catch (error) {
+          } catch (error) {
             res.status(400).send(error);
           }
         }
       }
+    } else {
+      console.log(req.headers.authorization);
+      console.log("token ilegal");
+      return res.status(403).send("Token required");
     }
-    else
-      return res.status(403).send('Token required');
   } catch (error) {
     res.status(400).send(error);
   }
@@ -243,8 +295,6 @@ exports.partialUpdateVideo = async (req, res) => {
 // Delete a video by ID
 exports.deleteVideo = async (req, res) => {
   try {
-
-
     const test = await Video.findById(req.params.id);
     if (!test) {
       return res.status(404).send();
@@ -252,7 +302,7 @@ exports.deleteVideo = async (req, res) => {
     const token = req.headers.authorization.split(" ")[1];
     const data = jwt.verify(token, key);
     if (data.username !== test.username) {
-      return res.status(403).send('Forbidden');
+      return res.status(403).send("Forbidden");
     }
 
     const video = await Video.findByIdAndDelete(req.params.id);

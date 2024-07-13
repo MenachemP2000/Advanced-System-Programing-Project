@@ -1,8 +1,6 @@
-const Video = require('../models/Video');
-const jwt = require("jsonwebtoken")
-const key = "Some super secret key"
-
-
+const Video = require("../models/Video");
+const jwt = require("jsonwebtoken");
+const key = "Some super secret key";
 
 // Create a comment
 exports.createComment = async (req, res) => {
@@ -11,7 +9,7 @@ exports.createComment = async (req, res) => {
   try {
     const video = await Video.findById(videoId);
     if (!video) {
-      return res.status(404).send('Video not found');
+      return res.status(404).send("Video not found");
     }
 
     const newComment = {
@@ -21,9 +19,8 @@ exports.createComment = async (req, res) => {
       usersLikes,
       replies,
     };
-    
 
-    video.comments.push(newComment);    
+    video.comments.push(newComment);
     await video.save();
 
     res.status(201).send(video.comments[video.comments.length - 1]);
@@ -39,7 +36,7 @@ exports.getComments = async (req, res) => {
   try {
     const video = await Video.findById(videoId);
     if (!video) {
-      return res.status(404).json({ message: 'Video not found' });
+      return res.status(404).json({ message: "Video not found" });
     }
     const sortedComments = video.comments.sort((a, b) => b.date - a.date);
     const limit = parseInt(req.query.limit) || sortedComments.length;
@@ -51,12 +48,11 @@ exports.getComments = async (req, res) => {
       comments: paginatedComments,
       totalComments: sortedComments.length,
       currentPage: page,
-      totalPages: Math.ceil(sortedComments.length / limit)
+      totalPages: Math.ceil(sortedComments.length / limit),
     });
-
   } catch (error) {
-    console.error('Error fetching comments:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error("Error fetching comments:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -67,12 +63,12 @@ exports.getComment = async (req, res) => {
   try {
     const video = await Video.findById(videoId);
     if (!video) {
-      return res.status(404).send('Video not found');
+      return res.status(404).send("Video not found");
     }
 
     const comment = video.comments.id(commentId);
     if (!comment) {
-      return res.status(404).send('Comment not found');
+      return res.status(404).send("Comment not found");
     }
     res.send(comment);
   } catch (error) {
@@ -88,18 +84,18 @@ exports.updateComment = async (req, res) => {
   try {
     const video = await Video.findById(videoId);
     if (!video) {
-      return res.status(404).send('Video not found');
+      return res.status(404).send("Video not found");
     }
 
     const comment = video.comments.id(commentId);
     if (!comment) {
-      return res.status(404).send('Comment not found');
+      return res.status(404).send("Comment not found");
     }
-    
+
     const token = req.headers.authorization.split(" ")[1];
     const data = jwt.verify(token, key);
     if (data.username !== comment.user) {
-      return res.status(403).send('Forbidden');
+      return res.status(403).send("Forbidden");
     }
 
     comment.user = updatedComment.user || comment.user; // retain the old value if the new value is not provided
@@ -124,44 +120,54 @@ exports.partialUpdateComment = async (req, res) => {
   try {
     const video = await Video.findById(videoId);
     if (!video) {
-      return res.status(404).send('Video not found');
+      return res.status(404).send("Video not found");
     }
 
     const comment = video.comments.id(commentId);
     if (!comment) {
-      return res.status(404).send('Comment not found');
+      return res.status(404).send("Comment not found");
     }
 
-    
     const token = req.headers.authorization.split(" ")[1];
     const data = jwt.verify(token, key);
     if (data.username !== comment.user) {
-      if ('user' in updatedFields || 'content' in updatedFields || 'date' in updatedFields ) {
-        return res.status(403).send('Forbidden');
+      if (
+        "user" in updatedFields ||
+        "content" in updatedFields ||
+        "date" in updatedFields
+      ) {
+        console.log("body problem");
+        return res.status(403).send("Forbidden");
       }
-      if ('usersLikes' in updatedFields ) {
-        if (updatedFields.usersLikes.length !== comment.usersLikes.length +1 && updatedFields.usersLikes.length !== comment.usersLikes.length -1 ) {
-          return res.status(403).send('Forbidden');
+      if ("usersLikes" in updatedFields) {
+        if (
+          updatedFields.usersLikes.length !== comment.usersLikes.length + 1 &&
+          updatedFields.usersLikes.length !== comment.usersLikes.length - 1
+        ) {
+          console.log("usersLikes problem");
+          return res.status(403).send("Forbidden");
         }
       }
-      if ('replies' in updatedFields ) {
-        if (updatedFields.replies.length !== comment.replies.length +1 &&
-           updatedFields.replies.length !== comment.replies.length -1 &&
-            updatedFields.replies.length !== comment.replies.length ) {
-          return res.status(403).send('Forbidden');
+      if ("replies" in updatedFields) {
+        if (
+          updatedFields.replies.length !== comment.replies.length + 1 &&
+          updatedFields.replies.length !== comment.replies.length - 1 &&
+          updatedFields.replies.length !== comment.replies.length
+        ) {
+          console.log("replies problem");
+          return res.status(403).send("Forbidden");
         }
       }
     }
 
     // Update only the provided fields
-    Object.keys(updatedFields).forEach(field => {
+    Object.keys(updatedFields).forEach((field) => {
       comment[field] = updatedFields[field];
     });
 
     await video.save();
 
     res.send(comment);
-
   } catch (error) {
     res.status(400).send(error.message);
   }
@@ -174,25 +180,25 @@ exports.deleteComment = async (req, res) => {
   try {
     const video = await Video.findById(videoId);
     if (!video) {
-      return res.status(404).send('Video not found');
+      return res.status(404).send("Video not found");
     }
 
     const comment = video.comments.id(commentId);
     if (!comment) {
-      return res.status(404).send('Comment not found');
+      return res.status(404).send("Comment not found");
     }
-    
+
     const token = req.headers.authorization.split(" ")[1];
 
     const data = jwt.verify(token, key);
     if (data.username !== comment.user) {
-      return res.status(403).send('Forbidden');
+      return res.status(403).send("Forbidden");
     }
 
     video.comments.remove(comment);
     await video.save();
 
-    res.send('Comment deleted successfully');
+    res.send("Comment deleted successfully");
   } catch (error) {
     res.status(500).send(error.message);
   }
