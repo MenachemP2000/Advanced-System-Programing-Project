@@ -1,4 +1,4 @@
-package com.example.aspp.fragments;
+package com.example.aspp;
 
 import android.Manifest;
 import android.content.Intent;
@@ -6,21 +6,17 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
 
-import com.example.aspp.MainActivity;
-import com.example.aspp.R;
 import com.example.aspp.objects.User;
 
 import org.json.JSONArray;
@@ -32,31 +28,26 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class SignInFragment extends Fragment {
+public class SignInActivity extends AppCompatActivity {
 
     private static final int REQUEST_PERMISSION_CODE = 123;
     private static final int REQUEST_CAMERA_PERMISSION_CODE = 456;
-    private static final String TAG = "SignInFragment";
+    private static final String TAG = "SignInActivity";
 
     private EditText usernameEditText;
     private EditText passwordEditText;
 
     private User myUser;
 
-    public SignInFragment() {
-        // Required empty public constructor
-    }
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_sign_in);
 
-        View view = inflater.inflate(R.layout.fragment_sign_in, container, false);
+        usernameEditText = findViewById(R.id.usernameText);
+        passwordEditText = findViewById(R.id.passwordText);
 
-        usernameEditText = view.findViewById(R.id.usernameText);
-        passwordEditText = view.findViewById(R.id.passwordText);
-
-        Button loginBtn = view.findViewById(R.id.login);
+        Button loginBtn = findViewById(R.id.login);
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -65,20 +56,20 @@ public class SignInFragment extends Fragment {
 
                 if (isValidCredentials(username, password)) {
                     if (myUser != null) {
-                        Intent intent = new Intent(requireContext(), MainActivity.class);
+                        Intent intent = new Intent(SignInActivity.this, MainActivity.class);
                         intent.putExtra("loggedInUser", myUser);
                         startActivity(intent);
                     } else {
                         Log.e(TAG, "User object is null after validation.");
-                        Toast.makeText(requireContext(), "An error occurred. Please try again.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SignInActivity.this, "An error occurred. Please try again.", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(requireContext(), "Invalid username or password", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SignInActivity.this, "Invalid username or password", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
-        TextView signUp = view.findViewById(R.id.signup);
+        TextView signUp = findViewById(R.id.signup);
         signUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -88,20 +79,19 @@ public class SignInFragment extends Fragment {
 
         // Request external storage and camera permission if not granted
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
                     != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(requireActivity(),
+                ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                         REQUEST_PERMISSION_CODE);
             }
-            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                     != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(requireActivity(),
+                ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.CAMERA},
                         REQUEST_CAMERA_PERMISSION_CODE);
             }
         }
-        return view;
     }
 
     private boolean isValidCredentials(String username, String password) {
@@ -109,7 +99,7 @@ public class SignInFragment extends Fragment {
 
         try {
             // Read the JSON file
-            File file = new File(requireContext().getFilesDir(), "user_credentials.json");
+            File file = new File(getFilesDir(), "user_credentials.json");
             StringBuilder json = new StringBuilder();
             BufferedReader br = new BufferedReader(new FileReader(file));
             String line;
@@ -158,10 +148,8 @@ public class SignInFragment extends Fragment {
     }
 
     private void goToSignUp() {
-        if (getActivity() instanceof MainActivity) {
-            MainActivity mainActivity = (MainActivity) getActivity();
-            mainActivity.switchFragment(new SignUpFragment());
-        }
+        Intent intent = new Intent(this, SignUpActivity.class);
+        startActivity(intent);
     }
 
     @Override
@@ -169,16 +157,21 @@ public class SignInFragment extends Fragment {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_PERMISSION_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(requireContext(), "External storage permission granted", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "External storage permission granted", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(requireContext(), "External storage permission denied", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "External storage permission denied", Toast.LENGTH_SHORT).show();
             }
         } else if (requestCode == REQUEST_CAMERA_PERMISSION_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(requireContext(), "Camera permission granted", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Camera permission granted", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(requireContext(), "Camera permission denied", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Camera permission denied", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 }

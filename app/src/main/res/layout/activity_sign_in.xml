@@ -12,14 +12,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="15dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <EditText
             android:id="@+id/usernameText"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="wrap_content"
             android:ems="10"
             android:hint="@string/login_edit_user"
             android:inputType="text"
@@ -28,7 +27,7 @@
         <EditText
             android:id="@+id/passwordText"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="wrap_content"
             android:ems="10"
             android:hint="@string/password_string"
             android:inputType="textPassword"
@@ -44,11 +43,11 @@
 
             <Button
                 android:id="@+id/login"
-                android:layout_width="128dp"
+                android:layout_width="128sp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
+                android:layout_marginLeft="5sp"
+                android:layout_marginRight="5sp"
                 android:backgroundTint="@color/colorOnSurface_day"
                 android:text="Login" />
     </LinearLayout>
@@ -66,7 +65,7 @@
         <TextView
             android:id="@+id/textView5"
             android:layout_width="wrap_content"
-            android:layout_height="63dp"
+            android:layout_height="63sp"
             android:layout_gravity="center_horizontal"
             android:text="Welcome!"
             android:textColor="@color/green"
@@ -75,27 +74,17 @@
         <ImageView
             android:id="@+id/imageView2"
             android:layout_width="match_parent"
-            android:layout_height="102dp"
+            android:layout_height="102sp"
             android:layout_gravity="center_horizontal"
             app:srcCompat="@mipmap/app_logo_round"
             tools:ignore="MissingConstraints" />
 
-        <TextView
-            android:id="@+id/textViewPleaseLogin"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:text="@string/please_login_to_continue_using_our_app2"
-            android:textColor="@color/green"
-            android:textSize="16sp"
-            tools:ignore="MissingConstraints" />
 
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/linearLayout2"
-        android:layout_width="407dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         tools:ignore="MissingConstraints"

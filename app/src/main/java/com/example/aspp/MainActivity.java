@@ -2,6 +2,7 @@ package com.example.aspp;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 
 import android.os.Bundle;
@@ -24,7 +25,7 @@ import com.example.aspp.fragments.ShortsFragment;
 import com.example.aspp.fragments.HomeFragment;
 import com.example.aspp.fragments.ProfileFragment;
 import com.example.aspp.databinding.ActivityMainBinding;
-import com.example.aspp.fragments.SignInFragment;
+
 import com.example.aspp.fragments.SignInRequestFragment;
 import com.example.aspp.fragments.SubscriptionsFragment;
 import com.example.aspp.objects.User;
@@ -164,13 +165,14 @@ public class MainActivity extends AppCompatActivity {
                     if(signIn){
                         myUser = null;
                         signIn = false;
-                        item.setTitle("Login");
-                        currentFragment = new SignInFragment();
-                        switchFragment(currentFragment);
+                        switchFragment(new HomeFragment(nightMode, myUser));
+                        currentFragment = new HomeFragment();
+                        Intent intent = new Intent(MainActivity.this, SignInActivity.class);
+                        startActivity(intent);
                     }
                     else {
-                        currentFragment = new SignInFragment();
-                        switchFragment(currentFragment);
+                        Intent intent = new Intent(MainActivity.this, SignInActivity.class);
+                        startActivity(intent);
                     }
                 }
                 return false;
@@ -194,7 +196,6 @@ public class MainActivity extends AppCompatActivity {
             file.delete();
         }
         finishAffinity();
-
     }
 
     public void setFragment(Fragment newFragment) {

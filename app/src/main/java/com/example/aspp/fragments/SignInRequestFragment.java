@@ -1,5 +1,6 @@
 package com.example.aspp.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -11,6 +12,7 @@ import android.widget.Button;
 
 import com.example.aspp.MainActivity;
 import com.example.aspp.R;
+import com.example.aspp.SignInActivity;
 
 
 /**
@@ -71,10 +73,8 @@ public class SignInRequestFragment extends Fragment {
     }
 
     private void signIn() {
-        if (getActivity() instanceof MainActivity) {
-            MainActivity mainActivity = (MainActivity) getActivity();
-            mainActivity.switchFragment(new SignInFragment());
-        }
+        Intent intent = new Intent(requireContext(), SignInActivity.class);
+        startActivity(intent);
     }
 
 

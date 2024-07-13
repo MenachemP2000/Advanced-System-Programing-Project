@@ -1,4 +1,4 @@
-package com.example.aspp.fragments;
+package com.example.aspp;
 
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -10,20 +10,15 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
-import androidx.fragment.app.Fragment;
 
-import com.example.aspp.MainActivity;
-import com.example.aspp.R;
 import com.example.aspp.objects.User;
 
 import org.json.JSONArray;
@@ -45,7 +40,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
-public class SignUpFragment extends Fragment {
+public class SignUpActivity extends AppCompatActivity {
 
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int REQUEST_IMAGE_CAPTURE = 2;
@@ -63,33 +58,26 @@ public class SignUpFragment extends Fragment {
     private String profilePictureUrl;
     private String currentPhotoPath;
 
-    public SignUpFragment() {
-        // Required empty public constructor
-    }
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_sign_up, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_sign_up); // Ensure the layout file is named properly
 
-        profile = view.findViewById(R.id.profilepicture);
-        name = view.findViewById(R.id.firstandlastname);
-        username = view.findViewById(R.id.usernameText);
-        password = view.findViewById(R.id.passwordText);
-        repeatPassword = view.findViewById(R.id.repeatPassword);
-        signUp = view.findViewById(R.id.signup);
+        profile = findViewById(R.id.profilepicture);
+        name = findViewById(R.id.firstandlastname);
+        username = findViewById(R.id.usernameText);
+        password = findViewById(R.id.passwordText);
+        repeatPassword = findViewById(R.id.repeatPassword);
+        signUp = findViewById(R.id.signup);
 
         signUp.setOnClickListener(v -> isSuccessSignUp());
 
         profile.setOnClickListener(v -> showImageOptions());
-
-        return view;
     }
 
     private void showImageOptions() {
         String[] options = {"Choose from Gallery", "Take a Photo"};
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Select Profile Picture");
         builder.setItems(options, (dialog, which) -> {
             if (which == 0) {
@@ -108,15 +96,15 @@ public class SignUpFragment extends Fragment {
 
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(requireActivity().getPackageManager()) != null) {
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             File photoFile = null;
             try {
                 photoFile = createImageFile();
             } catch (IOException ex) {
-                Toast.makeText(requireContext(), "Error occurred while creating the image file", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Error occurred while creating the image file", Toast.LENGTH_SHORT).show();
             }
             if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(requireContext(),
+                Uri photoURI = FileProvider.getUriForFile(this,
                         "com.example.aspp.fileprovider",
                         photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
@@ -128,7 +116,7 @@ public class SignUpFragment extends Fragment {
     private File createImageFile() throws IOException {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = new File(requireContext().getFilesDir(), "images");
+        File storageDir = new File(getFilesDir(), "images");
         if (!storageDir.exists()) {
             storageDir.mkdirs();
         }
@@ -142,22 +130,22 @@ public class SignUpFragment extends Fragment {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == getActivity().RESULT_OK && data != null && data.getData() != null) {
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
             // Load image from gallery
             Uri selectedImageUri = data.getData();
             try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(requireContext().getContentResolver(), selectedImageUri);
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImageUri);
                 Bitmap circularBitmap = getCircularBitmap(bitmap);
                 profile.setImageBitmap(circularBitmap);
                 profilePictureUrl = selectedImageUri.toString();
                 hasProfilePicture = true;
             } catch (IOException e) {
                 e.printStackTrace();
-                Toast.makeText(requireContext(), "Failed to load image", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show();
             }
-        } else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == getActivity().RESULT_OK) {
+        } else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             // Load image from camera
             File imgFile = new File(currentPhotoPath);
             if (imgFile.exists()) {
@@ -192,7 +180,6 @@ public class SignUpFragment extends Fragment {
         return output;
     }
 
-
     private void isSuccessSignUp() {
         String user = username.getText().toString().trim();
         String password1 = password.getText().toString().trim();
@@ -210,7 +197,7 @@ public class SignUpFragment extends Fragment {
         String password2 = repeatPassword.getText().toString().trim();
         String fullName = name.getText().toString().trim();
         if (fullName.isEmpty() || user.isEmpty() || password1.isEmpty() || password2.isEmpty()) {
-            Toast.makeText(requireContext(), "All fields must be filled", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "All fields must be filled", Toast.LENGTH_SHORT).show();
             return false;
         }
         if(!validUsername(user)){
@@ -230,7 +217,7 @@ public class SignUpFragment extends Fragment {
         }
 
         if (!hasProfilePicture) {
-            Toast.makeText(requireContext(), "Please select a profile picture", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please select a profile picture", Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;
@@ -238,7 +225,7 @@ public class SignUpFragment extends Fragment {
 
     private boolean checkPasswordLength(String password1) {
         if (password1.length() < 8) {
-            Toast.makeText(requireContext(), "Your password must contain at least 8 characters", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Your password must contain at least 8 characters", Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;
@@ -246,7 +233,7 @@ public class SignUpFragment extends Fragment {
 
     private boolean checkPasswordMatch(String password, String repeatPassword) {
         if (!password.equals(repeatPassword)) {
-            Toast.makeText(requireContext(), "Your passwords don't match", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Your passwords don't match", Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;
@@ -257,22 +244,21 @@ public class SignUpFragment extends Fragment {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(password);
         if (!matcher.matches()) {
-            Toast.makeText(requireContext(), "Your password must contain characters and numbers", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Your password must contain characters and numbers", Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;
     }
 
     private void navigateToSignInScreen() {
-        if (getActivity() instanceof MainActivity) {
-            MainActivity mainActivity = (MainActivity) getActivity();
-            mainActivity.setFragment(new SignInFragment());
-        }
+        Intent intent = new Intent(this, SignInActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     private void saveUserToJson(User user) {
         try {
-            File file = new File(requireContext().getFilesDir(), "user_credentials.json");
+            File file = new File(getFilesDir(), "user_credentials.json");
             JSONArray jsonArray;
 
             // Read existing JSON array from file if it exists
@@ -305,17 +291,17 @@ public class SignUpFragment extends Fragment {
             OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file));
             writer.write(jsonArray.toString());
             writer.close();
-            Log.d("SignUpFragment", "User data saved: " + userObject.toString());
+            Log.d("SignUpActivity", "User data saved: " + userObject.toString());
         } catch (IOException | JSONException e) {
             e.printStackTrace();
-            Log.e("SignUpFragment", "Error saving user data: " + e.getMessage());
+            Log.e("SignUpActivity", "Error saving user data: " + e.getMessage());
         }
     }
 
     private boolean validUsername(String username) {
         try {
             // Read the JSON file
-            File file = new File(requireContext().getFilesDir(), "user_credentials.json");
+            File file = new File(getFilesDir(), "user_credentials.json");
             StringBuilder json = new StringBuilder();
             BufferedReader br = new BufferedReader(new FileReader(file));
             String line;
@@ -333,7 +319,7 @@ public class SignUpFragment extends Fragment {
                 JSONObject user = jsonArray.getJSONObject(i);
                 String storedUsername = user.getString("username");
                 if (username.trim().equals(storedUsername)) {
-                    Toast.makeText(requireContext(), "Username already exists, Please choose another username", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Username already exists, Please choose another username", Toast.LENGTH_SHORT).show();
                     return false;
                 }
             }
@@ -342,5 +328,9 @@ public class SignUpFragment extends Fragment {
         }
         return true;
     }
-}
 
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
+}
