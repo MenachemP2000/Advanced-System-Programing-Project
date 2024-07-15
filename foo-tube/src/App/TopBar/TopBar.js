@@ -12,21 +12,20 @@ const TopBar = ({ toggleMenu, toggleDropDown, isSignedIn, theme }) => {
     setSearchInput(e.target.value);
   };
 
-
-
   useEffect(() => {
     setTheme(theme);
   }, [theme]);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleClick = () => {
     navigate(`/`);
   };
+
   const handleSearch = () => {
     const query = searchInput;
     console.log('Search query:', query);
-    if (query != "") {
+    if (query !== "") {
       navigate(`/search/${query}`);
     }
   };
@@ -36,11 +35,17 @@ const TopBar = ({ toggleMenu, toggleDropDown, isSignedIn, theme }) => {
       handleSearch();
     }
   };
+
   const handleExpandSearch = () => {
     setSearchOpen(true);
   };
+
   const handleCollapseSearch = () => {
     setSearchOpen(false);
+  };
+
+  const handleAddVideoClick = () => {
+    navigate('/addvideo');
   };
 
   return (
@@ -49,7 +54,7 @@ const TopBar = ({ toggleMenu, toggleDropDown, isSignedIn, theme }) => {
         {searchOpen && (
           <div className="TopBar leftTop bigScreenSearch">
             <button className='btn' onClick={handleCollapseSearch}>
-              <i class="bi bi-arrow-return-left"></i>
+              <i className="bi bi-arrow-return-left"></i>
             </button>
             <input
               type="text"
@@ -60,7 +65,7 @@ const TopBar = ({ toggleMenu, toggleDropDown, isSignedIn, theme }) => {
               onKeyUp={handleKeyPress}
             />
             <button className='btn' onClick={handleSearch}>
-              <i class="bi bi-search"></i>
+              <i className="bi bi-search"></i>
             </button>
           </div>
         )}
@@ -72,21 +77,24 @@ const TopBar = ({ toggleMenu, toggleDropDown, isSignedIn, theme }) => {
                 <div className={`bar ${appTheme}`}></div>
                 <div className={`bar ${appTheme}`}></div>
               </div>
-              <h1 className="app-title clickable" onClick={handleClick}> 
-              <img  className="icon" src="/favicon.ico" width="30px" highet="30px"></img>
-                  FooTube&trade;
-                  </h1>
+              <h1 className="app-title clickable" onClick={handleClick}>
+                <img className="icon" src="/favicon.ico" width="30px" height="30px" alt="Icon"></img>
+                FooTube&trade;
+              </h1>
             </div>
 
             {isSignedIn && (
               <div className="RightTopSmall">
                 <div className="smallScreenSearch">
                   <button className='btn' onClick={handleExpandSearch}>
-                    <i class="bi bi-search"></i>
+                    <i className="bi bi-search"></i>
                   </button>
                 </div>
                 <div className="drop-down">
-                  <img  className="clickable profilePic" src={isSignedIn.image} onClick={toggleDropDown} height="40px" width="40px" ></img>
+                  <button className="btn addVideoBtn" onClick={handleAddVideoClick}>
+                    <i className="bi bi-plus"></i>
+                  </button>
+                  <img className="clickable profilePic" src={isSignedIn.image} onClick={toggleDropDown} height="40px" width="40px" alt="Profile"></img>
                 </div>
               </div>
             )}
@@ -94,12 +102,12 @@ const TopBar = ({ toggleMenu, toggleDropDown, isSignedIn, theme }) => {
               <div className="RightTopSmall">
                 <div className="smallScreenSearch">
                   <button className='btn' onClick={handleExpandSearch}>
-                    <i class="bi bi-search"></i>
+                    <i className="bi bi-search"></i>
                   </button>
                 </div>
                 <div className="drop-down">
-                  <Link to="/signin" className="btn SignInBtn" >
-                    <i class="bi bi-person"></i>
+                  <Link to="/signin" className="btn SignInBtn">
+                    <i className="bi bi-person"></i>
                     <span className="icon-text">Sign In</span>
                   </Link>
                 </div>
@@ -116,10 +124,10 @@ const TopBar = ({ toggleMenu, toggleDropDown, isSignedIn, theme }) => {
               <div className={`bar ${appTheme}`}></div>
               <div className={`bar ${appTheme}`}></div>
             </div>
-              <h1 className="app-title clickable" onClick={handleClick}> 
-              <img className='icon' src="/favicon.ico" width="30px" highet="30px"></img>
-                  FooTube&trade;
-                  </h1>
+            <h1 className="app-title clickable" onClick={handleClick}>
+              <img className='icon' src="/favicon.ico" width="30px" height="30px" alt="Icon"></img>
+              FooTube&trade;
+            </h1>
           </div>
           <div className="search">
             <input
@@ -131,7 +139,7 @@ const TopBar = ({ toggleMenu, toggleDropDown, isSignedIn, theme }) => {
               onKeyUp={handleKeyPress}
             />
             <button className='btn' onClick={handleSearch}>
-              <i class="bi bi-search"></i>
+              <i className="bi bi-search"></i>
             </button>
           </div>
 
@@ -139,27 +147,25 @@ const TopBar = ({ toggleMenu, toggleDropDown, isSignedIn, theme }) => {
           {isSignedIn && (
             <div className="RightTop">
               <div className="drop-down">
-                <img className="clickable profilePic" src={isSignedIn.image} onClick={toggleDropDown} height="40px" width="40px" ></img>
+                <button className="btn addVideoBtn" onClick={handleAddVideoClick}>
+                <i class="bi bi-camera-video"></i>
+                </button>
+                <img className="clickable profilePic" src={isSignedIn.image} onClick={toggleDropDown} height="40px" width="40px" alt="Profile"></img>
               </div>
             </div>
           )}
           {!isSignedIn && (
             <div className="RightTop">
               <div className="drop-down">
-                <Link to="/signin" className="btn SignInBtn" >
-                  <i class="bi bi-person"></i>
+                <Link to="/signin" className="btn SignInBtn">
+                  <i className="bi bi-person"></i>
                   <span className="icon-text">Sign In</span>
                 </Link>
               </div>
             </div>
           )}
         </div>
-
-
-
-
       </div>
-
     </>
   );
 }
