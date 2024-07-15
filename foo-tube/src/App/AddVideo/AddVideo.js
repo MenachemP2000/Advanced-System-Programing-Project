@@ -8,105 +8,101 @@ const AddVideo = ({ onAddVideo, handleAddVideo, isSignedIn, videos }) => {
   const [tags, setTags] = useState('');
   const [videoFile, setVideoFile] = useState(null);
   const [videoPreview, setVideoPreview] = useState(null);
-  const [thumbnailFile, setThumbnailFile] = useState(null); // State to hold the selected thumbnail file
+  const [thumbnailFile, setThumbnailFile] = useState(null);
   const [thumbnailPreview, setThumbnailPreview] = useState(null);
-  const [videoError, setVideoError] = useState('');
-  const [thumbnailError, setThumbnailError] = useState('');
+  const [thumbnailError, setThumbnailError] = useState(''); // State for thumbnail error message
+  const [videoError, setVideoError] = useState(''); // State for video error message
   const navigate = useNavigate();
 
   const handleVideoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.type.startsWith('video/')) {
-        setVideoFile(file);
-        setVideoError('');
-
-        // Optional: Create a video preview if needed
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setVideoPreview(reader.result);
-        };
-        reader.readAsDataURL(file);
-
-        // Log to check if video file is set
-        console.log('Video file selected:', file);
-      } else {
+      if (!file.type.startsWith('video/')) {
+        setVideoError('Please select a video file.');
         setVideoFile(null);
         setVideoPreview(null);
-        setVideoError('Please select a valid video file.');
+        return;
       }
+      setVideoFile(file);
+      setVideoError('');
+
+      // Optional: Create a video preview if needed
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setVideoPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+
+      // Log to check if video file is set
+      console.log('Video file selected:', file);
     } else {
       setVideoFile(null);
       setVideoPreview(null);
-      setVideoError('');
     }
   };
 
   const handleThumbnailChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.type.startsWith('image/')) {
-        setThumbnailFile(file);
-        setThumbnailError('');
-
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setThumbnailPreview(reader.result);
-        };
-        reader.readAsDataURL(file);
-
-        // Log to check if thumbnail file is set
-        console.log('Thumbnail file selected:', file);
-      } else {
+      // Validate file type (should be an image)
+      if (!file.type.startsWith('image/')) {
+        setThumbnailError('Please select an image file.');
         setThumbnailFile(null);
         setThumbnailPreview(null);
-        setThumbnailError('Please select a valid image file.');
+        return;
       }
+
+      setThumbnailFile(file);
+      setThumbnailError('');
+
+      // Optional: Create a thumbnail preview if needed
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setThumbnailPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+
+      // Log to check if thumbnail file is set
+      console.log('Thumbnail file selected:', file);
     } else {
       setThumbnailFile(null);
       setThumbnailPreview(null);
-      setThumbnailError('');
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    let hasError = false;
+
     if (!videoFile) {
-      alert('Please select a video file.');
-      return;
+      setVideoError('Please select a video file.');
+      hasError = true;
     }
 
     if (!thumbnailFile) {
-      alert('Please select a thumbnail image.');
-      return;
+      setThumbnailError('Please select a image file.');
+      hasError = true;
     }
 
-    if (videoError || thumbnailError) {
-      alert('Please fix the errors before submitting.');
+    if (hasError) {
       return;
     }
-
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = ('0' + (today.getMonth() + 1)).slice(-2); // Ensures two digits for month
-  const day = ('0' + today.getDate()).slice(-2); // Ensures two digits for day
-
-  const uploadDate = `${year}-${month}-${day}`;
 
     const numberOfVideos = videos.length;
     const newVideoId = (numberOfVideos + 1).toString();
 
+    // Perform additional validations if needed
     const newVideo = {
-      id: newVideoId,
+      id: newVideoId, // Example ID, adjust as needed
       title,
       description,
       videoFile,
       thumbnailFile,
       tags: tags.trim().split(',').map(tag => tag.trim()),
-      upload_date: uploadDate, 
+      upload_date: new Date().toISOString().slice(0, 10), // Example: Current date
       duration: "00:10", // Example duration
-      username: isSignedIn.username, 
+      username: isSignedIn.username, // Example username
       likeCount: 0,
       views: 0,
       usersLikes: [],
@@ -161,7 +157,7 @@ const AddVideo = ({ onAddVideo, handleAddVideo, isSignedIn, videos }) => {
             onChange={handleVideoChange}
             required
           />
-          {videoError && <div className="error">{videoError}</div>}
+          {videoError && <p className="error-message">{videoError}</p>}
         </div>
         <div>
           <label>Thumbnail</label>
@@ -171,7 +167,7 @@ const AddVideo = ({ onAddVideo, handleAddVideo, isSignedIn, videos }) => {
             onChange={handleThumbnailChange}
             required
           />
-          {thumbnailError && <div className="error">{thumbnailError}</div>}
+          {thumbnailError && <p className="error-message">{thumbnailError}</p>}
         </div>
         <button type="submit">Add Video</button>
       </form>
@@ -180,3 +176,4 @@ const AddVideo = ({ onAddVideo, handleAddVideo, isSignedIn, videos }) => {
 };
 
 export default AddVideo;
+
