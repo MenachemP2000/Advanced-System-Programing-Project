@@ -22,16 +22,21 @@ const CreateAccount = ({ addUser, toggleSignendIn, toggleScreen, isSignedIn, use
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setImage(reader.result);
-            };
-            reader.readAsDataURL(file);
+            const validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/webp'];
+            if (validImageTypes.includes(file.type)) {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    setImage(reader.result);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                alert('Please select a valid image file (gif, jpeg, png, webp).');
+                setImage('');
+            }
         } else {
             setImage('');
         }
     };
-
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -60,6 +65,7 @@ const CreateAccount = ({ addUser, toggleSignendIn, toggleScreen, isSignedIn, use
             setError('Password must be at least 8 characters');
             return;
         }
+
 
         const hasLetter = /[a-zA-Z]/.test(password);
         const hasNumber = /[0-9]/.test(password);

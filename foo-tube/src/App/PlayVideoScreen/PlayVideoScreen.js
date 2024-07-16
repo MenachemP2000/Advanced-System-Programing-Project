@@ -130,10 +130,12 @@ const PlayVideoScreen = ({ onVideoDelete, toggleScreen, onVideoChange, isSignedI
     return <div>Loading...</div>;
   }
 
+  const videoSource = video.thumbnailFile ? URL.createObjectURL(video.videoFile) : video.source;
+
   return (
     <div className='PlayVideoScreen'>
       <div className="videoContainer">
-        <video src={video.source} type="video/mp4" className="VideoPlayer" controls />
+        <video src={videoSource} type="video/mp4" className="VideoPlayer" controls />
         {!isEditing && (
           <>
             <div className="videoTitle">{currentTitle}</div>
