@@ -109,6 +109,9 @@ public class SignInActivity extends AppCompatActivity {
     private void isValidCredentials(String username, String password) {
         UsersViewModel vm = new ViewModelProvider(this).get(UsersViewModel.class);
         vm.getUserByUsername(username).observe(this, user -> {
+            if (user == null) {
+                return;
+            }
             myUser = user;
             myUser.setPassword(password);
             TokenViewModel viewModel = new ViewModelProvider(this).get(TokenViewModel.class);
@@ -150,7 +153,9 @@ public class SignInActivity extends AppCompatActivity {
     }
 
     private void goToSignUp() {
-        startActivity(new Intent(this, SignUpActivity.class));
+        Intent i = new Intent(this, SignUpActivity.class);
+        i.putExtra("update", false);
+        startActivity(i);
     }
 
     @Override

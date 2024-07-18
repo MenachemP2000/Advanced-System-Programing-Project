@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -19,6 +20,7 @@ import android.view.ViewGroup;
 import com.example.aspp.R;
 import com.example.aspp.adapters.NotificationsRVAdapter;
 import com.example.aspp.entities.Video;
+import com.example.aspp.viewmodels.VideosViewModel;
 
 import java.util.ArrayList;
 
@@ -42,6 +44,7 @@ public class NotificationFragment extends Fragment {
     private String mParam1;
     private String mParam2;
     private NotificationsRVAdapter adp;
+    private VideosViewModel viewModel;
 
     public NotificationFragment() {
         // Required empty public constructor
@@ -90,7 +93,13 @@ public class NotificationFragment extends Fragment {
         });
 
         notificationListContainer = v.findViewById(R.id.recent_notifications);
-        notificationArrayList = readVideosList(getContext());
+        viewModel = new ViewModelProvider(this).get(VideosViewModel.class);
+        notificationArrayList = new ArrayList<>();
+        viewModel.get().observe(getViewLifecycleOwner(), videos -> {
+            notificationArrayList = new ArrayList<>(videos);
+            adp.setVideos(notificationArrayList);
+            adp.notifyDataSetChanged();
+        });
         Log.i("DATA", notificationArrayList.toString());
         adp = new NotificationsRVAdapter(getContext(), notificationArrayList);
         notificationListContainer.setAdapter(adp);

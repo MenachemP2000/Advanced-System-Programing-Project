@@ -129,38 +129,51 @@ exports.getUserByUserName = async (req, res) => {
 // Update a user (PUT)
 exports.updateUser = async (req, res) => {
   const { username, displayname, password, passwordAgain, image } = req.body;
+  console.log(passwordAgain);
   try {
     const test = await User.findById(req.params.id);
     if (!test) {
+      console.log("id is wrong");
       return res.status(404).send();
     }
     const token = req.headers.authorization.split(" ")[1];
     const data = jwt.verify(token, key);
     if (data.username !== test.username) {
+      console.log("user is wrong");
       return res.status(403).send("Forbidden");
     }
     if (req.body.username !== test.username) {
+      console.log("username is wrong");
       return res.status(400).send({ message: "Cannot change username" });
     }
-    if (req.body._id !== test._id) {
+    if (
+      req.body._id !== test._id ||
+      req.body._id !== new String(test._id).valueOf()
+    ) {
+      console.log(req.body._id);
+      console.log(new String(test._id).valueOf());
       return res.status(400).send({ message: "Cannot change _id" });
     }
     if (!displayname || !password || !passwordAgain || !image) {
+      console.log("empty fields");
       return res.status(400).json({ message: "All fields are required" });
     }
 
     const displaynameWords = displayname.trim().split(/\s+/);
     if (displaynameWords.length < 2) {
+      console.log("name is wrong");
       return res
         .status(400)
         .json({ message: "Must input first and last name" });
     }
 
     if (password !== passwordAgain) {
+      console.log("password is wrong");
       return res.status(400).json({ message: "Password fields do not match" });
     }
 
     if (password.length < 8) {
+      console.log("password length is wrong");
       return res
         .status(400)
         .json({ message: "Password must be at least 8 characters" });
@@ -170,6 +183,7 @@ exports.updateUser = async (req, res) => {
     const hasNumber = /[0-9]/.test(password);
 
     if (!hasLetter || !hasNumber) {
+      console.log("empty");
       return res
         .status(400)
         .json({ message: "Password must contain both letters and numbers" });
@@ -196,8 +210,10 @@ exports.updateUser = async (req, res) => {
       new: true,
       runValidators: true,
     });
+    console.log("no problem...");
     res.send(user);
   } catch (error) {
+    console.log(error);
     res.status(400).send(error);
   }
 };
@@ -328,6 +344,7 @@ exports.deleteUser = async (req, res) => {
     await User.findByIdAndDelete(req.params.id);
     res.status(204).send("User deleted");
   } catch (error) {
+    console.log(error);
     res.status(500).send(error);
   }
 };

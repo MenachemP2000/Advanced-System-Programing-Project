@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,14 +17,23 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.example.aspp.Helper;
 import com.example.aspp.R;
 import com.example.aspp.VideoPlayerActivity;
+import com.example.aspp.entities.SignedPartialVideoUpdate;
 import com.example.aspp.entities.Video;
+import com.example.aspp.viewmodels.UsersViewModel;
+import com.example.aspp.viewmodels.VideosViewModel;
 
 import java.util.ArrayList;
 
@@ -70,6 +80,19 @@ public class ShortsRVAdapter extends RecyclerView.Adapter<ShortsRVAdapter.MyView
         holder.videoView.setScaleX(vid.getScaleX());
         holder.videoView.setScaleY(vid.getScaleY());
 //        shorts.get(position).addView();
+        VideosViewModel viewModel = new ViewModelProvider((ViewModelStoreOwner) context).get(VideosViewModel.class);
+        final boolean[] alreadyLiked = {false};
+        viewModel.getVideoById(shorts.get(position).get_id())
+                .observe((LifecycleOwner) context, video -> {
+                    if (video != null) {
+                        loadVideo(holder, shorts.get(position));
+                        if (Helper.isSignedIn() &&
+                                shorts.get(position).getUsersLikes().contains(Helper.getSignedInUser().get_id())) {
+                            alreadyLiked[0] = true;
+                            holder.like.setBackgroundTintList(context.getColorStateList(R.color.dark_blue));
+                        }
+                    }
+                });
         holder.videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
@@ -81,12 +104,51 @@ public class ShortsRVAdapter extends RecyclerView.Adapter<ShortsRVAdapter.MyView
 //            holder.videoView.setVideoURI(Uri.parse("android.resource://com.example.aspp/"+context.getResources().getIdentifier(vid_path,"raw",context.getPackageName())));
 //        else
 //            holder.videoView.setVideoURI(Uri.parse(vid_path));
-//        holder.like.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                shorts.get(position).addLike();
-//            }
-//        });
+        holder.like.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!Helper.isSignedIn()) {
+                    Toast.makeText(context,
+                            "In order to like a video you first need to sign in", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                if (viewModel.getVideoById(shorts.get(position).get_id()).hasActiveObservers()) {
+                    viewModel.getVideoById(shorts.get(position).get_id())
+                            .removeObservers((LifecycleOwner) context);
+                }
+                if (alreadyLiked[0]) {
+                    holder.like.setBackgroundTintList(context.getColorStateList(R.color.colorSecondaryContainer_day));
+                    shorts.get(position).setLikeCount(shorts.get(position).getLikeCount() - 1);
+                    shorts.get(position).getUsersLikes().add(Helper.getSignedInUser().get_id());
+                    SignedPartialVideoUpdate update = new SignedPartialVideoUpdate(
+                            shorts.get(position).getUsersLikes(),
+                            shorts.get(position).getComments(),
+                            shorts.get(position).getLikeCount(),
+                            shorts.get(position).getViews()
+                    );
+                    viewModel.partialUpdateVideo(update, shorts.get(position).get_id())
+                            .observe((LifecycleOwner) context, video -> {
+
+                            });
+                    alreadyLiked[0] = false;
+                } else {
+                    holder.like.setBackgroundTintList(context.getColorStateList(R.color.dark_blue));
+                    shorts.get(position).setLikeCount(shorts.get(position).getLikeCount() + 1);
+                    shorts.get(position).getUsersLikes().add(Helper.getSignedInUser().get_id());
+                    SignedPartialVideoUpdate update = new SignedPartialVideoUpdate(
+                            shorts.get(position).getUsersLikes(),
+                            shorts.get(position).getComments(),
+                            shorts.get(position).getLikeCount(),
+                            shorts.get(position).getViews()
+                    );
+                    viewModel.partialUpdateVideo(update, shorts.get(position).get_id())
+                            .observe((LifecycleOwner) context, video -> {
+
+                            });
+                    alreadyLiked[0] = true;
+                }
+            }
+        });
 //        holder.dislike.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
@@ -128,6 +190,28 @@ public class ShortsRVAdapter extends RecyclerView.Adapter<ShortsRVAdapter.MyView
             }
         });
     }
+    private void loadVideo(MyViewHolder holder, Video currentVideo) {
+
+        String vid = "http://10.0.2.2:4000";
+        vid += currentVideo.getSource();
+        if (currentVideo.getSource().equals(""))
+            return;
+        holder.videoView.setVideoURI(Uri.parse(vid));
+        Log.i("Current Vid", currentVideo.toString());
+        Log.i("PATH", vid);
+
+        holder.videoName.setText(currentVideo.getTitle());
+        holder.publisher.setText(currentVideo.getUsername());
+        UsersViewModel vm = new UsersViewModel();
+        vm.getUserByUsername(currentVideo.getUsername()).observe((LifecycleOwner) context, user ->
+        {
+            String profile_url_str = context.getResources().getString(R.string.Base_Url)
+                    + user.getImage();
+            Glide.with(context)
+                    .load(profile_url_str)
+                    .into(holder.profilePic);
+        });
+    }
     public void showBottomDialog(Context context, Video currentVideo) {
 
         final Dialog dialog = new Dialog(context);
@@ -160,6 +244,10 @@ public class ShortsRVAdapter extends RecyclerView.Adapter<ShortsRVAdapter.MyView
     @Override
     public int getItemCount() {
         return shorts.size();
+    }
+
+    public void setVideos(ArrayList<Video> shortsArrayList) {
+        this.shorts = new ArrayList<>(shortsArrayList);
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {

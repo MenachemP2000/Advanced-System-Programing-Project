@@ -11,8 +11,10 @@ exports.isLoggedIn = (req, res, next) => {
     try {
       // Verify the token is valid
       const data = jwt.verify(token, key);
+      console.log(req.headers.authorization);
       return next();
     } catch (err) {
+      console.log(req.headers.authorization);
       return res.status(401).send("Invalid Token");
     }
   } else {

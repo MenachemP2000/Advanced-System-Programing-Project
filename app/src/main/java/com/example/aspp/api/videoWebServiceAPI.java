@@ -3,6 +3,7 @@ package com.example.aspp.api;
 import androidx.browser.trusted.Token;
 
 import com.example.aspp.Helper;
+import com.example.aspp.entities.RelatedVideosHelper;
 import com.example.aspp.entities.SignedPartialVideoUpdate;
 import com.example.aspp.entities.UnsignedPartialVideoUpdate;
 import com.example.aspp.entities.Video;
@@ -18,16 +19,19 @@ import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface videoWebServiceAPI {
     @GET("videos/all")
     Call<List<Video>> getAllVideos();
+    @GET("videos/all")
+    Call<List<Video>> getAllVideos(@Query("username") String username);
 
     @GET("videos")
     Call<List<Video>> getVideos();
 
     @GET("videos/{id}/related")
-    Call<List<Video>> getRelatedVideos(@Path("id") String id);
+    Call<RelatedVideosHelper> getRelatedVideos(@Path("id") String id);
 
     @GET("videos/{id}")
     Call<Video> getVideoById(@Path("id") String id);
@@ -36,7 +40,7 @@ public interface videoWebServiceAPI {
     Call<Video> createVideo(@Header("authorization") String token, @Body Video newVid);
 
     @PUT("videos/{id}")
-    Call<Void> updateVideo(@Path("id") int id, @Body Video updatedVid);
+    Call<Video> updateVideo(@Path("id") String id, @Header("authorization") String token, @Body Video updatedVid);
 
     @PATCH("videos/{id}")
     Call<Video> partialUpdateVideo(@Path("id") String id

@@ -1,10 +1,13 @@
 package com.example.aspp.api;
 
+import static com.example.aspp.Helper.context;
+
 import android.content.Context;
 import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.aspp.AuthInterceptor;
 import com.example.aspp.Helper;
 import com.example.aspp.R;
 import com.example.aspp.entities.User;
@@ -14,6 +17,7 @@ import com.example.aspp.entities.Video;
 import java.util.List;
 import java.util.concurrent.Executors;
 
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -24,8 +28,13 @@ public class UserAPI {
     Retrofit retrofit;
     userWebServiceAPI userWebServiceAPI;
     public UserAPI() {
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(new AuthInterceptor(context))
+                .build();
+
         retrofit = new Retrofit.Builder()
-                .baseUrl(Helper.context.getResources().getString(R.string.BaseURL))
+                .baseUrl(context.getResources().getString(R.string.BaseURL))
+                .client(client)
                 .callbackExecutor(Executors.newSingleThreadExecutor())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
@@ -87,6 +96,41 @@ public class UserAPI {
 
             @Override
             public void onFailure(Call<User> call, Throwable t) {
+                Log.e("ERROR", t.getMessage());
+            }
+        });
+    }
+    public void updateUser(MutableLiveData<User> userLive, Users user, String id) {
+        Call<User> call = userWebServiceAPI.updateUser(Helper.getToken(), id, user);
+
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                Log.i("updateUser", response.message());
+//                Log.i("Get user", response.body().toString());
+                Log.i("updateUser", String.valueOf(response.code()));
+                userLive.postValue(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                Log.e("ERROR", t.getMessage());
+            }
+        });
+    }
+    public void deleteUser(String usernameID) {
+        Call<Void> call = userWebServiceAPI.deleteUser(Helper.getToken(), usernameID);
+
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                Log.i("deleteUser", response.message());
+//                Log.i("Get user", response.body().toString());
+                Log.i("deleteUser", String.valueOf(response.code()));
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
                 Log.e("ERROR", t.getMessage());
             }
         });

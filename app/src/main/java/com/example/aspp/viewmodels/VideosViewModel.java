@@ -17,10 +17,18 @@ public class VideosViewModel extends ViewModel {
 
     public VideosViewModel () {
         repository = new VideoRepository();
-        videos = repository.getAll();
+//        videos = repository.getAll();
     }
-
+    public LiveData<List<Video>> getTopVideos() {
+        videos = repository.get();
+        return videos;
+    }
     public LiveData<List<Video>> get() {
+        videos = repository.getAll();
+        return videos;
+    }
+    public LiveData<List<Video>> get(String username) {
+        videos = repository.getAll(username);
         return videos;
     }
     public LiveData<Video> getVideoById(String id) {
@@ -37,6 +45,10 @@ public class VideosViewModel extends ViewModel {
     }
     public LiveData<Video> partialUpdateVideo(UnsignedPartialVideoUpdate videoUpdate, String id) {
         video = repository.partialUpdateVideo(videoUpdate, id);
+        return video;
+    }
+    public LiveData<Video> updateVideo(Video update) {
+        video = repository.updateVideo(update);
         return video;
     }
     public void add (Video vid) {

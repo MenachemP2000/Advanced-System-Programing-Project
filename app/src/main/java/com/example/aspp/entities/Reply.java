@@ -1,11 +1,16 @@
 package com.example.aspp.entities;
 
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import java.util.Date;
 import java.util.List;
-
+@Entity
 public class Reply {
 
-    String _id;
+    @PrimaryKey @NonNull String _id;
     String user, content;
     Date date;
     List<String> usersLikes;

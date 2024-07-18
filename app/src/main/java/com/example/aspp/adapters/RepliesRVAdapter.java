@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.aspp.Helper;
 import com.example.aspp.R;
+import com.example.aspp.entities.Comment;
 import com.example.aspp.entities.Reply;
 import com.example.aspp.entities.SignedPartialCommentUpdate;
 import com.example.aspp.entities.SignedPartialReplyUpdate;
@@ -38,7 +39,8 @@ public class RepliesRVAdapter extends RecyclerView.Adapter<RepliesRVAdapter.MyVi
     Button update;
     EditText text;
     int posToEdit;
-    String id, cId;
+    String id;
+    Comment cId;
     public RepliesRVAdapter(Context context, List<Reply> replies, Reply parent) {
         this.context = context;
         this.replies = new ArrayList<>();
@@ -55,7 +57,7 @@ public class RepliesRVAdapter extends RecyclerView.Adapter<RepliesRVAdapter.MyVi
         text = et;
         update = btn;
     }
-    public void setVideoAndCommentIdParent(String id, String cId) {
+    public void setVideoAndCommentIdParent(String id, Comment cId) {
         this.id = id;
         this.cId = cId;
     }
@@ -109,7 +111,7 @@ public class RepliesRVAdapter extends RecyclerView.Adapter<RepliesRVAdapter.MyVi
                                     if (text.getText().toString().trim().equals("")) {
                                         RepliesViewModel vm = new RepliesViewModel(id, cId);
                                         // update comment in the server
-                                        vm.deleteReply(replies.get(position).get_id());
+                                        vm.deleteReply(replies.get(position));
                                         replies.remove(position);
                                         notifyDataSetChanged();
                                         return;
@@ -149,20 +151,13 @@ public class RepliesRVAdapter extends RecyclerView.Adapter<RepliesRVAdapter.MyVi
                     ((ImageView)view).setImageResource(R.drawable.sharp_thumb_up_24);
                     replies.get(position).getUsersLikes().remove(Helper.getSignedInUser().get_id());
                     RepliesViewModel vm = new RepliesViewModel(id, cId);
-                    SignedPartialReplyUpdate updates = new SignedPartialReplyUpdate(
-                            replies.get(position).get_id(),
-                            replies.get(position).getUsersLikes());
-                    vm.partialUpdateReply(updates);
+                    vm.partialUpdateReply(replies.get(position));
                     alreadyLiked[0] = false;
                 } else {
                     ((ImageView)view).setImageResource(R.drawable.baseline_thumb_up_24);
                     replies.get(position).getUsersLikes().add(Helper.getSignedInUser().get_id());
                     RepliesViewModel vm = new RepliesViewModel(id, cId);
-                    SignedPartialReplyUpdate updates = new SignedPartialReplyUpdate(
-                            replies.get(position).get_id(),
-                            replies.get(position).getUsersLikes()
-                    );
-                    vm.partialUpdateReply(updates);
+                    vm.partialUpdateReply(replies.get(position));
                     alreadyLiked[0] = true;
                 }
                 notifyDataSetChanged();

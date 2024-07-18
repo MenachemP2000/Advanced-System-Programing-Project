@@ -29,6 +29,7 @@ import androidx.core.content.FileProvider;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.aspp.entities.Users;
 import com.example.aspp.fragments.SignInFragment;
@@ -79,11 +80,45 @@ public class SignUpActivity extends AppCompatActivity {
         repeatPassword = findViewById(R.id.repeatPassword);
         signUp = findViewById(R.id.signup);
 
-        signUp.setOnClickListener(v -> isSuccessSignUp());
+        Intent i = getIntent();
+        signUp.setOnClickListener(v -> {
+            if (i.getExtras().getBoolean("update")) {
+                updateUser();
+            } else {
+                isSuccessSignUp();
+            }
+        });
 
         profile.setOnClickListener(v -> showImageOptions());
 
 //        return view;
+    }
+
+    private void updateUser() {
+        if (attemptSignUp(true)) {
+            String user = username.getText().toString().trim();
+            String password1 = password.getText().toString().trim();
+            String password2 = repeatPassword.getText().toString().trim();
+            String fullName = name.getText().toString().trim();
+            BitmapDrawable drawable = (BitmapDrawable) profile.getDrawable();
+            Bitmap bitmap = drawable.getBitmap();
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG,100,bos);
+            byte[] bb = bos.toByteArray();
+            String image = Base64.encodeToString(bb, Base64.DEFAULT);
+
+            newUser = new Users(Helper.getSignedInUser().get_id(), user, fullName, password1, password2, image);
+            try {
+                UsersViewModel vm = new ViewModelProvider(this).get(UsersViewModel.class);
+                vm.updateUser(newUser, Helper.getSignedInUser().get_id()).observe(this,
+                        user1 -> {
+                    Helper.setSignedInUser(user1);
+                    navigateToSignInScreen();
+                        });
+            } catch (Exception e) {
+
+            }
+        }
     }
 
     private void showImageOptions() {
@@ -176,32 +211,6 @@ public class SignUpActivity extends AppCompatActivity {
                 hasProfilePicture = true;
             }
         }
-
-
-//        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
-//            // Load image from gallery
-//            Uri selectedImageUri = data.getData();
-//            try {
-//                Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImageUri);
-//                Bitmap circularBitmap = getCircularBitmap(bitmap);
-//                profile.setImageBitmap(circularBitmap);
-//                profilePictureUrl = selectedImageUri.toString();
-//                hasProfilePicture = true;
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//                Toast.makeText(this, "Failed to load image", Toast.LENGTH_SHORT).show();
-//            }
-//        } else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-//            // Load image from camera
-//            File imgFile = new File(currentPhotoPath);
-//            if (imgFile.exists()) {
-//                Bitmap bitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-//                Bitmap circularBitmap = getCircularBitmap(bitmap);
-//                profile.setImageBitmap(circularBitmap);
-//                profilePictureUrl = Uri.fromFile(imgFile).toString();
-//                hasProfilePicture = true;
-//            }
-//        }
     }
 
     private Bitmap getCircularBitmap(Bitmap squareBitmap) {
@@ -228,7 +237,7 @@ public class SignUpActivity extends AppCompatActivity {
 
 
     private void isSuccessSignUp() {
-        if (attemptSignUp()) {
+        if (attemptSignUp(false)) {
             String user = username.getText().toString().trim();
             String password1 = password.getText().toString().trim();
             String password2 = repeatPassword.getText().toString().trim();
@@ -240,9 +249,9 @@ public class SignUpActivity extends AppCompatActivity {
             byte[] bb = bos.toByteArray();
             String image = Base64.encodeToString(bb, Base64.DEFAULT);
 
-            newUser = new Users(user, fullName, password1, password2, image);
+            newUser = new Users("", user, fullName, password1, password2, image);
             try {
-                UsersViewModel vm = new UsersViewModel();
+                UsersViewModel vm = new ViewModelProvider(this).get(UsersViewModel.class);
                 vm.createUser(newUser).observe(this, user1 -> {
                     if (user1 != null && !user1.getUsername().equals(""))
                         navigateToSignInScreen();
@@ -255,7 +264,7 @@ public class SignUpActivity extends AppCompatActivity {
         }
     }
 
-    private boolean attemptSignUp() {
+    private boolean attemptSignUp(boolean update) {
         String user = username.getText().toString().trim();
         String password1 = password.getText().toString().trim();
         String password2 = repeatPassword.getText().toString().trim();
@@ -265,16 +274,18 @@ public class SignUpActivity extends AppCompatActivity {
             Toast.makeText(this, "All fields must be filled", Toast.LENGTH_SHORT).show();
             return false;
         }
-        UsersViewModel vm = new UsersViewModel();
-        vm.getUserByUsername(user).observe(this, user1 -> {
-            if (user1 != null && user1.getUsername().equals("")) {
+        if (!update) {
+            UsersViewModel vm = new UsersViewModel();
+            vm.getUserByUsername(user).observe(this, user1 -> {
+                if (user1 != null && user1.getUsername().equals("")) {
 
-            }
-            else if (user1 != null && !user1.getUsername().equals("")) {
-                username.setError("Username already exists, try another one");
-                valid[0] = false;
-            }
-        });
+                }
+                else if (user1 != null && !user1.getUsername().equals("")) {
+                    username.setError("Username already exists, try another one");
+                    valid[0] = false;
+                }
+            });
+        }
         if (!checkPasswordLength(password1)) {
             password.setError("Password should contain at least 8 characters");
             valid[0] = false;

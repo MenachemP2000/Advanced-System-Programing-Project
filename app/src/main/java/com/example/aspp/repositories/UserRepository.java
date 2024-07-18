@@ -40,6 +40,13 @@ public class UserRepository {
         api.createUser(userData, user);
         return userData;
     }
+    public void deleteUser(String usernameID) {
+        api.deleteUser(usernameID);
+    }
+    public LiveData<User> updateUser(Users user, String id) {
+        api.updateUser(userData, user, id);
+        return userData;
+    }
     class UserListData extends MutableLiveData<List<User>> {
         public UserListData() {
             super();

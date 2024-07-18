@@ -5,9 +5,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.aspp.entities.User;
 import com.example.aspp.entities.Users;
-import com.example.aspp.entities.Video;
 import com.example.aspp.repositories.UserRepository;
-import com.example.aspp.repositories.VideoRepository;
 
 import java.util.List;
 
@@ -27,5 +25,12 @@ public class UsersViewModel extends ViewModel {
     public LiveData<User> createUser(Users newUser) {
         user = repository.createUser(newUser);
         return user;
+    }
+    public LiveData<User> updateUser(Users newUser, String id) {
+        user = repository.updateUser(newUser, id);
+        return user;
+    }
+    public void deleteUser(String usernameID) {
+        repository.deleteUser(usernameID);
     }
 }

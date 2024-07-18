@@ -125,12 +125,16 @@ public class Video {
     }
 
     public String getUpload_date() {
-        String date = upload_date.substring(0,upload_date.indexOf("T"));
-        String day = date.substring(date.lastIndexOf("-") + 1);
-        String month = date.substring(date.indexOf("-") + 1, date.lastIndexOf("-"));
-        String year = date.substring(0, date.indexOf("-"));
-        date = day + "." + month + "." + year;
-        return date;
+        try {
+            String date = upload_date.substring(0,upload_date.indexOf("T"));
+            String day = date.substring(date.lastIndexOf("-") + 1);
+            String month = date.substring(date.indexOf("-") + 1, date.lastIndexOf("-"));
+            String year = date.substring(0, date.indexOf("-"));
+            date = day + "." + month + "." + year;
+            return date;
+        } catch (Exception e) {
+            return "Cannot retrieve date right now";
+        }
     }
 
     public void setUpload_date(String upload_date) {

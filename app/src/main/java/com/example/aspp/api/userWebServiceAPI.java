@@ -10,6 +10,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
@@ -32,11 +33,11 @@ public interface userWebServiceAPI {
 
 
     @PUT("users/{id}")
-    Call<Void> updateUser(@Path("id") String id, @Body User updatedUser);
+    Call<User> updateUser(@Header("authorization") String token, @Path("id") String id, @Body Users updatedUser);
 
     @PATCH("users/{id}")
     Call<Video> partialUpdateUser(@Path("id") String id, @Body User updatedUser);
 
     @DELETE("users/{id}")
-    Call<Void> deleteUser(@Path("id") String id);
+    Call<Void> deleteUser(@Header("authorization") String token, @Path("id") String id);
 }

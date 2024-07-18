@@ -201,7 +201,7 @@ public class SignUpFragment extends Fragment {
         String password2 = repeatPassword.getText().toString().trim();
         String fullName = name.getText().toString().trim();
         if (attemptSignUp()) {
-            newUser = new Users(user, fullName, password1, password2, profilePictureUrl);
+            newUser = new Users("", user, fullName, password1, password2, profilePictureUrl);
             try {
                 UsersViewModel vm = new UsersViewModel();
                 vm.createUser(newUser).observe(getViewLifecycleOwner(), user1 -> {

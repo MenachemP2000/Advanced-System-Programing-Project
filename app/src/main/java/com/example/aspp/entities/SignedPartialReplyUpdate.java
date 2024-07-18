@@ -11,7 +11,9 @@ public class SignedPartialReplyUpdate {
         this.usersLikes = usersLikes;
     }
 
-    public SignedPartialReplyUpdate() {
+    public SignedPartialReplyUpdate(Reply update) {
+        this._id = update.get_id();
+        this.usersLikes = update.getUsersLikes();
     }
 
     public String get_id() {

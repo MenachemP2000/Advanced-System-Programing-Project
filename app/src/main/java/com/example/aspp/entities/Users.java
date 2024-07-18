@@ -1,14 +1,17 @@
 package com.example.aspp.entities;
 
-public class Users {
-    String username, displayname, password, passwordAgain, image;
+import com.example.aspp.Helper;
 
-    public Users(String username, String displayname, String password, String passwordAgain, String image) {
+public class Users {
+    String _id, username, displayname, password, passwordAgain, image;
+
+    public Users(String _id, String username, String displayname, String password, String passwordAgain, String image) {
         this.username = username;
         this.displayname = displayname;
         this.password = password;
         this.passwordAgain = passwordAgain;
         this.image = image;
+        this._id = _id;
     }
 
     public String getUsername() {

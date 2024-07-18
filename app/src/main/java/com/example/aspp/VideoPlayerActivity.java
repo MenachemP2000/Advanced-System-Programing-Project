@@ -47,6 +47,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.aspp.adapters.CommentsRVAdapter;
 import com.example.aspp.adapters.HomeRVAdapter;
+import com.example.aspp.api.VideoAPI;
 import com.example.aspp.entities.Reply;
 import com.example.aspp.entities.SignedPartialVideoUpdate;
 import com.example.aspp.entities.UnsignedPartialVideoUpdate;
@@ -66,11 +67,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class VideoPlayerActivity extends AppCompatActivity {
-    private static final int CURRENT_USER = 123123123;
+    private int EDIT_MODE = 0;
+    EditText editTitle;
     TextView title, views, time, more, publisher, subscribers, comments, comment;
     RecyclerView related_videos;
-    ImageView c_profile, profilePic;
-    Button subscribe, like, dislike, share, watch_later, playlist;
+    ImageView c_profile, profilePic, edit;
+    Button subscribe, like, share, watch_later, playlist;
     MediaController mediaController;
     VideoView videoView;
     ProgressBar progressBar;
@@ -81,7 +83,6 @@ public class VideoPlayerActivity extends AppCompatActivity {
     private List<Comment> commentSection;
     private boolean alreadyLiked = false;
 
-    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,6 +99,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
         progressBar.setActivated(true);
         commentSection = new ArrayList<>();
         like = findViewById(R.id.like);
+        edit = findViewById(R.id.edit);
         VideosViewModel viewModel = new ViewModelProvider(this).get(VideosViewModel.class);
 
         viewModel.getVideoById(intent.getStringExtra("id"))
@@ -112,6 +114,9 @@ public class VideoPlayerActivity extends AppCompatActivity {
                             alreadyLiked = true;
                             like.setBackgroundTintList(VideoPlayerActivity.this.getColorStateList(R.color.dark_blue));
                         }
+                        if (Helper.isSignedIn() && currentVideo.getUsername().equals(Helper.getSignedInUser().getUsername())) {
+                            edit.setVisibility(View.VISIBLE);
+                        }
                     }
                 });
 //        if (currentVideo.getComments().isEmpty())
@@ -124,7 +129,26 @@ public class VideoPlayerActivity extends AppCompatActivity {
             }
 
         }).start();
+        editTitle = findViewById(R.id.editTitle);
+        edit.setOnClickListener(v -> {
+            if (EDIT_MODE == 0) {
+                editTitle.setVisibility(View.VISIBLE);
+                editTitle.setText(title.getText());
+                title.setVisibility(View.GONE);
+                edit.setImageResource(R.drawable.outline_file_download_24);
+                EDIT_MODE = 1;
+            } else {
+                currentVideo.setTitle(editTitle.getText().toString().trim());
+                viewModel.updateVideo(currentVideo).observe(this, video -> {
+                    title.setVisibility(View.VISIBLE);
+                    title.setText(editTitle.getText());
+                    editTitle.setVisibility(View.GONE);
+                    edit.setImageResource(R.drawable.outline_draw_24);
+                    EDIT_MODE = 0;
+                });
+            }
 
+        });
         videoView = findViewById(R.id.videoView);
         mediaController = new MediaController(this);
 //        if (intent.getIntExtra("video_thumbnail",0) != 0)
@@ -156,6 +180,14 @@ public class VideoPlayerActivity extends AppCompatActivity {
         comments = findViewById(R.id.comments);
         comment = findViewById(R.id.comment);
 
+        LinearLayout profileLayout = findViewById(R.id.profileLayout);
+        profileLayout.setOnClickListener(v ->
+        {
+            viewModel.get().removeObserver(videoList -> {});
+            Intent i = new Intent(VideoPlayerActivity.this, CreatorActivity.class);
+            i.putExtra("username", currentVideo.getUsername());
+            startActivity(i);
+        });
         LinearLayout layout_commentSection = findViewById(R.id.comment_section);
         layout_commentSection.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -395,10 +427,47 @@ public class VideoPlayerActivity extends AppCompatActivity {
         TextView ddescription = dialog.findViewById(R.id.description);
         ddescription.setText(currentVideo.getDescription());
         ImageView layout_cancel = dialog.findViewById(R.id.cancelButton);
+        ImageView dedit = dialog.findViewById(R.id.edit);
+        if (currentVideo.getUsername().equals(Helper.getSignedInUser().getUsername())) {
+            dedit.setVisibility(View.VISIBLE);
+            Log.i("Dialog", "Same user");
+        }
+        VideosViewModel viewModel = new ViewModelProvider(this).get(VideosViewModel.class);
+
+        EditText deditTitle = dialog.findViewById(R.id.editTitle);
+        EditText deditDes = dialog.findViewById(R.id.editDes);
+        final int[] dEDIT_MODE = {0};
+        dedit.setOnClickListener(v -> {
+            if (dEDIT_MODE[0] == 0) {
+                Log.i("Dialog", "Edit");
+                deditTitle.setVisibility(View.VISIBLE);
+                deditTitle.setText(dtitle.getText());
+                dtitle.setVisibility(View.GONE);
+                ddescription.setVisibility(View.GONE);
+                deditDes.setVisibility(View.VISIBLE);
+                deditDes.setText(ddescription.getText());
+                dedit.setImageResource(R.drawable.outline_file_download_24);
+                dEDIT_MODE[0] = 1;
+            } else {
+                currentVideo.setTitle(deditTitle.getText().toString().trim());
+                currentVideo.setDescription(deditDes.getText().toString().trim());
+                viewModel.updateVideo(currentVideo).observe(this, video -> {
+                    dtitle.setVisibility(View.VISIBLE);
+                    dtitle.setText(deditTitle.getText());
+                    deditTitle.setVisibility(View.GONE);
+                    ddescription.setVisibility(View.VISIBLE);
+                    ddescription.setText(deditDes.getText());
+                    deditDes.setVisibility(View.GONE);
+                    dedit.setImageResource(R.drawable.outline_draw_24);
+                    dEDIT_MODE[0] = 0;
+                });
+            }
+
+        });
         layout_cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                viewModel.updateVideo(currentVideo).removeObserver(video -> {});
                 dialog.dismiss();
             }
         });

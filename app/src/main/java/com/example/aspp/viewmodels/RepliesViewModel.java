@@ -3,6 +3,7 @@ package com.example.aspp.viewmodels;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.aspp.entities.Comment;
 import com.example.aspp.entities.Reply;
 import com.example.aspp.entities.SignedPartialReplyUpdate;
 import com.example.aspp.entities.User;
@@ -17,19 +18,19 @@ public class RepliesViewModel extends ViewModel {
     private LiveData<List<Reply>> replies;
     private LiveData<Reply> reply;
 
-    public RepliesViewModel (String videoId, String commentId) {
-        repository = new ReplyRepository(videoId, commentId);
-        replies = repository.getReplies();
+    public RepliesViewModel (String videoId, Comment comment) {
+        repository = new ReplyRepository(videoId, comment.get_id());
+        replies = repository.getReplies(comment);
     }
     public LiveData<Reply> createReply(Reply newReply) {
         reply = repository.createReply(newReply);
         return reply;
     }
 
-    public void deleteReply(String id) {
+    public void deleteReply(Reply id) {
         repository.deleteReply(id);
     }
-    public void partialUpdateReply(SignedPartialReplyUpdate update) {
+    public void partialUpdateReply(Reply update) {
         repository.partialUpdateReply(update);
     }
     public void updateReply(Reply update) {

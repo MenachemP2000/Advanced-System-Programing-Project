@@ -204,7 +204,7 @@ public class CommentsRVAdapter extends RecyclerView.Adapter<CommentsRVAdapter.My
         }
         Reply parent = new Reply(comments.get(posToReply));
         RepliesRVAdapter Cadp = new RepliesRVAdapter(context, c, parent);
-        Cadp.setVideoAndCommentIdParent(id, comments.get(posToReply).get_id());
+        Cadp.setVideoAndCommentIdParent(id, comments.get(posToReply));
         Cadp.setEditTextAndBtn(send, comment);
         commentsRV.setAdapter(Cadp);
         commentsRV.setLayoutManager(new LinearLayoutManager(dialog.getContext()));
@@ -239,7 +239,7 @@ public class CommentsRVAdapter extends RecyclerView.Adapter<CommentsRVAdapter.My
                             "@"+parent.getUser()+ " " + comment.getText().toString().trim(),
                             Calendar.getInstance().getTime(), new LinkedList<>());
                     c.add(newReply);
-                    RepliesViewModel vm = new RepliesViewModel(id, parent.get_id());
+                    RepliesViewModel vm = new RepliesViewModel(id, comments.get(posToReply));
                     vm.createReply(newReply).observe((LifecycleOwner) context,
                             comment1 -> {
                                 comment.setText("");

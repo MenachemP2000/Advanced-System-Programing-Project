@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.example.aspp.AuthInterceptor;
 import com.example.aspp.Helper;
 import com.example.aspp.R;
+import com.example.aspp.entities.RelatedVideosHelper;
 import com.example.aspp.entities.SignedPartialVideoUpdate;
 import com.example.aspp.entities.UnsignedPartialVideoUpdate;
 import com.example.aspp.entities.Video;
@@ -40,6 +41,22 @@ public class VideoAPI {
         videoWebServiceAPI = retrofit.create(videoWebServiceAPI.class);
     }
 
+    public void getVideos(MutableLiveData<List<Video>> videos) {
+        Call<List<Video>> call = videoWebServiceAPI.getVideos();
+
+        call.enqueue(new Callback<List<Video>>() {
+            @Override
+            public void onResponse(Call<List<Video>> call, Response<List<Video>> response) {
+                Log.i("Videos", response.raw().toString());
+                videos.postValue(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<List<Video>> call, Throwable t) {
+                Log.e("ERROR", t.getMessage());
+            }
+        });
+    }
     public void getAllVideos(MutableLiveData<List<Video>> videos) {
         Call<List<Video>> call = videoWebServiceAPI.getAllVideos();
 
@@ -56,19 +73,34 @@ public class VideoAPI {
             }
         });
     }
-
-    public void getRelatedVideos(MutableLiveData<List<Video>> videos, String id) {
-        Call<List<Video>> call = videoWebServiceAPI.getRelatedVideos(id);
+    public void getAllVideos(MutableLiveData<List<Video>> videos, String username) {
+        Call<List<Video>> call = videoWebServiceAPI.getAllVideos(username);
 
         call.enqueue(new Callback<List<Video>>() {
             @Override
             public void onResponse(Call<List<Video>> call, Response<List<Video>> response) {
-//                Log.i("RESPONSE", response.body().toString());
+                Log.i("All Videos of " + username, response.raw().toString());
                 videos.postValue(response.body());
             }
 
             @Override
             public void onFailure(Call<List<Video>> call, Throwable t) {
+                Log.e("ERROR", t.getMessage());
+            }
+        });
+    }
+    public void getRelatedVideos(MutableLiveData<List<Video>> videos, String id) {
+        Call<RelatedVideosHelper> call = videoWebServiceAPI.getRelatedVideos(id);
+
+        call.enqueue(new Callback<RelatedVideosHelper>() {
+            @Override
+            public void onResponse(Call<RelatedVideosHelper> call, Response<RelatedVideosHelper> response) {
+//                Log.i("RESPONSE", response.body().toString());
+                videos.postValue(response.body().getRelatedVideos());
+            }
+
+            @Override
+            public void onFailure(Call<RelatedVideosHelper> call, Throwable t) {
                 Log.e("ERROR", t.getMessage());
             }
         });
@@ -109,17 +141,18 @@ public class VideoAPI {
         });
     }
 
-    public void updateVideo(Video video, int id) {
-        Call<Void> call = videoWebServiceAPI.updateVideo(id, video);
+    public void updateVideo(MutableLiveData<Video> videoLive,Video video) {
+        Call<Video> call = videoWebServiceAPI.updateVideo(video.get_id(), Helper.getToken(), video);
 
-        call.enqueue(new Callback<Void>() {
+        call.enqueue(new Callback<Video>() {
             @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
+            public void onResponse(Call<Video> call, Response<Video> response) {
                 Log.i("RESPONSE", response.body().toString());
+                videoLive.postValue(response.body());
             }
 
             @Override
-            public void onFailure(Call<Void> call, Throwable t) {
+            public void onFailure(Call<Video> call, Throwable t) {
                 Log.e("ERROR", t.getMessage());
             }
         });

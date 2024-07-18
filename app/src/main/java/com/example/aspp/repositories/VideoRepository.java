@@ -33,9 +33,18 @@ public class VideoRepository {
         videoListData = new VideoListData();
         videoData = new VideoData();
         api= new VideoAPI(Helper.context);
-        api.getAllVideos(videoListData);
+//        api.getAllVideos(videoListData);
+    }
+    public LiveData<List<Video>> get() {
+        api.getVideos(videoListData);
+        return videoListData;
     }
     public LiveData<List<Video>> getAll() {
+        api.getAllVideos(videoListData);
+        return videoListData;
+    }
+    public LiveData<List<Video>> getAll(String username) {
+        api.getAllVideos(videoListData, username);
         return videoListData;
     }
     public LiveData<Video> getVideoById(String id) {
@@ -61,6 +70,10 @@ public class VideoRepository {
         api.createVideo(videoData, vid);
         return videoData;
     }
+    public LiveData<Video> updateVideo(Video vid) {
+        api.updateVideo(videoData, vid);
+        return videoData;
+    }
 
     public void delete(Video vid) {
         api.deleteVideo(vid.get_id());
@@ -82,7 +95,7 @@ public class VideoRepository {
 
             new Thread(() -> {
                 VideoAPI api = new VideoAPI(Helper.context);
-                api.getAllVideos(this);
+//                api.getAllVideos(this);
             }).start();
         }
     }
