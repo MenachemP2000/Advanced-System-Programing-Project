@@ -132,14 +132,13 @@ public class HomeFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        Log.i("TEST ONE", "working");
         inflater.inflate(R.menu.search_bar, menu);
         notifMenuItem = menu.findItem(R.id.notifications);
         notifMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(@NonNull MenuItem menuItem) {
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                fragmentManager.beginTransaction().replace(R.id.fragmentContainer, new NotificationFragment())
+                fragmentManager.beginTransaction().replace(R.id.fragmentContainer, new NotificationFragment(myUser))
                         .commit();
                 return false;
             }
