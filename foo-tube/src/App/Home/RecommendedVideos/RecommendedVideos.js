@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './RecommendedVideos.css';
 
-
 const RecommendedVideos = ({ videos, menuOpen, users }) => {
   const [relatedVideos, setRelatedVideos] = useState([]);
   const navigate = useNavigate();
@@ -24,23 +23,34 @@ const RecommendedVideos = ({ videos, menuOpen, users }) => {
     return shuffledArray;
   };
 
+  console.log('Related Videos:', relatedVideos);
 
   return (
     <div className={`RecommendedVideos ${menuOpen ? 'RecommendedVideosOpen' : 'RecommendedVideosClose'}`}>
       <ul>
-        {relatedVideos.map(video => (
-          <li className='clickable' key={video.id} onClick={() => handleVideoClick(video.id)}>
-            <img className='thumbNail' src={video.thumbnail} alt={video.title} />
-            <div className='videoDetails'>
-              <img src={users.find(author => author.username === video.username).image} height="35px" width="35px" ></img>
-              <div className="video-info">
-                <h3>{video.title}</h3>
-                <p>{video.username}</p>
-                <p>{video.views} views</p>
+        {relatedVideos.map(video => {
+          const user = users.find(author => author.username === video.username);
+          if (!user) {
+            return null; // Handle the case where user is not found
+          }
+
+          // Determine the source of the thumbnail image
+          const thumbnailSource = video.thumbnailFile ? URL.createObjectURL(video.thumbnailFile) : video.thumbnail;
+
+          return (
+            <li className='clickable' key={video.id} onClick={() => handleVideoClick(video.id)}>
+              <img className='thumbNail' src={thumbnailSource} alt={video.title} />
+              <div className='videoDetails'>
+                <img src={user.image} height="35px" width="35px" alt={`${user.username}'s profile`} />
+                <div className="video-info">
+                  <h3>{video.title}</h3>
+                  <p>{video.username}</p>
+                  <p>{video.views} views</p>
+                </div>
               </div>
-            </div>
-          </li>
-        ))}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
