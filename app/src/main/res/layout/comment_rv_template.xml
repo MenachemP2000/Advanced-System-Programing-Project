@@ -13,8 +13,8 @@
 
         <ImageView
             android:id="@+id/c_profile"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginLeft="5dp"
             app:srcCompat="@drawable/baseline_light_mode_24" />
 
@@ -25,6 +25,13 @@
             android:layout_marginLeft="5dp"
             android:layout_weight="1"
             android:text="comment" />
+
+        <ImageView
+            android:id="@+id/edit"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            app:srcCompat="@android:drawable/ic_menu_edit" />
 
     </LinearLayout>
 
