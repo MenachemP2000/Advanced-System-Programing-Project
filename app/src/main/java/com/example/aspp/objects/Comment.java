@@ -22,8 +22,16 @@ public class Comment implements Serializable {
     public void addLike() {
         this.likes++;
     }
+
+    public void noLike() {
+        this.likes--;
+    }
     public void subLike() {
         this.dislikes++;
+    }
+
+    public void noDisLike() {
+        this.dislikes--;
     }
     public void addReplay(Comment replay) {
         this.replayComments.add(replay);
@@ -54,5 +62,9 @@ public class Comment implements Serializable {
 
     public int getId() {
         return id;
+    }
+
+    public void setText(String newCommentText) {
+        this.text = newCommentText;
     }
 }
