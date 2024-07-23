@@ -2,14 +2,9 @@ package com.example.aspp.fragments;
 
 import static com.example.aspp.Utils.readVideosList;
 
-import android.app.SearchManager;
-import android.content.Context;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,14 +13,10 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.aspp.R;
-import com.example.aspp.adapters.HomeRVAdapter;
 import com.example.aspp.adapters.NotificationsRVAdapter;
 import com.example.aspp.objects.User;
 import com.example.aspp.objects.Video;
@@ -55,8 +46,8 @@ public class NotificationFragment extends Fragment {
     private String mParam2;
     private NotificationsRVAdapter adp;
 
-    public NotificationFragment() {
-        // Required empty public constructor
+    public NotificationFragment(User myUser) {
+        this.myUser = myUser;
     }
 
     /**
@@ -68,8 +59,8 @@ public class NotificationFragment extends Fragment {
      * @return A new instance of fragment NotificationFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static NotificationFragment newInstance(String param1, String param2) {
-        NotificationFragment fragment = new NotificationFragment();
+    public static NotificationFragment newInstance(String param1, String param2, User myUser) {
+        NotificationFragment fragment = new NotificationFragment(myUser);
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -96,7 +87,7 @@ public class NotificationFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                fragmentManager.beginTransaction().replace(R.id.fragmentContainer, new HomeFragment())
+                fragmentManager.beginTransaction().replace(R.id.fragmentContainer, new HomeFragment(myUser))
                         .commit();
             }
         });

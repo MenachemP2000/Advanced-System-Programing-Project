@@ -1,23 +1,10 @@
 package com.example.aspp.objects;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.icu.util.Calendar;
 import android.net.Uri;
-import android.os.Build;
 
-import androidx.appcompat.content.res.AppCompatResources;
-
-import com.example.aspp.R;
-
-import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
-import java.util.Map;
 
 public class Video {
 //    private double duration;
@@ -26,7 +13,10 @@ public class Video {
     private ArrayList<Comment> comments;
     private Date dateOfPublish;
     private Uri videoPathInRaw, thumbnailUri;
-    public Video(int id, String publisher, double duration, String title, String description, String tags, int thumbnailDrawableId, Uri videoPathInRaw) {
+
+    private User myUser;
+
+    public Video(int id, String publisher, double duration, String title, String description, String tags, int thumbnailDrawableId, Uri videoPathInRaw, User myUser) {
         this.id = id;
         this.publisher = publisher;
 //        this.duration = duration;
@@ -42,6 +32,7 @@ public class Video {
         this.views = 0;
         this.comments = new ArrayList<>();
         this.dateOfPublish = Calendar.getInstance().getTime();
+        this.myUser = myUser;
     }
 
     public Video(int id, String publisher, double duration, String title, String description, String tags, int thumbnailDrawableId, String videoPath) {
@@ -60,9 +51,10 @@ public class Video {
         this.views = 0;
         this.comments = new ArrayList<>();
         this.dateOfPublish = Calendar.getInstance().getTime();
+        this.myUser = null;
     }
 
-    public Video(int id,String publisher, double duration, String title, String description, String tags, Uri thumbnailUri, String videoPath) {
+    public Video(int id,String publisher, double duration, String title, String description, String tags, Uri thumbnailUri, String videoPath, User myUser) {
 //        this.duration = duration;
         this.id = id;
         this.publisher = publisher;
@@ -78,6 +70,7 @@ public class Video {
         this.views = 0;
         this.comments = new ArrayList<>();
         this.dateOfPublish = Calendar.getInstance().getTime();
+        this.myUser = myUser;
     }
     public String getTags() {
         return tags;
@@ -106,8 +99,23 @@ public class Video {
 //        return duration;
 //    }
 
+    public User getUser(){
+        if(this.myUser != null){
+            return null;
+        }
+        return this.myUser;
+    }
+
     public String getTitle() {
         return title;
+    }
+
+    public void setTitle(String newTitle){
+        this.title = newTitle;
+    }
+
+    public void setDescription(String newTitle){
+        this.description= newTitle;
     }
 
     public String getDescription() {

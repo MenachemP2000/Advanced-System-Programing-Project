@@ -37,7 +37,6 @@ public class NotificationsRVAdapter extends RecyclerView.Adapter<NotificationsRV
     public NotificationsRVAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(context);
         View v = inflater.inflate(R.layout.notifications_rv_template, parent, false);
-
         return new NotificationsRVAdapter.MyViewHolder(v);
     }
 
@@ -94,7 +93,6 @@ public class NotificationsRVAdapter extends RecyclerView.Adapter<NotificationsRV
         View v;
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
-
             title = itemView.findViewById(R.id.title);
             publisher = itemView.findViewById(R.id.publisher);
             time = itemView.findViewById(R.id.time);

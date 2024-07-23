@@ -77,7 +77,7 @@ public class AddVideoFragment extends Fragment {
     }
 
     public AddVideoFragment(User user) {
-        myUser = user;
+        this.myUser = user;
     }
 
     /**
@@ -110,7 +110,7 @@ public class AddVideoFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+
         View view = inflater.inflate(R.layout.fragment_add_video, container, false);
 
         if (ActivityCompat.checkSelfPermission(getContext(), android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -154,8 +154,8 @@ public class AddVideoFragment extends Fragment {
             if (!isValid) {
                 return;
             }
-            Video newVideo = new Video(123243, "demi user", 0.0,title,
-                    description, tags, uri, videoPath);
+            Video newVideo = new Video(Integer.parseInt(myUser.getId()), myUser.getUsername(), 0.0,title,
+                    description, tags, uri, videoPath, myUser);
             HomeFragment.videoArrayList.add(newVideo);
             HomeFragment.adp.notifyDataSetChanged();
             Intent intent = new Intent(requireContext(), MainActivity.class);
@@ -192,7 +192,6 @@ public class AddVideoFragment extends Fragment {
         layout_camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 dialog.dismiss();
                 Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
                 startActivityForResult(intent, 1);
