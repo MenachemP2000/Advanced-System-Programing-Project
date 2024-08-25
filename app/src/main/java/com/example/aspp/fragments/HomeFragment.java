@@ -22,6 +22,8 @@ import androidx.core.view.MenuItemCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -43,8 +45,12 @@ import android.widget.Toast;
 
 import com.example.aspp.R;
 import com.example.aspp.adapters.HomeRVAdapter;
-import com.example.aspp.objects.Comment;
-import com.example.aspp.objects.Video;
+import com.example.aspp.api.VideoAPI;
+import com.example.aspp.entities.Comment;
+import com.example.aspp.entities.User;
+import com.example.aspp.entities.Video;
+import com.example.aspp.repositories.VideoRepository;
+import com.example.aspp.viewmodels.VideosViewModel;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -57,10 +63,11 @@ import java.util.Set;
  */
 public class HomeFragment extends Fragment {
 
+    private User myUser;
     RecyclerView surveyListContainer;
     SwipeRefreshLayout swipeRefreshLayout;
     public static HomeRVAdapter adp;
-    public static ArrayList<Video> videoArrayList;
+    public ArrayList<Video> videoArrayList, filterdVideos;
     public static ArrayList<Comment> commentArrayList;
     Toolbar toolbar;
     MenuItem searchMenuItem, notifMenuItem;
@@ -68,6 +75,7 @@ public class HomeFragment extends Fragment {
     DrawerLayout drawerLayout;
     ImageButton openSideNav;
     Button all_btn, gaming_btn, music_btn, tutorials_btn;
+    VideosViewModel viewModel;
     boolean nightMode;
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -81,10 +89,14 @@ public class HomeFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public HomeFragment(boolean mode) {
+    public HomeFragment(boolean mode, User user) {
         nightMode = mode;
+        myUser = user;
     }
 
+    public HomeFragment(User user) {
+        myUser = user;
+    }
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -115,7 +127,6 @@ public class HomeFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        Log.i("TEST ONE", "working");
         inflater.inflate(R.menu.search_bar, menu);
         notifMenuItem = menu.findItem(R.id.notifications);
         notifMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
@@ -130,7 +141,6 @@ public class HomeFragment extends Fragment {
         searchMenuItem = menu.findItem(R.id.search);
         searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
         searchView.setIconified(true);
-        Log.i("TEST TWO", "working");
         SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -146,39 +156,36 @@ public class HomeFragment extends Fragment {
                 return true;
             }
         });
-        Log.i("TEST FINAL", "working");
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     private void mySearch(String query) {
         if (query.equals("")) {
-            adp = new HomeRVAdapter(getContext(), videoArrayList);
-            surveyListContainer.setAdapter(adp);
+            adp.setVideos(videoArrayList);
             return;
         }
 
-        ArrayList<Video> updatedArr = new ArrayList<>();
         Set<Video> updatedSet = new HashSet<>();
 
-        for (Video v:videoArrayList) {
+        for (Video v:filterdVideos) {
             if (v.getTitle().startsWith(query.trim()))
                 updatedSet.add(v);
-            else if (v.getPublisher().startsWith(query.trim()))
+            else if (v.getUsername().startsWith(query.trim()))
                 updatedSet.add(v);
-            else if (v.getDescription().startsWith(query.trim()))
-                updatedSet.add(v);
+//            else if (v.getDescription().startsWith(query.trim()))
+//                updatedSet.add(v);
         }
 
         if (updatedSet.isEmpty()) {
-            for (Video v:videoArrayList) {
+            for (Video v:filterdVideos) {
                 if (v.getTitle().contains(query.trim()))
                     updatedSet.add(v);
-                else if (v.getPublisher().contains(query.trim()))
+                else if (v.getUsername().contains(query.trim()))
                     updatedSet.add(v);
-                else if (v.getDescription().contains(query.trim()))
-                    updatedSet.add(v);
-                else if (v.getTags().contains(query.trim()))
-                    updatedSet.add(v);
+//                else if (v.getDescription().contains(query.trim()))
+//                    updatedSet.add(v);
+//                else if (v.getTags().contains(query.trim()))
+//                    updatedSet.add(v);
             }
         }
 
@@ -187,49 +194,16 @@ public class HomeFragment extends Fragment {
             return;
         }
 
-        updatedArr.addAll(updatedSet);
-        adp = new HomeRVAdapter(getContext(), updatedArr);
-        surveyListContainer.setAdapter(adp);
-    }
+        filterdVideos = new ArrayList<>(updatedSet);
+//        filterdVideos.addAll(updatedSet);
+        adp.setVideos(filterdVideos);
+//        viewModel.get().observe(getViewLifecycleOwner(), videos -> {
+//            filterdVideos = new ArrayList<>(videos);
+//        });
+        adp.notifyDataSetChanged();
 
-    private void searchByTag(String tags) {
-        if (tags.equals("")) {
-            adp = new HomeRVAdapter(getContext(), videoArrayList);
-            surveyListContainer.setAdapter(adp);
-            return;
-        }
-
-        ArrayList<Video> updatedArr = new ArrayList<>();
-        Set<Video> updatedSet = new HashSet<>();
-
-        for (Video v:videoArrayList) {
-            if (v.getTags().contains(tags.trim()))
-                updatedSet.add(v);
-//            else if (v.getPublisher().startsWith(tags.trim()))
-//                updatedSet.add(v);
-//            else if (v.getDescription().startsWith(tags.trim()))
-//                updatedSet.add(v);
-        }
-
-//        if (updatedSet.isEmpty()) {
-//            for (Video v:videoArrayList) {
-//                if (v.getTitle().contains(tags.trim()))
-//                    updatedSet.add(v);
-//                else if (v.getPublisher().contains(tags.trim()))
-//                    updatedSet.add(v);
-//                else if (v.getDescription().contains(tags.trim()))
-//                    updatedSet.add(v);
-//            }
-//        }
-
-        if (updatedSet.isEmpty()) {
-            Toast.makeText(getContext(), "We didn't find anything like that! are you sure it even exists?", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        updatedArr.addAll(updatedSet);
-        adp = new HomeRVAdapter(getContext(), updatedArr);
-        surveyListContainer.setAdapter(adp);
+        viewModel.getTopVideos().removeObservers(getViewLifecycleOwner());
+        
     }
 
     @Override
@@ -271,9 +245,17 @@ public class HomeFragment extends Fragment {
         activity.setSupportActionBar(toolbar);
         activity.getSupportActionBar().setTitle("");
         surveyListContainer = v.findViewById(R.id.ActiveSurveys);
-        if (videoArrayList == null)
-            videoArrayList = readVideosList(getContext());
-        adp = new HomeRVAdapter(getContext(), videoArrayList);
+        adp = new HomeRVAdapter(getContext(), new ArrayList<>());
+        viewModel = new ViewModelProvider(this).get(VideosViewModel.class);
+        viewModel.getTopVideos().observe(getViewLifecycleOwner(), videos -> {
+            videoArrayList = new ArrayList<>(videos);
+            adp.setVideos(videos);
+            adp.notifyDataSetChanged();
+
+        });
+        viewModel.get().observe(getViewLifecycleOwner(), videos -> {
+            filterdVideos = new ArrayList<>(videos);
+        });
         surveyListContainer.setAdapter(adp);
         surveyListContainer.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -286,16 +268,19 @@ public class HomeFragment extends Fragment {
     }
 
     private void onRefreshList() {
-        videoArrayList = readVideosList(getContext());
-        adp = new HomeRVAdapter(getContext(), videoArrayList);
-        surveyListContainer.setAdapter(adp);
+        viewModel = new ViewModelProvider(this).get(VideosViewModel.class);
+        viewModel.get().observe(getViewLifecycleOwner(), videos -> {
+            videoArrayList = new ArrayList<>(videos);
+            adp.setVideos(videos);
+            adp.notifyDataSetChanged();
+        });
         swipeRefreshLayout.setRefreshing(false);
     }
 
     private void onFilterList(View view) {
         if (view.getId() == R.id.all) {
-            videoArrayList = readVideosList(getContext());
-            adp = new HomeRVAdapter(getContext(), videoArrayList);
+//            videoArrayList = readVideosList(getContext());
+//            adp = new HomeRVAdapter(getContext(), videoArrayList);
             surveyListContainer.setAdapter(adp);
         } else {
             mySearch(((Button)view).getText().toString().trim());
@@ -322,116 +307,5 @@ public class HomeFragment extends Fragment {
             tutorials_btn.setTextColor(getContext().getColorStateList(R.color.black));
             view.setBackgroundTintList(getContext().getColorStateList(R.color.colorOnSurface_day));
         }
-    }
-
-    public static void showBottomDialog(Context context, Video choosenVideo) {
-
-        final Dialog dialog = new Dialog(context);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.home_bottom_sheet_layout);
-
-//        LinearLayout layout_download = dialog.findViewById(R.id.layout_download);
-//        layout_download.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                dialog.dismiss();
-//
-//            }
-//        });
-
-        LinearLayout layout_not_interested = dialog.findViewById(R.id.layout_not_interested);
-        layout_not_interested.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                dialog.dismiss();
-                videoArrayList.remove(choosenVideo);
-                adp.notifyDataSetChanged();
-                Toast.makeText(context, choosenVideo.getTitle()+" was removed", Toast.LENGTH_SHORT).show();
-
-            }
-        });
-
-//        LinearLayout layout_not_recommend = dialog.findViewById(R.id.layout_not_recommend);
-//        layout_not_recommend.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                dialog.dismiss();
-//
-//            }
-//        });
-
-        LinearLayout layout_playlist = dialog.findViewById(R.id.layout_playlist);
-        layout_playlist.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                dialog.dismiss();
-
-            }
-        });
-
-        LinearLayout layout_queue = dialog.findViewById(R.id.layout_queue);
-        layout_queue.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                dialog.dismiss();
-
-            }
-        });
-
-//        LinearLayout layout_report = dialog.findViewById(R.id.layout_report);
-//        layout_report.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                dialog.dismiss();
-//
-//            }
-//        });
-
-        LinearLayout layout_watch_later = dialog.findViewById(R.id.layout_watch_later);
-        layout_watch_later.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                dialog.dismiss();
-
-            }
-        });
-
-        LinearLayout layout_share = dialog.findViewById(R.id.layout_share);
-        layout_share.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                dialog.dismiss();
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.setType("text/plain");
-                String body = "Check out this video!";
-                String sub = "Check out this video!\n" + choosenVideo.getTitle();
-                shareIntent.putExtra(Intent.EXTRA_TEXT, body);
-                shareIntent.putExtra(Intent.EXTRA_TEXT, sub);
-                context.startActivity(Intent.createChooser(shareIntent, "Share using"));
-
-            }
-        });
-
-        ImageView cancelButton = dialog.findViewById(R.id.cancelButton);
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.dismiss();
-            }
-        });
-
-        dialog.show();
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
-        dialog.getWindow().setGravity(Gravity.BOTTOM);
     }
 }

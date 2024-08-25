@@ -1,10 +1,13 @@
+
 package com.example.aspp;
 
+
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
@@ -23,11 +26,18 @@ import com.example.aspp.fragments.ShortsFragment;
 import com.example.aspp.fragments.HomeFragment;
 import com.example.aspp.fragments.ProfileFragment;
 import com.example.aspp.databinding.ActivityMainBinding;
+import com.example.aspp.fragments.SignInFragment;
+import com.example.aspp.fragments.SignInRequestFragment;
 import com.example.aspp.fragments.SubscriptionsFragment;
+import com.example.aspp.entities.User;
 import com.google.android.material.navigation.NavigationView;
+
+import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
 
+    private User myUser = Helper.getSignedInUser();
+    boolean signIn = Helper.isSignedIn();
     ActivityMainBinding binding;
     DrawerLayout drawerLayout;
     NavigationView navigationView;
@@ -35,11 +45,14 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences sp;
     private Fragment currentFragment;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+
 
         sp = getSharedPreferences("MODE", Context.MODE_PRIVATE);
         nightMode = sp.getBoolean("night",false);
@@ -55,8 +68,29 @@ public class MainActivity extends AppCompatActivity {
 
         binding.bottomNavbar.getMenu().findItem(R.id.home).setChecked(true);
 
-        switchFragment(new HomeFragment());
-        currentFragment = new HomeFragment();
+
+        //Handle the login state - gets the user object and handle the login-logout on the side navigate item.
+        User loggedInUser = (User) getIntent().getSerializableExtra("loggedInUser");
+        // Log the retrieved user for debugging
+        if (loggedInUser != null) {
+            Log.d("MainActivity", "Logged in user: " + loggedInUser.getUsername());
+            myUser = loggedInUser;
+            signIn = true;
+        } else {
+            Log.d("MainActivity", "No user logged in.");
+        }
+
+        //handle the login-logout
+        MenuItem loginLogoutItem = navigationView.getMenu().findItem(R.id.logout);
+        if (signIn) {
+            loginLogoutItem.setTitle("Logout");
+        } else {
+            loginLogoutItem.setTitle("Login");
+        }
+
+
+        switchFragment(new HomeFragment(myUser));
+        currentFragment = new HomeFragment(myUser);
 
         if (nightMode){
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
@@ -66,11 +100,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         binding.bottomNavbar.setOnItemSelectedListener(item -> {
-
             if (item.getItemId() == R.id.home){
-                switchFragment(new HomeFragment(nightMode));
+                switchFragment(new HomeFragment(nightMode, myUser));
                 currentFragment = new HomeFragment();
-
             } else if (item.getItemId() == R.id.shorts) {
                 switchFragment(new ShortsFragment());
                 currentFragment = new ShortsFragment();
@@ -80,16 +112,27 @@ public class MainActivity extends AppCompatActivity {
                 currentFragment = new SubscriptionsFragment();
             }
             else if (item.getItemId() == R.id.add_video) {
-                switchFragment(new AddVideoFragment());
-                currentFragment = new AddVideoFragment();
+                if(!signIn){
+                    switchFragment(new SignInRequestFragment());
+                    currentFragment = new SignInRequestFragment();
+                }
+                else {
+                    switchFragment(new AddVideoFragment(myUser));
+                    currentFragment = new AddVideoFragment();
+                }
             }
             else {
-                switchFragment(new ProfileFragment());
-                currentFragment = new ProfileFragment();
+                if(!signIn){
+                    switchFragment(new SignInRequestFragment());
+                    currentFragment = new SignInRequestFragment();
+                }
+                else {
+                    switchFragment(new ProfileFragment());
+                    currentFragment = new ProfileFragment();
+                }
             }
             return true;
         });
-
 
         navigationView.bringToFront();
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -120,15 +163,19 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 else {
-                    //logout
+                    if(signIn){
+                        myUser = null;
+                        signIn = false;
+                        item.setTitle("Login");
+                    }
+                    startActivity(new Intent(MainActivity.this, SignInActivity.class));
                 }
                 return false;
             }
         });
     }
 
-    private void switchFragment(androidx.fragment.app.Fragment f){
-
+    public void switchFragment(androidx.fragment.app.Fragment f){
         FragmentManager fm = getSupportFragmentManager();
         fm.beginTransaction()
                 .replace(R.id.fragmentContainer, f, null)
@@ -138,6 +185,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        File file = new File(getFilesDir(), "user_credentials.json");
+        //close the users files to make it not persist
+        if(file.exists()){
+            file.delete();
+        }
         finishAffinity();
+
+    }
+
+    public void setFragment(Fragment newFragment) {
+        this.currentFragment = newFragment;
+        switchFragment(currentFragment);
     }
 }
