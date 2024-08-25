@@ -8,13 +8,47 @@ const mongoose = require('mongoose');
 // Create a new video
 exports.createVideo = async (req, res) => {
   try {
-    const newVideo = new Video(req.body);
+    // Log the incoming request body
+    console.log('Request body:', req.body);
+
+    const { title, description, tags, source, thumbnail, username, duration, upload_date } = req.body;
+
+    // Validate required fields
+    if (!title || !description || !source || !thumbnail || !username || !duration || !upload_date) {
+      console.log('Validation failed:', req.body);
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    // Log successful validation
+    console.log('Validation passed, creating new video...');
+
+    const newVideo = new Video({
+      title,
+      description,
+      tags,
+      source,
+      thumbnail,
+      username,
+      duration,
+      upload_date
+    });
+
+    // Save the video to the database
     await newVideo.save();
+
+    // Log the saved video
+    console.log('Video saved successfully:', newVideo);
+
     res.status(201).send(newVideo);
   } catch (error) {
-    res.status(400).send(error);
+    // Log the error
+    console.error('Error saving video:', error);
+
+    res.status(400).send({ message: 'An error occurred', error: error.message });
   }
 };
+
+
 
 exports.getVideos = async (req, res) => {
   try {
