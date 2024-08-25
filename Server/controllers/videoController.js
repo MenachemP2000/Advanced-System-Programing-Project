@@ -3,6 +3,36 @@ const jwt = require("jsonwebtoken");
 const key = "Some super secret key";
 const mongoose = require("mongoose");
 
+const express = require('express');
+const net = require('net');
+const app = express();
+app.use(express.json());
+const CppServerHost = 'localhost'; // Host of the C++ server
+const CppServerPort = 9090;        // Port of the C++ server
+
+var relatedVideos = [];
+
+function communicateWithCppServer(message, callback) {
+  const client = new net.Socket();
+  let responseData = '';
+
+  client.connect(CppServerPort, CppServerHost, () => {
+    client.write(message);
+  });
+
+  client.on('data', (data) => {
+    responseData += data.toString();
+  });
+
+  client.on('end', () => {
+    callback(null, responseData);
+  });
+
+  client.on('error', (err) => {
+    callback(err, null);
+  });
+}
+
 // Create a new video
 exports.createVideo = async (req, res) => {
   try {
@@ -96,6 +126,13 @@ exports.getRelatedVideos = async (req, res) => {
               }, // Score for common tags
               {
                 $cond: {
+                  if: { $in: ["$_id", relatedVideos] },
+                  then: 100000,
+                  else: 1
+                }
+              }, // Score for related videos
+              {
+                $cond: {
                   if: { $eq: ["$username", username] },
                   then: 5,
                   else: 0,
@@ -124,7 +161,6 @@ exports.getRelatedVideos = async (req, res) => {
 
     const videos = await Video.aggregate(pipeline);
     const totalVideos = await Video.countDocuments();
-    console.log(videos);
     res.json({
       videos: videos,
       totalVideos: totalVideos,
@@ -236,7 +272,18 @@ exports.partialUpdateVideo = async (req, res) => {
           new: true,
           runValidators: true,
         });
-
+        if (req.body.views === test.views + 1) {
+          const message = `WATCH ${data.username} ${req.params.id}\n`;
+          // Communicate with C++ server
+          communicateWithCppServer(message, (err, response) => {
+            if (err) {
+              console.error('Error communicating with C++ server:', err);
+              return res.status(500).send('Internal Server Error');
+            }
+            console.log('C++ server response1:', response);
+            relatedVideos = JSON.parse(response).recommendations;
+          });
+        }
         res.send(video);
       } catch (err) {
         if (
@@ -266,6 +313,18 @@ exports.partialUpdateVideo = async (req, res) => {
               req.body,
               { new: true, runValidators: true }
             );
+            if (req.body.views === test.views + 1) {
+              const message = `WATCH ${data.username} ${req.params.id}\n`;
+              // Communicate with C++ server
+              communicateWithCppServer(message, (err, response) => {
+                if (err) {
+                  console.error('Error communicating with C++ server:', err);
+                  return res.status(500).send('Internal Server Error');
+                }
+                console.log('C++ server response2:', response);
+                relatedVideos = JSON.parse(response).recommendations;
+              });
+            }
             res.send(video);
           } catch (error) {
             res.status(400).send(error);
@@ -277,7 +336,6 @@ exports.partialUpdateVideo = async (req, res) => {
     res.status(400).send(error);
   }
 };
-
 // Delete a video by ID
 exports.deleteVideo = async (req, res) => {
   try {
