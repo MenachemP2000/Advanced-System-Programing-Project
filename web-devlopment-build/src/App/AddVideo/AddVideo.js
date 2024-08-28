@@ -10,7 +10,6 @@ const AddVideo = ({ isSignedIn }) => {
   const [thumbnailFile, setThumbnailFile] = useState(null);
   const [videoError, setVideoError] = useState('');
   const [thumbnailError, setThumbnailError] = useState('');
-  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleVideoChange = (e) => {
@@ -46,23 +45,17 @@ const AddVideo = ({ isSignedIn }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    let hasError = false;
-
     if (!videoFile) {
       setVideoError('Please select a video file.');
-      hasError = true;
+      return;
     }
 
     if (!thumbnailFile) {
       setThumbnailError('Please select a thumbnail image file.');
-      hasError = true;
-    }
-
-    if (hasError) {
       return;
     }
 
-    const duration = "00:10"; // Fixed duration of 10 seconds
+    const duration = "00:10"; // Fixed duration of 10 seconds (change if dynamic duration is needed)
     const upload_date = new Date().toISOString(); // Get the current date and time
 
     const convertFileToBase64 = (file) => {
@@ -82,7 +75,7 @@ const AddVideo = ({ isSignedIn }) => {
         title,
         description,
         tags: tags.trim().split(',').map(tag => tag.trim()),
-        source: base64Video,
+        video: base64Video, // Note: Renamed 'source' to 'video' to match backend logic
         thumbnail: base64Thumbnail,
         username: isSignedIn.username,
         duration,
@@ -98,9 +91,8 @@ const AddVideo = ({ isSignedIn }) => {
         body: JSON.stringify(payload),
       });
 
-      const result = await response.json();
-
       if (!response.ok) {
+        const result = await response.json();
         setVideoError(result.message || 'Failed to upload video.');
         return;
       }
@@ -163,7 +155,6 @@ const AddVideo = ({ isSignedIn }) => {
           />
           {thumbnailError && <p className="error-message">{thumbnailError}</p>}
         </div>
-        {error && <div className="error-message">{error}</div>}
         <button type="submit">Add Video</button>
       </form>
     </div>

@@ -305,13 +305,13 @@ public class VideoPlayerActivity extends AppCompatActivity {
 
     private void loadVideo() {
 
-        String vid = "http://10.0.2.2:4000";
+        String vid = getResources().getString(R.string.Base_Url);
         vid += currentVideo.getSource();
         if (currentVideo.getSource().equals(""))
             return;
         videoView.setVideoURI(Uri.parse(vid));
-        Log.i("Current Vid", currentVideo.toString());
-        Log.i("PATH", vid);
+        Log.i("!!!!!!!!!", currentVideo.toString());
+        Log.i("!!!!!", vid);
 
         time.setText(currentVideo.getUpload_date());
         title.setText(currentVideo.getTitle());
