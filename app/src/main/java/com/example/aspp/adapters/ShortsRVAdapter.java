@@ -192,7 +192,7 @@ public class ShortsRVAdapter extends RecyclerView.Adapter<ShortsRVAdapter.MyView
     }
     private void loadVideo(MyViewHolder holder, Video currentVideo) {
 
-        String vid = "http://10.0.2.2:4000";
+        String vid = context.getResources().getString(R.string.Base_Url);
         vid += currentVideo.getSource();
         if (currentVideo.getSource().equals(""))
             return;
