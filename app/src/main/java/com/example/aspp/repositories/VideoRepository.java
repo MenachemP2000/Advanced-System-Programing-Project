@@ -1,7 +1,6 @@
 package com.example.aspp.repositories;
 
 import android.content.Context;
-import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -17,16 +16,14 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 public class VideoRepository {
     private VideoListData videoListData;
     private VideoData videoData;
     private VideoDao dao;
     private VideoAPI api;
     private Context context;
+    private static final String TAG = "VideoRepository";
+    private MutableLiveData<Video> videoData1 = new MutableLiveData<>();
 
     public VideoRepository() {
 //        this.context = context;
@@ -66,10 +63,12 @@ public class VideoRepository {
         api.partialUpdateVideo(videoData, video, id);
         return videoData;
     }
-    public LiveData<Video> add(Video vid) {
+    public LiveData<Video> createVideo(Video vid) {
         api.createVideo(videoData, vid);
         return videoData;
     }
+
+
     public LiveData<Video> updateVideo(Video vid) {
         api.updateVideo(videoData, vid);
         return videoData;
