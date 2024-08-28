@@ -20,6 +20,12 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import retrofit2.Call;
+import retrofit2.http.Body;
+import retrofit2.http.Header;
+import retrofit2.http.POST;
+
+
 
 public interface videoWebServiceAPI {
     @GET("videos/all")
@@ -37,7 +43,7 @@ public interface videoWebServiceAPI {
     Call<Video> getVideoById(@Path("id") String id);
 
     @POST("videos")
-    Call<Video> createVideo(@Header("authorization") String token, @Body Video newVid);
+    Call<Video> createVideo(@Header("authorization") String token,@Body Video newVid);
 
     @PUT("videos/{id}")
     Call<Video> updateVideo(@Path("id") String id, @Header("authorization") String token, @Body Video updatedVid);
