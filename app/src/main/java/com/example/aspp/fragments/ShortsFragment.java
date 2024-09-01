@@ -6,7 +6,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.lifecycle.ViewModelProvider;
+import androidx.viewpager2.widget.ViewPager2;
+
 import com.example.aspp.R;
+import com.example.aspp.adapters.ShortsRVAdapter;
+import com.example.aspp.entities.Video;
+import com.example.aspp.viewmodels.VideosViewModel;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link androidx.fragment.app.Fragment} subclass.
@@ -15,6 +23,8 @@ import com.example.aspp.R;
  */
 public class ShortsFragment extends androidx.fragment.app.Fragment {
 
+    ViewPager2 viewPager2;
+    ShortsRVAdapter adp;
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -23,6 +33,7 @@ public class ShortsFragment extends androidx.fragment.app.Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private ArrayList<Video> shortsArrayList;
 
     public ShortsFragment() {
         // Required empty public constructor
@@ -59,6 +70,17 @@ public class ShortsFragment extends androidx.fragment.app.Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_shorts, container, false);
+        View v = inflater.inflate(R.layout.fragment_shorts, container, false);
+        viewPager2 = v.findViewById(R.id.viewPager2);
+        VideosViewModel viewModel = new ViewModelProvider(this).get(VideosViewModel.class);
+        shortsArrayList = new ArrayList<>();
+        viewModel.get().observe(getViewLifecycleOwner(), videos -> {
+            shortsArrayList = new ArrayList<>(videos);
+            adp.setVideos(shortsArrayList);
+            adp.notifyDataSetChanged();
+        });
+        adp = new ShortsRVAdapter(getContext(), shortsArrayList);
+        viewPager2.setAdapter(adp);
+        return v;
     }
 }
