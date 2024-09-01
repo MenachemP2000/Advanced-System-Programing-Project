@@ -1,8 +1,10 @@
 package com.example.aspp.dao;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
@@ -15,9 +17,9 @@ public interface VideoDao {
     List<Video> index();
 
     @Query("SELECT * FROM Video WHERE _id = :id")
-    Video get(int id);
+    Video get(String id);
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(Video... videos);
 
     @Update
@@ -25,4 +27,13 @@ public interface VideoDao {
 
     @Delete
     void delete(Video... videos);
+
+    @Query("SELECT * FROM Video WHERE username = :username")
+    List<Video> getByUsername(String username);
+
+    @Query("DELETE FROM Video")
+    void deleteAll();
+
+    @Query("SELECT COUNT(*) FROM Video")
+    int getVideoCount();
 }
