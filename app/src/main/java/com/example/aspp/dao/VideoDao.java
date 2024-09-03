@@ -36,4 +36,7 @@ public interface VideoDao {
 
     @Query("SELECT COUNT(*) FROM Video")
     int getVideoCount();
+
+    @Query("SELECT * FROM Video WHERE _id != :videoId")
+    List<Video> getAllExcept(String videoId);
 }
