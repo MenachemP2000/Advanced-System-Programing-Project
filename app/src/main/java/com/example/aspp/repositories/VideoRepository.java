@@ -75,9 +75,13 @@ public class VideoRepository {
     }
 
     public LiveData<List<Video>> getRelatedVideos(String id) {
-        api.getRelatedVideos(videoListData, id);
-        List<Video> video =  dao.index();
-        videoListData.postValue(video);
+        if (isNetworkAvailable()) {
+            // Fetch related videos from the network
+            api.getRelatedVideos(videoListData, id);
+            return videoListData;
+        }
+        List<Video> videoList = dao.getAllExcept(id);
+        videoListData.postValue(videoList);
         return videoListData;
     }
 
@@ -224,8 +228,7 @@ public class VideoRepository {
             System.out.println("Video Title: " + video.getTitle());
             System.out.println("Video URL: " + video.getSource());
         }
-
-        return videoListData;
+        return getAll();
     }
 
     public void downloadVideoFromServer(Video video) {
