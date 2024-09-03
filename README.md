@@ -31,7 +31,10 @@ To run the server, follow these steps:
 
 11. For the Android part you can open the project through IDE and run it on the emulator.
     If you want to run it on your personal device you will need to change line 16 and 17 on res/values/strings.xml
-    to <string name="BaseURL">http://<yourIP>:4000/api/</string> and 
-        <string name="Base_Url">http://<yourIP>:4000/</string>
-    Notice that you should connect to the same Wifi as your PC connected to.
+    to
+    ```
+    <string name="BaseURL">http://<yourIP>:4000/api/</string>
+    <string name="Base_Url">http://<yourIP>:4000/</string>
+    ```
+    Notice that you have to connect at your phone to the same Wifi as your PC connected to.
 
