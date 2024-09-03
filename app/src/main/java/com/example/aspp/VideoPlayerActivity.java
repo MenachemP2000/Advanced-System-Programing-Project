@@ -73,7 +73,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
     EditText editTitle;
     TextView title, views, time, more, publisher, subscribers, comments, comment;
     RecyclerView related_videos;
-    ImageView c_profile, profilePic, edit;
+    ImageView c_profile, profilePic, edit, delete;
     Button subscribe, like, share, watch_later, playlist;
     MediaController mediaController;
     VideoView videoView;
@@ -102,6 +102,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
         commentSection = new ArrayList<>();
         like = findViewById(R.id.like);
         edit = findViewById(R.id.edit);
+        delete = findViewById(R.id.delete);
         VideosViewModel viewModel = new ViewModelProvider(this).get(VideosViewModel.class);
         Log.i("VideoPlayerActivity", "hereeeeeeeeeeeeeee");
 
@@ -122,9 +123,27 @@ public class VideoPlayerActivity extends AppCompatActivity {
                         Log.i("VideoPlayerActivity", "hereeeeeeeeeeeeeee3");
                         if (Helper.isSignedIn() && currentVideo.getUsername().equals(Helper.getSignedInUser().getUsername())) {
                             edit.setVisibility(View.VISIBLE);
+                            delete.setVisibility(View.VISIBLE);
                         }
                     }
                 });
+
+        delete.setOnClickListener(v -> {
+            new android.app.AlertDialog.Builder(this)
+                    .setTitle("Delete Video")
+                    .setMessage("Are you sure you want to delete this video?")
+                    .setPositiveButton(android.R.string.yes, (dialog, which) -> {
+                        viewModel.delete(currentVideo);
+                        Toast.makeText(VideoPlayerActivity.this,
+                                "Video Deleted successfully", Toast.LENGTH_LONG).show();
+                        Intent intent1 = new Intent(this, MainActivity.class);
+                        intent1.putExtra("loggedInUser", Helper.getSignedInUser());
+                        startActivity(intent1);
+                    })
+                    .setNegativeButton(android.R.string.no, null)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+        });
 //        if (currentVideo.getComments().isEmpty())
 //            loadComments(currentVideo.getId());
 //        currentVideo = HomeFragment.videoArrayList.get(intent.getIntExtra("pos",0));
@@ -154,7 +173,12 @@ public class VideoPlayerActivity extends AppCompatActivity {
                 });
             }
 
+
         });
+
+
+
+
         videoView = findViewById(R.id.videoView);
         mediaController = new MediaController(this);
 //        if (intent.getIntExtra("video_thumbnail",0) != 0)

@@ -36,36 +36,6 @@ function communicateWithCppServer(message, callback) {
   });
 }
 
-const express = require('express');
-const net = require('net');
-const app = express();
-app.use(express.json());
-const CppServerHost = 'localhost'; // Host of the C++ server
-const CppServerPort = 9090;        // Port of the C++ server
-
-var relatedVideos = [];
-
-function communicateWithCppServer(message, callback) {
-  const client = new net.Socket();
-  let responseData = '';
-
-  client.connect(CppServerPort, CppServerHost, () => {
-    client.write(message);
-  });
-
-  client.on('data', (data) => {
-    responseData += data.toString();
-  });
-
-  client.on('end', () => {
-    callback(null, responseData);
-  });
-
-  client.on('error', (err) => {
-    callback(err, null);
-  });
-}
-
 // Create a new video
 exports.createVideo = async (req, res) => {
   // Log incoming request body
@@ -492,4 +462,3 @@ exports.deleteVideo = async (req, res) => {
     res.status(500).send(error);
   }
 };
-
