@@ -1,4 +1,4 @@
-# Advanced Web Development Project part 2
+# Advanced Web Development Project part 4
 
 # Running the Server
 
@@ -23,9 +23,9 @@ To run the server, follow these steps:
     ```
    npm install
     ```
-9. after that Run the following command to start the server:
+9. after that Run the following commands to start the servers:
     ```
-    ./cpp_server
+   ./cpp_server
    node server.js
     ```
 10. The server should now be running and accessible. Check the terminal output for the address and port it is listening on, it should be `http://localhost:4000`.
@@ -38,4 +38,3 @@ To run the server, follow these steps:
     <string name="Base_Url">http://<yourIP>:4000/</string>
     ```
     Notice that you have to connect at your phone to the same Wifi as your PC connected to.
-
