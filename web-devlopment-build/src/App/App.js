@@ -15,6 +15,7 @@ import CreateAccount from './SignIn/CreateAccount';
 import Search from './Search/Search';
 import UserProfile from './UserProfile/UserProfile';
 import EditAccount from './SignIn/EditAccount';
+import AddVideo from './AddVideo/AddVideo'; // Import the AddVideo component
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -47,7 +48,6 @@ function App() {
   const toggleDropDown = () => {
     setDropDownOpen(!dropDownOpen);
   };
-
 
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
@@ -90,7 +90,6 @@ function App() {
     setScreen(screen);
   }, []);
 
-
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -99,66 +98,70 @@ function App() {
         !(bigProfilePicRef.current && bigProfilePicRef.current.contains(event.target)) &&
         !(smallProfilePicRef.current && smallProfilePicRef.current.contains(event.target))
       ) {
-    setDropDownOpen(false);
-  }
-};
-if (dropDownOpen) {
-  document.addEventListener('mousedown', handleClickOutside);
-} else {
-  document.removeEventListener('mousedown', handleClickOutside);
-}
+        setDropDownOpen(false);
+      }
+    };
+    if (dropDownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
 
-return () => {
-  document.removeEventListener('mousedown', handleClickOutside);
-};
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, [dropDownOpen]);
 
-return (
-  <Router>
-    <div className={`App ${theme}`}>
-      {!(screen === "SignIn" || screen === "CreateAccount" || screen  === "EditAccount") && (
-        <>
-          <TopBar smallProfilePicRef={smallProfilePicRef} bigProfilePicRef={bigProfilePicRef} setDropDownOpen={setDropDownOpen} dropDownOpen={dropDownOpen} theme={theme} toggleMenu={toggleMenu} toggleDropDown={toggleDropDown} isSignedIn={isSignedIn} />
-          <Menu screen={screen} isOpen={menuOpen} />
-          {(isSignedIn && (
-            <DropDown dropdownRef={dropdownRef} setIsOpen={setDropDownOpen} isOpen={dropDownOpen} isSignedIn={isSignedIn} toggleTheme={toggleTheme} toggleSignendIn={toggleSignendIn} />
-          ))
-          }
-          {(menuOpen && screen !== "Home") && (<div className="Overlay" onClick={toggleMenu}></div>)}
-        </>
-      )}
+  return (
+    <Router>
+      <div className={`App ${theme}`}>
+        {!(screen === "SignIn" || screen === "CreateAccount" || screen === "EditAccount") && (
+          <>
+            <TopBar smallProfilePicRef={smallProfilePicRef} bigProfilePicRef={bigProfilePicRef} setDropDownOpen={setDropDownOpen} dropDownOpen={dropDownOpen} theme={theme} toggleMenu={toggleMenu} toggleDropDown={toggleDropDown} isSignedIn={isSignedIn} />
+            <Menu screen={screen} isOpen={menuOpen} />
+            {(isSignedIn && (
+              <DropDown dropdownRef={dropdownRef} setIsOpen={setDropDownOpen} isOpen={dropDownOpen} isSignedIn={isSignedIn} toggleTheme={toggleTheme} toggleSignendIn={toggleSignendIn} />
+            ))
+            }
+            {(menuOpen && screen !== "Home") && (<div className="Overlay" onClick={toggleMenu}></div>)}
+          </>
+        )}
 
-      <Routes>
-        <Route path="/search/:key" element={<Search toggleScreen={toggleScreen} />} />
-        <Route path="/user/:key" element={<UserProfile toggleScreen={toggleScreen} />} />
-        <Route path="/signin" element={<SignIn
-          toggleScreen={toggleScreen}
-          isSignedIn={isSignedIn}
-          toggleSignendIn={toggleSignendIn}
-        />} />
-        <Route path="/createaccount" element={<CreateAccount
-          isSignedIn={isSignedIn}
-          toggleScreen={toggleScreen}
-          toggleSignendIn={toggleSignendIn}
-        />} />
-        <Route path="/editaccount" element={<EditAccount
-          isSignedIn={isSignedIn}
-          toggleScreen={toggleScreen}
-          toggleSignendIn={toggleSignendIn}
-        />} />
-        <Route path="/" element={<Home
-          toggleScreen={toggleScreen}
-          isSignedIn={isSignedIn}
-          menuOpen={menuOpen}
-        />} />
-        <Route path="/video/:id" element={<PlayVideoScreen
-          toggleScreen={toggleScreen}
-          isSignedIn={isSignedIn}
-        />} />
-      </Routes>
-    </div>
-  </Router>
-);
+        <Routes>
+          <Route path="/search/:key" element={<Search toggleScreen={toggleScreen} />} />
+          <Route path="/user/:key" element={<UserProfile toggleScreen={toggleScreen} />} />
+          <Route path="/signin" element={<SignIn
+            toggleScreen={toggleScreen}
+            isSignedIn={isSignedIn}
+            toggleSignendIn={toggleSignendIn}
+          />} />
+          <Route path="/createaccount" element={<CreateAccount
+            isSignedIn={isSignedIn}
+            toggleScreen={toggleScreen}
+            toggleSignendIn={toggleSignendIn}
+          />} />
+          <Route path="/editaccount" element={<EditAccount
+            isSignedIn={isSignedIn}
+            toggleScreen={toggleScreen}
+            toggleSignendIn={toggleSignendIn}
+          />} />
+          <Route path="/" element={<Home
+            toggleScreen={toggleScreen}
+            isSignedIn={isSignedIn}
+            menuOpen={menuOpen}
+          />} />
+          <Route path="/video/:id" element={<PlayVideoScreen
+            toggleScreen={toggleScreen}
+            isSignedIn={isSignedIn}
+          />} />
+          <Route path="/AddVideo" element={<AddVideo
+            isSignedIn={isSignedIn}
+            toggleScreen={toggleScreen}
+          />} /> {/* AddVideo Route */}
+        </Routes>
+      </div>
+    </Router>
+  );
 }
-export default App;
 
+export default App;

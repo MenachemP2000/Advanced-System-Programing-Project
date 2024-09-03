@@ -17,6 +17,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Gravity;
@@ -59,6 +60,7 @@ import com.example.aspp.viewmodels.CommentsViewModel;
 import com.example.aspp.viewmodels.UsersViewModel;
 import com.example.aspp.viewmodels.VideosViewModel;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -101,19 +103,23 @@ public class VideoPlayerActivity extends AppCompatActivity {
         like = findViewById(R.id.like);
         edit = findViewById(R.id.edit);
         VideosViewModel viewModel = new ViewModelProvider(this).get(VideosViewModel.class);
+        Log.i("VideoPlayerActivity", "hereeeeeeeeeeeeeee");
 
         viewModel.getVideoById(intent.getStringExtra("id"))
                 .observe(this, video -> {
                     currentVideo = video;
                     if (currentVideo != null) {
+                        Log.i("VideoPlayerActivity", "hereeeeeeeeeeeeeee1");
                         loadVideo();
                         commentSection = video.getComments();
                         loadComments();
+                        Log.i("VideoPlayerActivity", "hereeeeeeeeeeeeeee2");
                         if (Helper.isSignedIn() &&
                                 currentVideo.getUsersLikes().contains(Helper.getSignedInUser().get_id())) {
                             alreadyLiked = true;
                             like.setBackgroundTintList(VideoPlayerActivity.this.getColorStateList(R.color.dark_blue));
                         }
+                        Log.i("VideoPlayerActivity", "hereeeeeeeeeeeeeee3");
                         if (Helper.isSignedIn() && currentVideo.getUsername().equals(Helper.getSignedInUser().getUsername())) {
                             edit.setVisibility(View.VISIBLE);
                         }
@@ -202,6 +208,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
         like.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.i("VideoPlayerActivity", "hereeeeeeeeeeeeeee4");
                 if (!Helper.isSignedIn()) {
                     Toast.makeText(VideoPlayerActivity.this,
                             "In order to like a video you first need to sign in", Toast.LENGTH_LONG).show();
@@ -304,26 +311,49 @@ public class VideoPlayerActivity extends AppCompatActivity {
     }
 
     private void loadVideo() {
+        String baseUrl = getResources().getString(R.string.Base_Url);
+        String videoFileName = currentVideo.getSource();
+        File file = new File(videoFileName);
+        String fileName = file.getName();
+        // Define the base URL and the local path
+        if (videoFileName == null || videoFileName.isEmpty()) {
+            Log.e("VideoPlayer", "No video source provided.");
+            return; // Exit if no source is available
+        }
+        File destinationFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName);
 
-        String vid = "http://10.0.2.2:4000";
-        vid += currentVideo.getSource();
-        if (currentVideo.getSource().equals(""))
-            return;
-        videoView.setVideoURI(Uri.parse(vid));
-        Log.i("Current Vid", currentVideo.toString());
-        Log.i("PATH", vid);
 
+        //File localVideoFile = new File(destinationFile);
+        Log.i("VideoPlayer", "Local video path: " + destinationFile);
+
+        // Check if the video exists locally
+        if (destinationFile.exists()) {
+            // Play the video from local storage
+            videoView.setVideoURI(Uri.parse(String.valueOf(destinationFile)));
+            Log.i("VideoPlayer", "Playing video from local storage: " + destinationFile);
+        } else {
+            // Play the video from the online source
+            String onlineVideoUrl = baseUrl + currentVideo.getSource();
+            videoView.setVideoURI(Uri.parse(onlineVideoUrl));
+            Log.i("VideoPlayer", "Playing video from online source: " + onlineVideoUrl);
+        }
+
+        MediaController mediaController = new MediaController(this);
+        mediaController.setAnchorView(videoView);
+        videoView.setMediaController(mediaController);
+
+        // Set video information
         time.setText(currentVideo.getUpload_date());
         title.setText(currentVideo.getTitle());
         views.setText(currentVideo.getViews() + " Views");
         publisher.setText(currentVideo.getUsername());
+
+        // Load the publisher's profile picture using Glide
         UsersViewModel vm = new UsersViewModel();
-        vm.getUserByUsername(currentVideo.getUsername()).observe(this, user ->
-        {
-            String profile_url_str = getResources().getString(R.string.Base_Url)
-                    + user.getImage();
+        vm.getUserByUsername(currentVideo.getUsername()).observe(this, user -> {
+            String profileUrl = baseUrl + user.getImage();
             Glide.with(this)
-                    .load(profile_url_str)
+                    .load(profileUrl)
                     .into(profilePic);
         });
     }
@@ -351,7 +381,9 @@ public class VideoPlayerActivity extends AppCompatActivity {
             viewModel.getVideoById(currentVideo.get_id())
                     .removeObservers(VideoPlayerActivity.this);
         }
+        Log.i("VideoPlayerActivity", "hereeeeeeeeeeeeeee5");
         if (Helper.isSignedIn()) {
+            Log.i("VideoPlayerActivity", "hereeeeeeeeeeeeeee6");
             String profile_url_str = getResources().getString(R.string.Base_Url)
                     + Helper.getSignedInUser().getImage();
             Glide.with(this)
@@ -364,7 +396,9 @@ public class VideoPlayerActivity extends AppCompatActivity {
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.i("VideoPlayerActivity", "hereeeeeeeeeeeeeee7");
                 if (!Helper.isSignedIn()) {
+                    Log.i("VideoPlayerActivity", "hereeeeeeeeeeeeeee8");
                     Toast.makeText(VideoPlayerActivity.this,
                             "In order to comment on a video you first need to sign in",
                             Toast.LENGTH_LONG).show();
@@ -428,7 +462,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
         ddescription.setText(currentVideo.getDescription());
         ImageView layout_cancel = dialog.findViewById(R.id.cancelButton);
         ImageView dedit = dialog.findViewById(R.id.edit);
-        if (currentVideo.getUsername().equals(Helper.getSignedInUser().getUsername())) {
+        if ((Helper.getSignedInUser() != null) && (currentVideo.getUsername().equals(Helper.getSignedInUser().getUsername()))) {
             dedit.setVisibility(View.VISIBLE);
             Log.i("Dialog", "Same user");
         }

@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Environment;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -35,6 +36,7 @@ import com.example.aspp.entities.Video;
 import com.example.aspp.viewmodels.UsersViewModel;
 import com.example.aspp.viewmodels.VideosViewModel;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class ShortsRVAdapter extends RecyclerView.Adapter<ShortsRVAdapter.MyViewHolder> {
@@ -191,12 +193,20 @@ public class ShortsRVAdapter extends RecyclerView.Adapter<ShortsRVAdapter.MyView
         });
     }
     private void loadVideo(MyViewHolder holder, Video currentVideo) {
-
-        String vid = "http://10.0.2.2:4000";
+        String vid = context.getResources().getString(R.string.Base_Url);
         vid += currentVideo.getSource();
+        String videoFileName = currentVideo.getSource();
+
+        File file = new File(videoFileName);
+        String fileName = file.getName();
         if (currentVideo.getSource().equals(""))
             return;
-        holder.videoView.setVideoURI(Uri.parse(vid));
+        File destinationFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName);
+        if (destinationFile.exists()) {
+            holder.videoView.setVideoURI(Uri.parse(String.valueOf(destinationFile)));
+        } else {
+            holder.videoView.setVideoURI(Uri.parse(vid));
+        }
         Log.i("Current Vid", currentVideo.toString());
         Log.i("PATH", vid);
 

@@ -37,7 +37,7 @@ public class ReplyRepository {
         repliesListData = new ReplyRepository.ReplyListData();
         replyData = new ReplyRepository.ReplyData();
 //        Converters c = new Converters();
-        AppDB db = Room.databaseBuilder(Helper.context, AppDB.class, "Replies")
+        AppDB db = Room.databaseBuilder(Helper.context, AppDB.class, "Replies").allowMainThreadQueries()
                 .build();
         dao = db.replyDao();
         api = new ReplyAPI();

@@ -253,10 +253,10 @@ public class SignUpActivity extends AppCompatActivity {
             try {
                 UsersViewModel vm = new ViewModelProvider(this).get(UsersViewModel.class);
                 vm.createUser(newUser).observe(this, user1 -> {
-                    if (user1 != null && !user1.getUsername().equals(""))
+                    if (user1 != null) {
                         navigateToSignInScreen();
-                    else if (user1 != null)
-                        Toast.makeText(this, "An error has accrued", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, "User created successfully", Toast.LENGTH_SHORT).show();
+                    }
                 });
             } catch (Exception e) {
 

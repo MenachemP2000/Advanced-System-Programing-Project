@@ -126,7 +126,8 @@ public class SignInActivity extends AppCompatActivity {
                     intent.putExtra("loggedInUser", myUser);
                     startActivity(intent);
                 } else {
-                    Toast.makeText(this, "Invalid username or password", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Invalid username or password, " +
+                            "Please ensure your connection", Toast.LENGTH_SHORT).show();
                 }
             });
         });
