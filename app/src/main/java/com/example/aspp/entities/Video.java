@@ -1,8 +1,5 @@
 package com.example.aspp.entities;
 
-import android.icu.util.Calendar;
-import android.net.Uri;
-
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.Ignore;
@@ -15,12 +12,13 @@ import java.util.List;
 
 @Entity
 public class Video {
-     @Ignore private String[] tags;
+      private String[] tags;
 @PrimaryKey @NonNull String _id;
-    private String title, description, source, thumbnail, upload_date, username;
+    private String title, description, source, video, duration, thumbnail, upload_date, username;
     private int likeCount, __v, views;
-    @Ignore private List<Comment> comments;
-    @Ignore private List<String> usersLikes;
+    private List<Comment> comments;
+    private List<String> usersLikes;
+    @Ignore private List<Video> relatedVideos;
 
     @Override
     public String toString() {
@@ -30,11 +28,12 @@ public class Video {
                 ", _id='" + _id + '\'' +
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
-                ", source='" + source + '\'' +
-                ", thumbnail='" + thumbnail + '\'' +
+                ", source='" +  '\'' +
+                ", thumbnail='" + "thumbnail" + '\'' +
                 ", upload_date='" + upload_date + '\'' +
                 ", username='" + username + '\'' +
                 ", likeCount=" + likeCount +
+                "duration"  +
                 ", __v=" + __v +
                 ", views=" + views +
                 ", comments=" + comments +
@@ -58,6 +57,8 @@ public class Video {
         this.__v = __v;
         this.views = views;
         this.comments = comments;
+        this.duration = "00:05";
+        this.video = this.source;
     }
 
     public List<Comment> getComments() {
@@ -116,6 +117,10 @@ public class Video {
         this.source = source;
     }
 
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
+
     public String getThumbnail() {
         return thumbnail;
     }
@@ -126,12 +131,34 @@ public class Video {
 
     public String getUpload_date() {
         try {
-            String date = upload_date.substring(0,upload_date.indexOf("T"));
-            String day = date.substring(date.lastIndexOf("-") + 1);
-            String month = date.substring(date.indexOf("-") + 1, date.lastIndexOf("-"));
-            String year = date.substring(0, date.indexOf("-"));
-            date = day + "." + month + "." + year;
-            return date;
+            // Check if upload_date is null or empty
+            if (upload_date == null || upload_date.isEmpty()) {
+                return "Date not available";
+            }
+
+            // Check if upload_date contains a 'T' (indicating ISO 8601 format)
+            if (upload_date.contains("T")) {
+                // Extract date part before 'T'
+                int tIndex = upload_date.indexOf("T");
+                String datePart = upload_date.substring(0, tIndex);
+
+                // Split the date into year, month, and day
+                String[] dateParts = datePart.split("-");
+                if (dateParts.length == 3) {
+                    String day = dateParts[2];
+                    String month = dateParts[1];
+                    String year = dateParts[0];
+
+                    // Format the date as DD.MM.YYYY
+                    String formattedDate = day + "." + month + "." + year;
+                    return formattedDate;
+                } else {
+                    return "Invalid date format";
+                }
+            } else {
+                // Assume the date is already in "DD.MM.YYYY" format
+                return upload_date;
+            }
         } catch (Exception e) {
             return "Cannot retrieve date right now";
         }
@@ -171,5 +198,25 @@ public class Video {
 
     public void setViews(int views) {
         this.views = views;
+    }
+
+    public String getVideo() {
+        return video;
+    }
+
+    public void setVideo(String video) {
+        this.video = video;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public List<Video> getRelatedVideos() {
+        return relatedVideos;
+    }
+
+    public void setRelatedVideos(List<Video> relatedVideos) {
+        this.relatedVideos = relatedVideos;
     }
 }

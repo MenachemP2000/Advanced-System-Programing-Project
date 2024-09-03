@@ -96,7 +96,7 @@ public class RepliesRVAdapter extends RecyclerView.Adapter<RepliesRVAdapter.MyVi
             if (replies.get(position).getUsersLikes().contains(Helper.getSignedInUser().get_id())) {
                 holder.like.setImageResource(R.drawable.baseline_thumb_up_24);
             }
-            if (user.get_id().equals(Helper.getSignedInUser().get_id())) {
+            if ((Helper.getSignedInUser() != null) && (user.get_id().equals(Helper.getSignedInUser().get_id()))) {
                 holder.edit.setVisibility(View.VISIBLE);
                 holder.edit.setOnClickListener(new View.OnClickListener() {
                     @Override

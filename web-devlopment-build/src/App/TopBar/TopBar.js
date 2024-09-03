@@ -45,6 +45,10 @@ const TopBar = ({ toggleMenu, toggleDropDown ,isSignedIn, theme,bigProfilePicRef
   const handleDropDown = () => {
     toggleDropDown();
   };
+
+  const handleAddVideoClick = () => {
+    navigate('/AddVideo');
+  };
   
 
   return (
@@ -77,8 +81,8 @@ const TopBar = ({ toggleMenu, toggleDropDown ,isSignedIn, theme,bigProfilePicRef
                 <div className={`bar ${appTheme}`}></div>
               </div>
               <h1 className="app-title clickable" onClick={handleClick}>
-                <img alt="icon" className="icon" src="/favicon.ico" width="30px" highet="30px"></img>
-                FooTube<span id="country-code">IL</span>
+                <img className="icon" src="/favicon.ico" width="30px" height="30px" alt="Icon"></img>
+                FooTube&trade;
               </h1>
             </div>
 
@@ -90,7 +94,10 @@ const TopBar = ({ toggleMenu, toggleDropDown ,isSignedIn, theme,bigProfilePicRef
                   </button>
                 </div>
                 <div className="drop-down">
-                  <img className="clickable profilePic"  ref={smallProfilePicRef}alt={isSignedIn.username} src={isSignedIn.image} onClick={handleDropDown} height="40px" width="40px" ></img>
+                  <button className="btn addVideoBtn" onClick={handleAddVideoClick}>
+                    <i className="bi bi-plus"></i>
+                  </button>
+                  <img className="clickable profilePic" src={isSignedIn.image} onClick={toggleDropDown} height="40px" width="40px" alt="Profile"></img>
                 </div>
               </div>
             )}
@@ -102,7 +109,7 @@ const TopBar = ({ toggleMenu, toggleDropDown ,isSignedIn, theme,bigProfilePicRef
                   </button>
                 </div>
                 <div className="drop-down">
-                  <Link to="/signin" className="btn SignInBtn" >
+                  <Link to="/signin" className="btn SignInBtn">
                     <i className="bi bi-person"></i>
                     <span className="icon-text">Sign In</span>
                   </Link>
@@ -121,9 +128,8 @@ const TopBar = ({ toggleMenu, toggleDropDown ,isSignedIn, theme,bigProfilePicRef
               <div className={`bar ${appTheme}`}></div>
             </div>
             <h1 className="app-title clickable" onClick={handleClick}>
-              <img alt="icon" className='icon' src="/favicon.ico" width="30px" highet="30px"></img>
-              FooTube<span id="country-code">IL</span>
-
+              <img className='icon' src="/favicon.ico" width="30px" height="30px" alt="Icon"></img>
+              FooTube&trade;
             </h1>
           </div>
           <div className="search">
@@ -143,15 +149,18 @@ const TopBar = ({ toggleMenu, toggleDropDown ,isSignedIn, theme,bigProfilePicRef
 
           {isSignedIn && (
             <div className="RightTop">
-              <div className="drop-down" >
-                <img className="clickable profilePic" alt={isSignedIn.username} src={isSignedIn.image}  ref={bigProfilePicRef} onClick={handleDropDown} height="40px" width="40px" ></img>
+              <div className="drop-down">
+                <button className="btn addVideoBtn" onClick={handleAddVideoClick}>
+                <i class="bi bi-camera-video"></i>
+                </button>
+                <img className="clickable profilePic" src={isSignedIn.image} onClick={toggleDropDown} height="40px" width="40px" alt="Profile"></img>
               </div>
             </div>
           )}
           {!isSignedIn && (
             <div className="RightTop">
               <div className="drop-down">
-                <Link to="/signin" className="btn SignInBtn" >
+                <Link to="/signin" className="btn SignInBtn">
                   <i className="bi bi-person"></i>
                   <span className="icon-text">Sign In</span>
                 </Link>
@@ -159,12 +168,7 @@ const TopBar = ({ toggleMenu, toggleDropDown ,isSignedIn, theme,bigProfilePicRef
             </div>
           )}
         </div>
-
-
-
-
       </div>
-
     </>
   );
 }

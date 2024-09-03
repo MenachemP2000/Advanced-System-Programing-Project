@@ -23,10 +23,11 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-
 public class VideoAPI {
-    Retrofit retrofit;
-    videoWebServiceAPI videoWebServiceAPI;
+    private static final String TAG = "VideoAPI";
+    private final Retrofit retrofit;
+    private final videoWebServiceAPI videoWebServiceAPI;
+
     public VideoAPI(Context context) {
         OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(new AuthInterceptor(context))
@@ -57,6 +58,7 @@ public class VideoAPI {
             }
         });
     }
+
     public void getAllVideos(MutableLiveData<List<Video>> videos) {
         Call<List<Video>> call = videoWebServiceAPI.getAllVideos();
 
@@ -69,13 +71,13 @@ public class VideoAPI {
 
             @Override
             public void onFailure(Call<List<Video>> call, Throwable t) {
-                Log.e("ERROR", t.getMessage());
+                Log.e(TAG, "Error fetching all videos: " + t.getMessage());
             }
         });
     }
+
     public void getAllVideos(MutableLiveData<List<Video>> videos, String username) {
         Call<List<Video>> call = videoWebServiceAPI.getAllVideos(username);
-
         call.enqueue(new Callback<List<Video>>() {
             @Override
             public void onResponse(Call<List<Video>> call, Response<List<Video>> response) {
@@ -91,7 +93,6 @@ public class VideoAPI {
     }
     public void getRelatedVideos(MutableLiveData<List<Video>> videos, String id) {
         Call<RelatedVideosHelper> call = videoWebServiceAPI.getRelatedVideos(id);
-
         call.enqueue(new Callback<RelatedVideosHelper>() {
             @Override
             public void onResponse(Call<RelatedVideosHelper> call, Response<RelatedVideosHelper> response) {
@@ -101,14 +102,13 @@ public class VideoAPI {
 
             @Override
             public void onFailure(Call<RelatedVideosHelper> call, Throwable t) {
-                Log.e("ERROR", t.getMessage());
+                Log.e(TAG, "Error fetching related videos: " + t.getMessage());
             }
         });
     }
 
     public void getVideoById(MutableLiveData<Video> video, String id) {
         Call<Video> call = videoWebServiceAPI.getVideoById(id);
-
         call.enqueue(new Callback<Video>() {
             @Override
             public void onResponse(Call<Video> call, Response<Video> response) {
@@ -136,7 +136,7 @@ public class VideoAPI {
 
             @Override
             public void onFailure(Call<Video> call, Throwable t) {
-                Log.e("ERROR", t.getMessage());
+                Log.e("VideoAPI!!!!!", "Error creating video: " + t.getMessage());
             }
         });
     }
@@ -208,5 +208,4 @@ public class VideoAPI {
             }
         });
     }
-
 }

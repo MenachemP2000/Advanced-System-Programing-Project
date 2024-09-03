@@ -76,14 +76,25 @@ public class HomeRVAdapter extends RecyclerView.Adapter<HomeRVAdapter.MyViewHold
                 .load(photo_url_str)
                 .into(holder.thumbnail);
 
+
+
         UsersViewModel vm = new UsersViewModel();
         vm.getUserByUsername(videos.get(position).getUsername()).observe((LifecycleOwner) context, user ->
         {
-            String profile_url_str = context.getResources().getString(R.string.Base_Url)
-                + user.getImage();
-            Glide.with(context)
+            if(user != null) {
+                String profile_url_str = context.getResources().getString(R.string.Base_Url)
+                        + user.getImage();
+                Glide.with(context)
+                        .load(profile_url_str)
+                        .into(holder.profilePic);
+            }
+            else {
+                String profile_url_str = context.getResources().getString(R.string.Base_Url);
+                Glide.with(context)
                     .load(profile_url_str)
-                    .into(holder.profilePic);
+                    .placeholder(R.drawable.outline_face_retouching_natural_24) // Show a placeholder while loading
+                    .error(R.drawable.outline_face_retouching_natural_24) // Show a default image if loading fails or URL is null
+                    .into(holder.profilePic);}
         });
 
         holder.v.setOnClickListener(new View.OnClickListener() {
