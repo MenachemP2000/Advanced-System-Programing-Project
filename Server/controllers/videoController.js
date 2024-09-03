@@ -1,67 +1,60 @@
-const path = require("path"); 
+const path = require("path");
 const Video = require("../models/Video");
 const jwt = require("jsonwebtoken");
 const key = "Some super secret key";
 const mongoose = require("mongoose");
 const fs = require("fs");
 
-const express = require('express');
-const net = require('net');
+const express = require("express");
+const net = require("net");
 
 const app = express();
 app.use(express.json());
-const CppServerHost = 'localhost'; // Host of the C++ server
-const CppServerPort = 9090;        // Port of the C++ server
+const CppServerHost = "localhost"; // Host of the C++ server
+const CppServerPort = 9090; // Port of the C++ server
 
 var relatedVideos = [];
 
 function communicateWithCppServer(message, callback) {
   const client = new net.Socket();
-  let responseData = '';
+  let responseData = "";
 
   client.connect(CppServerPort, CppServerHost, () => {
     client.write(message);
   });
 
-  client.on('data', (data) => {
+  client.on("data", (data) => {
     responseData += data.toString();
   });
 
-  client.on('end', () => {
+  client.on("end", () => {
     callback(null, responseData);
   });
 
-  client.on('error', (err) => {
+  client.on("error", (err) => {
     callback(err, null);
   });
 }
 
-const express = require('express');
-const net = require('net');
-const app = express();
-app.use(express.json());
-const CppServerHost = 'localhost'; // Host of the C++ server
-const CppServerPort = 9090;        // Port of the C++ server
-
 var relatedVideos = [];
 
 function communicateWithCppServer(message, callback) {
   const client = new net.Socket();
-  let responseData = '';
+  let responseData = "";
 
   client.connect(CppServerPort, CppServerHost, () => {
     client.write(message);
   });
 
-  client.on('data', (data) => {
+  client.on("data", (data) => {
     responseData += data.toString();
   });
 
-  client.on('end', () => {
+  client.on("end", () => {
     callback(null, responseData);
   });
 
-  client.on('error', (err) => {
+  client.on("error", (err) => {
     callback(err, null);
   });
 }
@@ -71,13 +64,29 @@ exports.createVideo = async (req, res) => {
   // Log incoming request body
   console.log("Received request body:", req.body);
 
-  const { title, description, tags, video, thumbnail, upload_date, duration, username } = req.body;
+  const {
+    title,
+    description,
+    tags,
+    video,
+    thumbnail,
+    upload_date,
+    duration,
+    username,
+  } = req.body;
 
   try {
     // Basic validation
-    if (!title || !description || !video || !thumbnail || !upload_date || !duration || !username) {
+    if (
+      !title ||
+      !description ||
+      !video ||
+      !thumbnail ||
+      !upload_date ||
+      !duration ||
+      !username
+    ) {
       console.log("Validation failed: Missing fields");
-
 
       if (!title) {
         console.log("Missing or empty field: title");
@@ -100,7 +109,7 @@ exports.createVideo = async (req, res) => {
       if (!username) {
         console.log("Missing or empty field: username");
       }
-  
+
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -140,7 +149,7 @@ exports.createVideo = async (req, res) => {
       "build",
       "pictures",
       "thumbnails",
-      thumbnailName  // Ensure this path matches your static file serving path
+      thumbnailName // Ensure this path matches your static file serving path
     );
 
     // Log before writing the thumbnail file
@@ -155,8 +164,8 @@ exports.createVideo = async (req, res) => {
     const newVideo = new Video({
       title,
       description,
-      source: `/Videos/${videoName}`,   // Store relative path to the video
-      thumbnail: `/pictures/thumbnails/${thumbnailName}`,  // Update to match the working path
+      source: `/Videos/${videoName}`, // Store relative path to the video
+      thumbnail: `/pictures/thumbnails/${thumbnailName}`, // Update to match the working path
       tags,
       upload_date,
       duration,
@@ -164,7 +173,7 @@ exports.createVideo = async (req, res) => {
       likeCount: 0, // Initialize like count to 0
       views: 0, // Initialize view count to 0
       usersLikes: [],
-      comments: []
+      comments: [],
     });
 
     // Log the new video object before saving to the database
@@ -172,7 +181,9 @@ exports.createVideo = async (req, res) => {
 
     await newVideo.save();
 
-    console.log("New video has been created and saved to database: " + newVideo.title);
+    console.log(
+      "New video has been created and saved to database: " + newVideo.title
+    );
     res.status(201).send(newVideo);
   } catch (error) {
     console.error("Error creating video:", error);
@@ -264,8 +275,8 @@ exports.getRelatedVideos = async (req, res) => {
                 $cond: {
                   if: { $in: ["$_id", relatedVideos] },
                   then: 100000,
-                  else: 1
-                }
+                  else: 1,
+                },
               }, // Score for related videos
               {
                 $cond: {
@@ -413,10 +424,10 @@ exports.partialUpdateVideo = async (req, res) => {
           // Communicate with C++ server
           communicateWithCppServer(message, (err, response) => {
             if (err) {
-              console.error('Error communicating with C++ server:', err);
-              return res.status(500).send('Internal Server Error');
+              console.error("Error communicating with C++ server:", err);
+              return res.status(500).send("Internal Server Error");
             }
-            console.log('C++ server response1:', response);
+            console.log("C++ server response1:", response);
             relatedVideos = JSON.parse(response).recommendations;
           });
         }
@@ -454,10 +465,10 @@ exports.partialUpdateVideo = async (req, res) => {
               // Communicate with C++ server
               communicateWithCppServer(message, (err, response) => {
                 if (err) {
-                  console.error('Error communicating with C++ server:', err);
-                  return res.status(500).send('Internal Server Error');
+                  console.error("Error communicating with C++ server:", err);
+                  return res.status(500).send("Internal Server Error");
                 }
-                console.log('C++ server response2:', response);
+                console.log("C++ server response2:", response);
                 relatedVideos = JSON.parse(response).recommendations;
               });
             }
@@ -492,4 +503,3 @@ exports.deleteVideo = async (req, res) => {
     res.status(500).send(error);
   }
 };
-
