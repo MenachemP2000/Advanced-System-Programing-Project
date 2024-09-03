@@ -32,9 +32,9 @@
 
 #### In order to delete one of your videos you will need to enter the video that you want to delete ,you can search it or go to your profile page and play it from there (in order to enter your profile page you will need to press on your profile pic and in the menu that pops up you need to click on your name)
 
-![alt text](proofs/Screenshot_97.png)
-
 #### Then just press on delete an the video will be deleted
+
+![alt text](proofs/Screenshot_97.png)
 
 ![alt text](proofs/Screenshot_98.png)
 
@@ -67,13 +67,13 @@
 
 #### In order to edit one of your videos you will need to enter the video that you want to edit ,you can search it or go to your profile page and play it from there (in order to enter your profile page you will need to press on your profile pic and in the menu that pops up you need to click on your name)
 
-![alt text](proofs/Screenshot_102.png)
-
 #### Then press on edit and edit your title (you also can edit the description, there is a button for that under the description box)
 
-![alt text](proofs/Screenshot_103.png)
+![alt text](proofs/Screenshot_102.png)
 
 #### Now hit save and you have it!
+
+![alt text](proofs/Screenshot_103.png)
 
 ![alt text](proofs/Screenshot_104.png)
 

@@ -31,29 +31,30 @@
 
 #### In order to add new video you will need to press on the + icon in the navigation bar
 
-![alt text](proofs/Screenshot_116.png)
-
 #### Now you should select video to upload
 
-![alt text](proofs/Screenshot_117.png)
+![alt text](proofs/Screenshot_116.png)
 
 #### Then you will need to fill al the fields
 
-![alt text](proofs/Screenshot_118.png)
+![alt text](proofs/Screenshot_117.png)
 
 #### And there you have it! (this is from your profile page in order to get there you will need to press on the face icon in the navigation bar, the video maybe not apper right away because the upload is happening in the background)
+
+![alt text](proofs/Screenshot_118.png)
 
 ### Editing a video:
 
 #### In order to edit one of your videos you will need to enter the video that you want to edit ,you can search it or go to your profile page and play it from there (in order to enter your profile page you will need to press on the face icon in the navigation bar)
 
-![alt text](proofs/Screenshot_119.png)
-
 #### Then you should click on the drawing icon
 
-![alt text](proofs/Screenshot_120.png)
+![alt text](proofs/Screenshot_119.png)
 
 #### Change the title as you like and press on the save icon (you also can edit the description, you need to press on "more" and a drawing icon will appear there)
 
+![alt text](proofs/Screenshot_120.png)
+
+#### There you have it!
+
 ![alt text](proofs/Screenshot_121.png)
-There you have it!
