@@ -1,4 +1,4 @@
-# Advanced Web Development Project part 3
+# Advanced Web Development Project part 4
 
 # Running the Server
 
@@ -45,8 +45,4 @@ To run the server, follow these steps:
     ```
     Notice that you have to connect at your phone to the same Wifi as your PC connected to.
 
-    <string name="BaseURL">http://<yourIP>:4000/api/</string>
-    <string name="Base_Url">http://<yourIP>:4000/</string>
-    ```
-    Notice that you have to connect at your phone to the same Wifi as your PC connected to.
 
