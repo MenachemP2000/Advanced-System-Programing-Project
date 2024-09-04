@@ -31,7 +31,6 @@ To run the server, follow these steps:
     ```
 9. after that Run the following commands to start the servers:
     ```
-   ./cpp_server
    node server.js
     ```
 10. The server should now be running and accessible. Check the terminal output for the address and port it is listening on, it should be `http://localhost:4000`.
