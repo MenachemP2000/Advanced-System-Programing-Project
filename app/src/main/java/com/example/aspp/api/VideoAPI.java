@@ -199,7 +199,6 @@ public class VideoAPI {
         call.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
-                Log.i("RESPONSE", response.body().toString());
             }
 
             @Override
