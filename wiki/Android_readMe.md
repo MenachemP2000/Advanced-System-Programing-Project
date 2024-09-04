@@ -24,8 +24,19 @@
 
 ### Deleting a video:
 
-![alt text](proofs/Screenshot_97.png)
-![alt text](proofs/Screenshot_98.png)
+#### In order to delete one of your videos you will need to enter the video that you want to delete ,you can search it or go to your profile page and play it from there (in order to enter your profile page you will need to press on the face icon in the navigation bar)
+
+#### Then you should click on the bin icon
+
+![alt text](proofs/Screenshot_122.png)
+
+#### Now you need to confirm the deletion (this is a different video because I forgot to screenshot the dialog)
+
+![alt text](proofs/Screenshot_126.png)
+
+#### And there you have it! (this is from your profile page in order to get there you will need to press on the face icon in the navigation bar)
+
+![alt text](proofs/Screenshot_125.png)
 
 ### Adding new video:
 
@@ -49,12 +60,12 @@
 
 #### Then you should click on the drawing icon
 
-![alt text](proofs/Screenshot_119.png)
+![alt text](proofs/Screenshot_127.png)
 
 #### Change the title as you like and press on the save icon (you also can edit the description, you need to press on "more" and a drawing icon will appear there)
 
-![alt text](proofs/Screenshot_120.png)
+![alt text](proofs/Screenshot_128.png)
 
 #### There you have it!
 
-![alt text](proofs/Screenshot_121.png)
+![alt text](proofs/Screenshot_129.png)
