@@ -36,7 +36,6 @@ function communicateWithCppServer(message, callback) {
   });
 }
 
-
 // Create a new video
 exports.createVideo = async (req, res) => {
   // Log incoming request body
@@ -480,4 +479,4 @@ exports.deleteVideo = async (req, res) => {
   } catch (error) {
     res.status(500).send(error);
   }
-
+};
