@@ -1,4 +1,4 @@
-# Advanced Web Development Project part 2
+# Advanced Web Development Project part 4
 
 # Running the Server
 
@@ -6,6 +6,12 @@ To run the server, follow these steps:
 
 1. Open your terminal or command prompt.
 2. navigate to the dirctory where the web development build is located (web-development-build).
+3. Open the .env file and add the following line with your local IP:
+   ```
+   REACT_APP_API_BASE_URL = 'http://<your_local_IP>:4000
+    ```
+
+   
 3. run the following command to install the required packages:
     ```
    npm install
@@ -23,7 +29,7 @@ To run the server, follow these steps:
     ```
    npm install
     ```
-9. after that Run the following command to start the server:
+9. after that Run the following commands to start the servers:
     ```
    node server.js
     ```
@@ -37,4 +43,5 @@ To run the server, follow these steps:
     <string name="Base_Url">http://<yourIP>:4000/</string>
     ```
     Notice that you have to connect at your phone to the same Wifi as your PC connected to.
+
 
