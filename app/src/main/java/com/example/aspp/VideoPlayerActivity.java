@@ -5,6 +5,7 @@ import static com.example.aspp.Utils.generateId;
 import static com.example.aspp.fragments.HomeFragment.adp;
 //import static com.example.aspp.fragments.HomeFragment.videoArrayList;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -129,13 +130,14 @@ public class VideoPlayerActivity extends AppCompatActivity {
                 });
 
         delete.setOnClickListener(v -> {
-            new android.app.AlertDialog.Builder(this)
+            AlertDialog a = new android.app.AlertDialog.Builder(this)
                     .setTitle("Delete Video")
                     .setMessage("Are you sure you want to delete this video?")
                     .setPositiveButton(android.R.string.yes, (dialog, which) -> {
                         viewModel.delete(currentVideo);
                         Toast.makeText(VideoPlayerActivity.this,
                                 "Video Deleted successfully", Toast.LENGTH_LONG).show();
+
                         Intent intent1 = new Intent(this, MainActivity.class);
                         intent1.putExtra("loggedInUser", Helper.getSignedInUser());
                         startActivity(intent1);
@@ -143,6 +145,12 @@ public class VideoPlayerActivity extends AppCompatActivity {
                     .setNegativeButton(android.R.string.no, null)
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .show();
+            Button positive = a.getButton(DialogInterface.BUTTON_POSITIVE);
+            positive.setTextColor(this.getColor(R.color.black));
+
+            Button negative = a.getButton(DialogInterface.BUTTON_NEGATIVE);
+            negative.setTextColor(this.getColor(R.color.black));
+
         });
 //        if (currentVideo.getComments().isEmpty())
 //            loadComments(currentVideo.getId());
