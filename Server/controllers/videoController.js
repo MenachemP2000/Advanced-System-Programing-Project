@@ -36,28 +36,6 @@ function communicateWithCppServer(message, callback) {
   });
 }
 
-var relatedVideos = [];
-
-function communicateWithCppServer(message, callback) {
-  const client = new net.Socket();
-  let responseData = "";
-
-  client.connect(CppServerPort, CppServerHost, () => {
-    client.write(message);
-  });
-
-  client.on("data", (data) => {
-    responseData += data.toString();
-  });
-
-  client.on("end", () => {
-    callback(null, responseData);
-  });
-
-  client.on("error", (err) => {
-    callback(err, null);
-  });
-}
 
 // Create a new video
 exports.createVideo = async (req, res) => {
@@ -502,4 +480,4 @@ exports.deleteVideo = async (req, res) => {
   } catch (error) {
     res.status(500).send(error);
   }
-};
+
